@@ -199,8 +199,10 @@ function initLightbox() {
   // backdrop-click handler below — all funnel through overlay.close(),
   // and Escape triggers this same event natively. One place for
   // cleanup instead of repeating it at each call site.
+  const BLANK_SRC = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBTAA7"; // inert 1x1 transparent gif — keeps overlayImg.src always non-empty/valid between opens
+
   overlay.addEventListener("close", () => {
-    overlayImg.src = "";
+    overlayImg.src = BLANK_SRC;
     if (overlayCaption) overlayCaption.textContent = "";
     currentIndex = -1;
     if (lastFocusedEl) {
