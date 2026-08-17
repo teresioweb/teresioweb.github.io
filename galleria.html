@@ -42,7 +42,7 @@
     <a href="logos.html">Logos 27</a>
     <a href="discorso.html">Un discorso di Capellaro</a>
     <a href="curriculum.html">Curriculum</a>
-    <a href="galleria.html" class="active">Foto</a>
+    <a href="galleria.html" class="active" aria-current="page">Foto</a>
     <a href="/en/galleria.html" class="lang-link" hreflang="en"><img src="/sfondi/flag-gb.svg" alt="" class="lang-flag-icon"><span>EN</span></a>
   </nav>
     <button type="button" class="menu-toggle" aria-controls="nav-links" aria-label="Apri il menu" aria-expanded="false" data-label-open="Apri il menu" data-label-close="Chiudi il menu">
@@ -51,44 +51,44 @@
   </div>
 </header>
 
-<main id="main">
+<main id="main" tabindex="-1">
   <h1>Foto</h1>
   <p class="page-subtitle">Foto storiche dall&rsquo;archivio di famiglia.</p>
 
   <div class="gallery-grid">
     <figure class="reveal-img from-right">
       <button type="button" class="lightbox-trigger" data-caption="Teresio con i colleghi">
-        <img src="images/galleria/foto-01.webp" width="1553" height="1003" alt="Teresio con i colleghi">
+        <img src="images/galleria/foto-01.webp" width="1553" height="1003" alt="Teresio e colleghi seduti all'aperto a un tavolino">
       </button>
       <figcaption class="gallery-caption">Teresio con i colleghi</figcaption>
     </figure>
     <figure class="reveal-img from-right crop-top">
       <button type="button" class="lightbox-trigger" data-caption="Relax in montagna">
-        <img src="images/galleria/foto-02.webp" width="464" height="542" alt="Relax in montagna">
+        <img src="images/galleria/foto-02.webp" width="464" height="542" alt="Teresio in montagna con maglione decorato, occhiali da sole e racchette da sci">
       </button>
       <figcaption class="gallery-caption">Relax in montagna</figcaption>
     </figure>
     <figure class="reveal-img from-right">
       <button type="button" class="lightbox-trigger" data-caption="Passione infinita per la montagna">
-        <img src="images/galleria/foto-03.webp" width="1261" height="1038" alt="Passione infinita per la montagna">
+        <img src="images/galleria/foto-03.webp" width="1261" height="1038" alt="Teresio seduto in montagna con occhiali da sole scruta l'orizzonte">
       </button>
       <figcaption class="gallery-caption">Passione infinita per la montagna</figcaption>
     </figure>
     <figure class="reveal-img">
       <button type="button" class="lightbox-trigger" data-caption="Brevetto di volo">
-        <img src="images/galleria/foto-04.webp" width="1478" height="1145" alt="Brevetto di volo">
+        <img src="images/galleria/foto-04.webp" width="1478" height="1145" alt="Teresio di fronte ad aeroplano a elica con altre persone">
       </button>
       <figcaption class="gallery-caption">Brevetto di volo</figcaption>
     </figure>
     <figure class="reveal-img">
       <button type="button" class="lightbox-trigger" data-caption="La nomina a Cavaliere con il presidente Gronchi">
-        <img src="images/galleria/foto-05.webp" width="1200" height="1600" alt="La nomina a Cavaliere con il presidente Gronchi">
+        <img src="images/galleria/foto-05.webp" width="1200" height="1600" alt="Il Presidente Gronchi, di spalle, consegna l'onorificenza di Cavaliere a Teresio">
       </button>
       <figcaption class="gallery-caption">La nomina a Cavaliere con il presidente Gronchi</figcaption>
     </figure>
     <figure class="reveal-img">
       <button type="button" class="lightbox-trigger" data-caption="Relax a Monte Navale con Capellaro">
-        <img src="images/galleria/foto-06.webp" width="1600" height="1096" alt="Relax a Monte Navale con Capellaro">
+        <img src="images/galleria/foto-06.webp" width="1600" height="1096" alt="Teresio e Natale Capellaro in giardino nella casa di Monte Navale">
       </button>
       <figcaption class="gallery-caption">Relax a Monte Navale con Capellaro</figcaption>
     </figure>
@@ -102,7 +102,8 @@
   <button type="button" class="lightbox-next" aria-label="Foto successiva">&#8250;</button>
   <div class="lightbox-content">
     <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBTAA7" alt="">
-    <p class="lightbox-caption"></p>
+    <p class="lightbox-counter" aria-live="polite"></p>
+    <p class="lightbox-caption" aria-live="polite"></p>
   </div>
 </dialog>
 

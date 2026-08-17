@@ -146,6 +146,7 @@ function initLightbox() {
 
   const overlayImg = overlay.querySelector("img");
   const overlayCaption = overlay.querySelector(".lightbox-caption");
+  const overlayCounter = overlay.querySelector(".lightbox-counter");
   const closeBtn = overlay.querySelector(".lightbox-close");
   const prevBtn = overlay.querySelector(".lightbox-prev");
   const nextBtn = overlay.querySelector(".lightbox-next");
@@ -166,6 +167,16 @@ function initLightbox() {
     const caption = el.dataset.caption || alt || "";
     overlayImg.src = src;
     overlayImg.alt = alt;
+    if (overlayCounter) {
+      // "3 / 6" — only when there's more than one photo to step through
+      // (mirrors prevBtn/nextBtn's own currentHasMultiple gate above);
+      // :empty in CSS hides it the rest of the time, same pattern as
+      // .lightbox-caption. aria-live="polite" on the element (set in
+      // markup) means this update is announced on prev/next — but only
+      // once the dialog is actually open and visible; setting it here,
+      // before showModal() runs on the very first open, is silent.
+      overlayCounter.textContent = currentHasMultiple ? `${currentIndex + 1} / ${items.length}` : "";
+    }
     if (overlayCaption) {
       // innerHTML only for the two captions that actually carry a real
       // link (data-caption-html="true" on the Home page's standalone
@@ -203,6 +214,7 @@ function initLightbox() {
 
   overlay.addEventListener("close", () => {
     overlayImg.src = BLANK_SRC;
+    if (overlayCounter) overlayCounter.textContent = "";
     if (overlayCaption) overlayCaption.textContent = "";
     currentIndex = -1;
     if (lastFocusedEl) {

@@ -59,7 +59,7 @@
   <div class="nav-inner">
     <a href="/en/index.html" class="brand"><span class="brand-text">Teresio Gassino</span> <img src="/sfondi/firma.svg" alt="" class="brand-signature"></a>
     <nav class="nav-links" id="nav-links">
-    <a href="/en/home.html" class="active">A recollection</a>
+    <a href="/en/home.html" class="active" aria-current="page">A recollection</a>
     <a href="/en/logos.html">Logos 27</a>
     <a href="/en/discorso.html">A speech by Capellaro</a>
     <a href="/en/curriculum.html">Curriculum</a>
@@ -72,7 +72,7 @@
   </div>
 </header>
 
-<main id="main">
+<main id="main" tabindex="-1">
   <div class="essay-masthead essay-anim">
     <h1>In memory of Grandfather Teresio</h1>
     <p class="essay-subtitle">A recollection by Valerio</p>
@@ -127,7 +127,8 @@
   <button type="button" class="lightbox-next" aria-label="Next photo">&#8250;</button>
   <div class="lightbox-content">
     <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBTAA7" alt="">
-    <p class="lightbox-caption"></p>
+    <p class="lightbox-counter" aria-live="polite"></p>
+    <p class="lightbox-caption" aria-live="polite"></p>
   </div>
 </dialog>
 

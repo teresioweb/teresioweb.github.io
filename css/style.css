@@ -1321,6 +1321,32 @@ footer .cc-logo {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
 }
 
+/* position counter ("3 / 6"), shown above the caption only when the
+   lightbox has more than one photo to step through (see showIndex()
+   in animations.js — same currentHasMultiple gate that shows/hides
+   prev/next). Quieter than .lightbox-caption since it's secondary
+   wayfinding, not editorial content; empty and collapsed the rest of
+   the time via the same :empty pattern .lightbox-caption already uses. */
+.lightbox-counter {
+  margin: 14px 0 0;
+  color: #999;
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.3px;
+  text-align: center;
+}
+
+.lightbox-counter:empty {
+  display: none;
+}
+
+/* when the counter is actually showing, it takes over the top margin
+   and the caption right below it sits closer, tucked under it as one
+   group rather than two evenly-spaced lines */
+.lightbox-counter:not(:empty) + .lightbox-caption {
+  margin-top: 4px;
+}
+
 .lightbox-caption {
   margin: 14px 0 0;
   color: #fff;
