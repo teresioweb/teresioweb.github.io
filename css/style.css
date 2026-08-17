@@ -2,12 +2,15 @@
    see fonts/OFL-merriweather.txt and fonts/OFL-merriweather-sans.txt,
    two separate families/copyright holders despite the shared name)
    instead of loaded from Google Fonts, so no request/IP is ever sent
-   to a third-party server. Only weights 300/400/700/900 are loaded
-   (see the @font-face blocks below) — every font-weight declaration
-   in this file uses one of those four values, never 600, since a
-   requested weight with no matching face resolves to the nearest one
-   available (700 here) anyway; writing 600 would just be misleading
-   about what actually renders. */
+   to a third-party server. Weights loaded: Merriweather 300/400/700/900
+   (+ 400 italic); Merriweather Sans 300/400/700/800 (+ 400 italic) — the
+   800 face was added for the five sans page titles below, which
+   previously declared font-weight:900 with no matching sans face at
+   all, silently resolving to 700 (see the h1 rule further down).
+   Every font-weight declaration in this file now matches an actual
+   loaded face for whichever family is active at that point, never a
+   value like 600 that would just resolve to the nearest one available
+   instead of rendering as requested. */
 @font-face {
   font-family: 'Merriweather';
   font-style: normal;
@@ -70,6 +73,13 @@
   font-weight: 700;
   font-display: swap;
   src: url('../fonts/merriweather-sans-700-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Merriweather Sans';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('../fonts/merriweather-sans-800-normal.woff2') format('woff2');
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -408,14 +418,19 @@ main > *:last-child {
 
 /* five section-index pages (landing, Logos 27, Discorso, Curriculum,
    Foto) get a sans title instead of the default serif — home.html's
-   essay masthead and quercia.html keep the serif h1 untouched. */
+   essay masthead and quercia.html keep the serif h1 untouched.
+   font-weight:800, not 900: Merriweather Sans has no 900 cut at all
+   (the family tops out at 800 — see the new @font-face above), so a
+   900 request here was silently resolving to 700 the whole time,
+   same as the plain h1 rule everywhere else on the site. 800 is
+   the heaviest weight that's actually real for this family. */
 body.page-index h1,
 body.page-logos h1,
 body.page-discorso h1,
 body.page-curriculum h1,
 body.page-galleria h1 {
   font-family: 'Merriweather Sans', Arial, sans-serif;
-  font-weight: 900;
+  font-weight: 800;
   letter-spacing: 0.3px;
 }
 
