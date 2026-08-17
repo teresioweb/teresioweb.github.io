@@ -423,7 +423,14 @@ main > *:last-child {
    (the family tops out at 800 — see the new @font-face above), so a
    900 request here was silently resolving to 700 the whole time,
    same as the plain h1 rule everywhere else on the site. 800 is
-   the heaviest weight that's actually real for this family. */
+   the heaviest weight that's actually real for this family.
+   No letter-spacing here (unlike .brand/.nav-links a below): the old
+   700-fallback made this rule render as literally the same face the
+   navbar uses, so the same +0.3px tracking read as consistent by
+   coincidence. Now that this loads its own real 800 cut — a
+   different, more tightly-drawn face — that coincidence is gone, and
+   adding navbar tracking on top of it has no remaining reason. Left
+   at the font's own natural spacing. */
 body.page-index h1,
 body.page-logos h1,
 body.page-discorso h1,
@@ -431,7 +438,6 @@ body.page-curriculum h1,
 body.page-galleria h1 {
   font-family: 'Merriweather Sans', Arial, sans-serif;
   font-weight: 800;
-  letter-spacing: 0.3px;
 }
 
 /* quercia.html: same serif h1 as everywhere else, just at the heavier
