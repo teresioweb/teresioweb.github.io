@@ -1,0 +1,1990 @@
+/* Merriweather & Merriweather Sans, self-hosted (SIL Open Font License —
+   see fonts/OFL-merriweather.txt and fonts/OFL-merriweather-sans.txt,
+   two separate families/copyright holders despite the shared name)
+   instead of loaded from Google Fonts, so no request/IP is ever sent
+   to a third-party server. Only weights 300/400/700/900 are loaded
+   (see the @font-face blocks below) — every font-weight declaration
+   in this file uses one of those four values, never 600, since a
+   requested weight with no matching face resolves to the nearest one
+   available (700 here) anyway; writing 600 would just be misleading
+   about what actually renders. */
+@font-face {
+  font-family: 'Merriweather';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('../fonts/merriweather-300-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Merriweather';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/merriweather-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Merriweather';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/merriweather-400-italic.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Merriweather';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/merriweather-700-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Merriweather';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url('../fonts/merriweather-900-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Merriweather Sans';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('../fonts/merriweather-sans-300-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Merriweather Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/merriweather-sans-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Merriweather Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/merriweather-sans-400-italic.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Merriweather Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/merriweather-sans-700-normal.woff2') format('woff2');
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* smooth in-page jumps (footnote <-> ornament round-trip on home.html);
+   the prefers-reduced-motion block below already forces this back to
+   auto with !important, so it stays a no-op for anyone who has that
+   setting on */
+html {
+  scroll-behavior: smooth;
+}
+
+/* keyboard-focus outline, kept off for mouse/touch via :focus-visible —
+   currentColor so it reads correctly both on the light nav bar (#111)
+   and on the dark page body (#eee) without a separate color per context */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* skip link: the first focusable thing on every page, so a keyboard
+   user doesn't have to tab through the whole nav bar on every single
+   page load just to reach the content. Off-screen until focused
+   (not display:none/visibility:hidden, which would also remove it
+   from the tab order) — then it drops into view above the nav so it
+   reads before the brand/links, not on top of them. */
+.skip-link {
+  position: fixed;
+  top: -60px;
+  left: 12px;
+  z-index: 200;
+  padding: 10px 16px;
+  background: #101010;
+  color: #eee;
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  font-size: 14px;
+  text-decoration: none;
+  border-radius: 0 0 6px 6px;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* respect the OS-level "reduce motion" setting: collapses every
+   transition/animation on the site (scroll-reveal slides/fades, nav
+   hide-on-scroll, burger morph, lightbox, etc.) down to effectively
+   instant, without having to touch each rule individually */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body {
+  font-family: 'Merriweather', Georgia, serif;
+  background: #101010;
+  color: #eee;
+  min-height: 100vh;
+  line-height: 1.8;
+  overflow-x: hidden;
+  /* stop iOS Safari from silently rescaling text size based on the
+     ratio of a block's width to the viewport (its "font boosting"
+     heuristic for readability in narrow columns) — without this,
+     the same element can render at a different visual size between
+     portrait and landscape purely from that ratio changing, with no
+     font-size rule of ours actually changing */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* reserve space so fixed nav doesn't cover the top of the page content */
+  padding-top: 66px;
+}
+
+/* --- site nav: fixed bar, hides on scroll down, reappears on scroll up.
+   Floats narrower than full width (max-width 950px — measured to
+   comfortably fit brand + 5 links on one line with real margin, while
+   still reading as a floating panel like the footer). Flush with the
+   top edge, so only the bottom corners round — mirrors the footer,
+   which is flush with the bottom edge and rounds only its top corners.
+   950px doesn't match main/footer's 760px on purpose, not from
+   inconsistency: main and footer already share the same value, and
+   the clump's resting frame (further down) lines up with them too,
+   within a couple of pixels for the photos' drop shadow. The nav
+   stays wider deliberately — narrowing it to match would cramp the
+   menu items and the space around the signature, tuned separately
+   for its own reason (breathing room for a horizontal menu, not the
+   text-reading measure the other three share). --- */
+.site-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  max-width: 950px;
+  margin: 0 auto;
+  z-index: 100;
+  padding: 0 44px;
+  background: rgba(220, 220, 220, 0.68);
+  backdrop-filter: blur(6px);
+  border-radius: 0 0 10px 10px;
+  transition: transform 0.35s ease;
+}
+
+.site-nav.nav-hidden {
+  transform: translateY(-100%);
+}
+
+.nav-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 16px 0;
+}
+
+.brand,
+.nav-links {
+  position: relative;
+  z-index: 1;
+}
+
+.brand {
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  color: #111;
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.3px;
+  text-decoration: none;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.brand-text {
+  padding-bottom: 2px;
+  border-bottom: 1px solid transparent;
+}
+
+.brand:hover .brand-text {
+  border-bottom-color: #111;
+}
+
+.brand-signature {
+  height: 26px;
+  width: auto;
+  display: block;
+}
+
+.nav-links {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  gap: 22px;
+}
+
+.nav-links a {
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  color: #111;
+  text-decoration: none;
+  font-size: 14.5px;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  font-weight: 700;
+  border-bottom: 1px solid #111;
+}
+
+.menu-toggle {
+  display: none;
+  position: relative;
+  z-index: 1;
+  width: 26px;
+  height: 20px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.menu-toggle span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: #111;
+  transition: top 0.3s ease, transform 0.3s ease, opacity 0.2s ease;
+}
+
+.menu-toggle span:nth-child(1) { top: 0; }
+.menu-toggle span:nth-child(2) { top: 9px; }
+.menu-toggle span:nth-child(3) { top: 18px; }
+
+.menu-toggle.open span:nth-child(1) {
+  top: 9px;
+  transform: rotate(45deg);
+}
+
+.menu-toggle.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-toggle.open span:nth-child(3) {
+  top: 9px;
+  transform: rotate(-45deg);
+}
+
+/* mobile: thin bar with brand left, burger right; links become a dropdown.
+   Threshold raised to 1080px: with the real Merriweather Sans font (wider
+   than the fallback), the nav-inner needs more room before it fits on
+   one line without wrapping. */
+@media (max-width: 1080px) {
+  .site-nav {
+    /* max(), not a plain env() fallback: keeps the normal 20px on
+       phones without a notch (env() resolves to 0 there, and max()
+       just keeps the 20px), but grows past it in landscape on a
+       notched iPhone, where the notch relocates to a side edge and
+       can otherwise sit right on top of "Teresio Gassino" or the
+       burger icon. Only takes effect together with the page's
+       viewport-fit=cover meta tag, already set — without it env()
+       always resolves to 0 and this is a no-op. */
+    padding: 0 max(20px, env(safe-area-inset-right)) 0 max(20px, env(safe-area-inset-left));
+    max-width: none;
+    border-radius: 0;
+  }
+
+  .nav-inner {
+    padding: 12px 0;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .nav-links {
+    display: flex;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 0 24px;
+    background: rgba(220, 220, 220, 0.9);
+    backdrop-filter: blur(6px);
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition: max-height 0.55s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.4s ease, padding 0.55s ease;
+  }
+
+  .nav-links a {
+    padding: 9px 0;
+  }
+
+  .nav-links.open {
+    max-height: 400px;
+    opacity: 1;
+    padding: 22px 24px 26px;
+    pointer-events: auto;
+  }
+}
+
+main {
+  /* 760px, matching footer below and the clump's resting frame
+     further down — see the note on .site-nav for why this is shared
+     on purpose while the nav's own 950px isn't. */
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 60px 24px 98px;
+}
+
+h1 {
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 28px;
+}
+
+/* whatever type of element happens to close a page (p, figure, div...)
+   carries its own trailing margin, which otherwise stacks on top of
+   main's own padding-bottom and makes the gap to the footer vary by
+   page depending on content type. Zeroing it here makes that gap a
+   single, predictable value everywhere. */
+main > *:last-child {
+  margin-bottom: 0;
+}
+
+/* vertical rhythm, scaled down for mobile: the same fixed pixel gap
+   reads as proportionally larger on a small screen (less surrounding
+   content, less width) than on desktop, so mobile gets its own
+   smaller values instead of inheriting the desktop numbers as-is */
+@media (max-width: 700px) {
+  main {
+    padding-top: 24px;
+    padding-bottom: 61px;
+  }
+
+  h1 {
+    margin-bottom: 12px;
+  }
+
+  /* the fregio is now main's own last child (the fonte line that used
+     to close the page moved up into the masthead), so the last-child
+     rule above zeroes its own 48px bottom margin — the same 48px it
+     still keeps above itself. On mobile that leaves only the generic
+     61px padding-bottom to clear the fixed footer, which on notched
+     phones (safe-area-inset-bottom padding pushing the footer past
+     ~65-70px tall with its two-line credit text) can eat the padding
+     entirely and leave the fregio with no visible gap at all. Adding
+     back the 48px it lost keeps the gap below it equal to the gap
+     above it, clearing even the tallest notched-phone footer with
+     room to spare. Desktop doesn't need this: its footer is short
+     enough (~38px, see body.page-galleria main below) that the
+     generic 98px padding already clears 48px+38px on its own. */
+  body.page-home main {
+    padding-bottom: 116px;
+  }
+}
+
+/* five section-index pages (landing, Logos 27, Discorso, Curriculum,
+   Foto) get a sans title instead of the default serif — home.html's
+   essay masthead and quercia.html keep the serif h1 untouched. */
+body.page-index h1,
+body.page-logos h1,
+body.page-discorso h1,
+body.page-curriculum h1,
+body.page-galleria h1 {
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+}
+
+/* quercia.html: same serif h1 as everywhere else, just at the heavier
+   900 cut already used for home's masthead title — pixel size left
+   exactly as the generic h1 rule sets it. */
+body.page-quercia h1 {
+  font-weight: 900;
+}
+
+/* dek-style subtitle under the h1 on the five sans-title pages above:
+   serif italic, quieter than body copy, deliberately a different
+   register from the now-sans title just above it. Tightens the gap
+   to the title (h1's normal margin-bottom is sized for body content,
+   not for a subtitle sitting right underneath) and takes over h1's
+   usual role of separating the title area from whatever follows. */
+h1:has(+ .page-subtitle) {
+  margin-bottom: 8px;
+}
+
+.page-subtitle {
+  font-family: 'Merriweather', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.5;
+  color: #bbb;
+  margin-bottom: 28px;
+}
+
+@media (max-width: 700px) {
+  h1:has(+ .page-subtitle) {
+    margin-bottom: 4px;
+  }
+
+  .page-subtitle {
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+}
+
+/* Logos 27 and Curriculum: the bold lead-ins inside the color-band
+   figcaptions (article headings, document names, patent labels) get
+   the heavier 900 cut instead of the browser-default bold (700) —
+   these two pages are dense with short bold labels, so the extra
+   weight helps them read as landmarks in the text rather than
+   blending into ordinary emphasis. */
+body.page-logos strong,
+body.page-curriculum strong {
+  font-weight: 900;
+}
+
+h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 36px 0 12px;
+}
+
+p {
+  margin-bottom: 18px;
+  color: #ddd;
+}
+
+/* link colour, as a custom property so each background context can
+   override it locally instead of every context needing its own
+   fully-specified selector: :root sets the default for the dark page
+   background and .essay-block cards (8.49:1 on #101010), and the two
+   contexts below override --link where the default would fail or
+   read poorly — .color-band (light pastel cards) needs something
+   much darker, .ritagli-band (translucent light-grey band) needs
+   something lighter again. Every `a` just reads var(--link); which
+   value wins is resolved by normal inheritance/cascade, not by
+   selector specificity, so there's no risk of one context's rule
+   accidentally outranking another's the way two selectors targeting
+   the same property can. */
+:root {
+  /* same hue as the brand blue (#2974AE, itself derived from the
+     #CEDCE6 card band — see sfondi/firma.svg) and as .color-band's
+     link colour below: one hue family across three lightness/
+     saturation points tuned per context, not one recycled hex value.
+     6.62 on #101010, 5.47 on .essay-block (#232323, this page's
+     strictest context) — comfortable margin above the 4.5 AA floor
+     without drifting into the highlighter-bright territory a lighter
+     step on this scan lands in. */
+  --link: #699EC6;
+}
+
+.color-band {
+  --link: #205C8B; /* min 4.57 su tutte le bande — la tonalità più
+                       vicina possibile all'originale #2974AE (3.22 min,
+                       non conforme) che superi comunque 4.5:1 ovunque */
+}
+
+.ritagli-band {
+  --link: #A8D5F2; /* 5.51 sul grigio */
+}
+
+a {
+  color: var(--link);
+}
+
+figure {
+  margin: 32px 0;
+}
+
+figcaption {
+  font-size: 13px;
+  color: #888;
+  margin-top: 8px;
+}
+
+/* --- scroll-reveal images: slide in from a side, once --- */
+.reveal-img img {
+  width: 100%;
+  border-radius: 8px;
+  display: block;
+}
+
+/* starting (hidden) state lives behind .js only: the reveal depends on
+   an IntersectionObserver in animations.js to ever add .visible, so
+   without JS this content must never start from opacity:0 or it would
+   simply stay invisible forever — see the .no-js/.js swap in <head>. */
+.js .reveal-img img {
+  opacity: 0;
+  transform: translateX(-60px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.js .reveal-img.from-right img {
+  transform: translateX(60px);
+}
+
+/* .js prefix added here too, purely to match the specificity of the
+   .from-right rule above (both now: .js + 2 more classes + img).
+   Without it, this rule's lower specificity (.reveal-img.visible img,
+   one class short) lost to .js .reveal-img.from-right img regardless
+   of source order once both classes were present on the same element
+   — so a "from-right" image would reach .visible but stay stuck at
+   its +60px starting offset forever, never settling into place. The
+   .js prefix is functionally redundant on its own (.visible is only
+   ever added by the same script that adds .js), but it's what
+   restores the tie that lets source order decide again, same as
+   before the .no-js/.js split existed. */
+.js .reveal-img.visible img {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* --- side-by-side figure: image + description next to each other ---
+   figcaption sits inside .side-row here, not as <figure>'s direct
+   first/last child — a W3C validator flags this as a content-model
+   error. Left as-is deliberately: making figcaption a true direct
+   child means switching this layout from flex to CSS Grid, which
+   changes how row height gets computed for the text-driven image
+   stretch used on the Logos 27 page, and needs its own compensating
+   fix per card (cropping, column width) to match. Tried once,
+   reverted — the validator warning has no real accessibility cost
+   (screen readers still associate the caption correctly regardless
+   of DOM position within the figure), so it wasn't worth the risk to
+   a hand-tuned layout. --- */
+.side-row {
+  display: flex;
+  gap: 28px;
+}
+
+.side-row > a,
+.side-row > img {
+  width: 42%;
+  flex-shrink: 0;
+}
+
+/* fonte-row: a second side-row below the image+text one, with an
+   invisible spacer standing in for the image column, so the Fonte
+   line stays visually indented in line with the text — without
+   contributing its height to the image's stretch (see Logos 27,
+   where letting Fonte's height affect the stretch crushed the image
+   into an oddly narrow crop for the two longer entries). */
+.fonte-row {
+  margin-top: 6px;
+}
+
+.side-row-spacer {
+  width: 42%;
+  flex-shrink: 0;
+}
+
+.fonte-row .fonte {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+@media (max-width: 640px) {
+  .side-row-spacer {
+    display: none;
+  }
+}
+
+.reveal-img.side figcaption {
+  flex: 1;
+  margin-top: 0;
+  font-size: 15px;
+  color: #ccc;
+  line-height: 1.7;
+}
+
+.reveal-img.side.from-right .side-row {
+  flex-direction: row-reverse;
+}
+
+/* text aligned to the top of the image instead of centered vertically */
+.reveal-img.side.align-top .side-row {
+  align-items: flex-start;
+}
+
+/* consistent image proportions so text block height roughly matches the image */
+.reveal-img.side img {
+  aspect-ratio: 4 / 3;
+  height: auto;
+  object-fit: cover;
+}
+
+/* crop from the top instead of the center, for portrait-ish source images */
+.reveal-img.side.crop-top img {
+  object-position: top;
+}
+
+/* Logos 27 specifically: the image stretches to match whatever height
+   the text naturally takes (rather than a fixed aspect ratio), since
+   the four entries have different amounts of text — this keeps every
+   image/text pair matched in height without picking one fixed size
+   that would only fit one of them correctly. */
+body.page-logos .side-row {
+  align-items: stretch;
+}
+
+body.page-logos .side-row > a {
+  display: block;
+}
+
+body.page-logos .side-row img {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  object-fit: cover;
+}
+
+/* colored band behind image + text, like the landing page cards.
+   Solid pastel colour only — the technical drawings live on the page
+   background instead (see body.page-* rules below), not inside these. */
+.reveal-img.side.color-band {
+  position: relative;
+  padding: 22px;
+  border-radius: 14px;
+  color: #1a1a1a;
+  background-color: var(--band-color, transparent);
+}
+
+.reveal-img.side.color-band figcaption {
+  color: #222;
+}
+
+/* Fonte lines on pastel bands (Logos 27, Curriculum): a slightly
+   lighter shade than the body text, to read as a quieter, secondary
+   line — still comfortably readable on every band colour used
+   (contrast 4.8–6.2:1, all above the 4.5 AA threshold for body text) */
+.reveal-img.side.color-band .fonte-row .fonte,
+.reveal-img.side.color-band figcaption p.fonte {
+  color: #555;
+}
+
+.reveal-img.side.color-band figcaption p {
+  color: #222;
+}
+
+.reveal-img.side.color-band figcaption p:last-child {
+  margin-bottom: 0;
+}
+
+.reveal-img.side.color-band figcaption a {
+  text-decoration: underline;
+}
+
+/* technical drawings as a faint watermark across the black page
+   background — a near-opaque dark tint on top lets only a sliver of
+   the pattern show through, so it never competes with the text or,
+   on Logos/Curriculum, with the pastel colour bands sitting on top */
+body.page-logos {
+  background-image:
+    linear-gradient(rgba(16, 16, 16, 0.75), rgba(16, 16, 16, 0.75)),
+    url('../sfondi/disegno-1.svg');
+  background-repeat: no-repeat, repeat;
+  background-size: cover, 640px auto;
+  background-color: #101010;
+}
+
+body.page-curriculum {
+  background-image:
+    linear-gradient(rgba(16, 16, 16, 0.75), rgba(16, 16, 16, 0.75)),
+    url('../sfondi/disegno-2.svg');
+  background-repeat: no-repeat, repeat;
+  background-size: cover, 640px auto;
+  background-color: #101010;
+}
+
+body.page-discorso {
+  background-image:
+    linear-gradient(rgba(16, 16, 16, 0.75), rgba(16, 16, 16, 0.75)),
+    url('../sfondi/disegno-3.svg');
+  background-repeat: no-repeat, repeat;
+  background-size: cover, 640px auto;
+  background-color: #101010;
+}
+
+/* index landing page: the four link-cards to the site's main sections.
+   Previously duplicated as an inline <style> block on index.html and
+   en/index.html — identical in both, so it belongs here instead.
+   The image darkens on hover using the same technique and value as
+   the color-band photo links elsewhere (.side-row > a::after), so the
+   two "photo you can click" patterns on the site read as one
+   convention rather than two different darken amounts. */
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  margin-top: 20px;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  text-decoration: none;
+  color: #1a1a1a;
+  padding: 26px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.card:nth-child(1) { background: #FEE8B2; }
+.card:nth-child(2) { background: #CEDCE6; }
+.card:nth-child(3) { background: #FCC1C1; }
+.card:nth-child(4) { background: #FFDDC2; }
+
+/* hover-darken the whole colored band, not just the photo — an
+   overlay on .card itself, clipped to its own border-radius by
+   overflow:hidden above, using the same value as the color-band
+   photo-link darkening elsewhere (.side-row > a::after) so it's the
+   same convention, just scoped to the full card here. */
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
+  transition: background 0.2s ease;
+  pointer-events: none;
+}
+
+.card:hover::after {
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.card-img {
+  display: block;
+  width: 180px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.card-img img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.card h2 { margin: 0 0 8px; font-size: 19px; color: #1a1a1a; }
+.card p { margin: 0; color: #333; font-style: italic; font-size: 15px; }
+.card p .plain { font-style: normal; }
+.card:nth-child(4) p { font-style: normal; }
+
+@media (max-width: 560px) {
+  .card { flex-direction: column; align-items: flex-start; }
+  .card-img { width: 100%; }
+}
+
+body.page-index {
+  background-image:
+    linear-gradient(rgba(16, 16, 16, 0.75), rgba(16, 16, 16, 0.75)),
+    url('../sfondi/disegno-4.svg');
+  background-repeat: no-repeat, repeat;
+  background-size: cover, 640px auto;
+  background-color: #101010;
+}
+
+body.page-quercia {
+  background-image:
+    linear-gradient(rgba(16, 16, 16, 0.75), rgba(16, 16, 16, 0.75)),
+    url('../sfondi/sgimignano.svg');
+  background-repeat: no-repeat, no-repeat;
+  background-size: cover, 1240px auto;
+  background-color: #101010;
+  background-position-y: 50px;
+}
+
+body.page-galleria {
+  background-image:
+    linear-gradient(rgba(16, 16, 16, 0.75), rgba(16, 16, 16, 0.75)),
+    url('../sfondi/disegno-5.svg');
+  background-repeat: no-repeat, repeat;
+  background-size: cover, 1260px auto;
+  background-color: #101010;
+  background-position-y: -20px;
+}
+
+/* the background SVG on this page loses its opacity control and its
+   lines render solid white (#fff) if the last row of photos sits too
+   close to the footer bar — the footer itself is position:fixed and
+   38px tall, eating into whatever padding is reserved here, so this
+   is 105px (the real target) + 38px (footer's own height) = 143px,
+   not 105px directly, to get a true 105px of visible clearance */
+body.page-galleria main {
+  padding-bottom: 143px;
+}
+
+@media (max-width: 640px) {
+  .side-row {
+    flex-direction: column !important;
+  }
+  .side-row > a,
+  .side-row > img {
+    width: 100%;
+  }
+  body.page-logos .side-row img {
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* --- clump: several images slide in together from different sides
+   and land clustered with spacing between them, then page text follows below.
+   Each .clump-photo sets its own --fx/--fy (start offset) and --tx/--ty
+   (resting offset) inline, so the same keyframe works for all of them.
+   The stage bleeds slightly past main's padding (negative margin) to
+   give the photos more room to actually grow larger. --- */
+.clump-stage {
+  position: relative;
+  height: 800px;
+  width: calc(100% + 48px);
+  margin: 0 -24px 32px;
+}
+
+.clump-anchor {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+}
+
+.clump-photo {
+  position: absolute;
+  width: 370px;
+  height: 240px;
+  border-radius: 10px;
+  opacity: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  animation: clumpIn 0.9s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+  animation-delay: var(--delay, 0s);
+}
+
+.clump-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.clump-photo a {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+
+/* badge: sits over the blank paper margin at the bottom of each scan
+   (verified on all six images — narrowest is sartor.webp, still ~7%
+   of clear white space even after the crop), not over the typed
+   text, so it doesn't compete with the exact thing the zoom exists
+   to make legible. Hidden by default; only ever shown inside the
+   hover-capable block below — on touch it never renders, which is
+   deliberate (see that block's comment). */
+.clump-badge {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  padding: 5px 12px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  font-size: 11px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+@keyframes clumpIn {
+  from { transform: translate(var(--fx), var(--fy)); opacity: 0; }
+  to   { transform: translate(var(--tx), var(--ty)); opacity: 1; }
+}
+
+/* hover zoom: gated two ways on purpose.
+   1) .settled — added by JS on animationend. While clumpIn is still
+      running, the animation's forwards fill holds `transform` at a
+      priority normal author rules can't beat (CSS animations outrank
+      plain-specificity author declarations in the cascade), so a
+      :hover transform here would silently do nothing until the
+      animation ends anyway. Waiting for .settled sidesteps that
+      entirely instead of fighting it with !important, and also
+      avoids the transform being reset mid-flight if the cursor
+      happens to already be sitting where a photo lands.
+   2) (hover: hover) and (pointer: fine) — real mouse only. Touch
+      has no true hover; a tap would latch the zoomed state until
+      the next tap elsewhere, which reads as broken, not zoomed. */
+.clump-photo.settled {
+  animation: none;
+  opacity: 1;
+  transform: translate(var(--tx), var(--ty));
+  transition: transform 0.25s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .clump-photo.settled:hover {
+    transform: translate(var(--tx), var(--ty)) scale(1.5);
+    z-index: 5;
+  }
+
+  .clump-photo.settled:hover .clump-badge {
+    opacity: 1;
+  }
+
+  /* horizontally centered on desktop instead of pinned to the right
+     corner — the blank margin runs across the full width beneath the
+     highlighted text on every scan, so centering there reads as
+     intentional placement rather than "tucked in a corner". */
+  .clump-badge {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+
+  /* the top-of-page hint is what told touch users (and mouse users,
+     before this) to click a photo. On a hover-capable pointer the
+     per-photo badge now does that job at the moment it's actually
+     useful, so the page-level banner would just be saying the same
+     thing twice — once abstractly at the top, once concretely on
+     the image itself. Left untouched for touch, where the badge
+     never appears and the banner is still the only signal there is. */
+  .discorso-hint {
+    display: none;
+  }
+}
+
+/* on narrow screens, drop the clustered layout entirely and stack the
+   images vertically at a readable size, instead of shrinking them */
+@media (max-width: 640px) {
+  .clump-stage {
+    height: auto;
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto 32px;
+  }
+  .clump-anchor {
+    position: static;
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .clump-photo {
+    position: static;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 14 / 9;
+    opacity: 1;
+    animation: none;
+  }
+  /* explicit reset, matching .clump-photo.settled's specificity: that
+     rule pins a translate() offset once the entrance animation ends,
+     which only ever happens in the desktop/landscape grid layout.
+     Rotating from there to portrait doesn't remove the .settled class
+     (nothing tells it to), so without this the old grid offset was
+     still being applied on top of the new stacked layout — the
+     "scattered with big gaps" bug. */
+  .clump-photo,
+  .clump-photo.settled {
+    transform: none;
+  }
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  /* matches main's own max-width — see the note on .site-nav */
+  max-width: 760px;
+  margin: 0 auto;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  text-align: center;
+  padding: 11px 20px calc(8px + (env(safe-area-inset-bottom) * 0.8));
+  background: rgba(220, 220, 220, 0.68);
+  backdrop-filter: blur(4px);
+  border-radius: 10px 10px 0 0;
+  color: #000;
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  font-size: 12.5px;
+}
+
+footer a { color: #000; }
+
+/* forces a line break in the footer credit line, but only on mobile —
+   on desktop the <br> is suppressed and everything stays on one line */
+.mobile-break {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .mobile-break {
+    display: inline;
+  }
+
+  .desktop-dot {
+    display: none;
+  }
+}
+
+/* the global "p { color: #ddd }" rule directly targets this <p> too,
+   and a direct rule always wins over inheriting footer's own color —
+   so it needs its own explicit override here, not just on footer. */
+footer p {
+  color: #000;
+  line-height: 1.4;
+  margin: 0;
+}
+
+footer .cc-logo {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+
+@media (max-width: 700px) {
+  footer {
+    padding: 8px 14px calc(5px + (env(safe-area-inset-bottom) * 0.8));
+    font-size: 10.5px;
+    gap: 6px;
+    border-radius: 0;
+  }
+
+  footer p {
+    line-height: 1.3;
+  }
+
+  footer .cc-logo {
+    height: 15px;
+  }
+}
+
+/* landscape phones: width is often generous (700px+) even on small
+   devices, so the max-width breakpoint above doesn't catch them — but
+   height is very short (350-420px), and the footer is position:fixed,
+   so it needs to be even more compact here regardless of width. Force
+   everything onto a single line since landscape width is rarely the
+   constraint, height always is. No border-radius override here on
+   purpose: whether the footer should be square (edge-to-edge, on a
+   narrow phone that also matches the max-width:700px block above) or
+   rounded (floating with visible side margins, its own max-width:760px
+   never reaching the actual screen edges — the common case on
+   iPhone-mini-and-up-width landscape phones, where this query alone
+   applies) depends on width, not on being in landscape as such, so
+   it's left to whichever of those two width-based rules applies. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .mobile-break {
+    display: none;
+  }
+
+  .desktop-dot {
+    display: inline;
+  }
+
+  footer {
+    padding: 7px 14px calc(4px + (env(safe-area-inset-bottom) * 0.8));
+    font-size: 10px;
+    gap: 6px;
+  }
+
+  footer p {
+    line-height: 1.2;
+  }
+
+  footer .cc-logo {
+    height: 14px;
+  }
+}
+
+/* fixed-height scrollable window for a long bulleted list inside a card
+   (e.g. the patents list) — same principle as .quercia-window (a fixed
+   box with overflow-y:auto instead of letting the card grow to fit
+   everything), but for text instead of an image. Set in the Fonte's
+   own typeface/size: this content is a citation-style list (titles +
+   patent numbers + links), not narrative prose, so it reads as the
+   same register as the "Fonte:" lines rather than body text. */
+.text-window {
+  height: 130px;
+  overflow-y: auto;
+  margin: 10px 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.06);
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.6;
+  /* #4A4A4A, not #555: this box adds its own rgba(0,0,0,0.06) tint on
+     top of whichever card colour it sits on, which on the pink card
+     brings contrast down to 4.20:1 — under the 4.5:1 AA threshold
+     that #555 alone would otherwise clear. #4A4A4A holds 5:1+ with
+     that tint included, on every card colour. */
+  color: #4A4A4A;
+}
+
+.text-window p {
+  margin: 0 0 6px;
+}
+
+.text-window p:last-child {
+  margin-bottom: 0;
+}
+
+/* small print / citation lines ("Fonte: ...") throughout the site */
+.fonte {
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  font-size: 13px;
+  color: #888;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+/* lightbox-trigger is a real <button> wrapping the <img> now, not the
+   img itself with tabindex/role="button" bolted on — this reset just
+   strips the browser's own button chrome (border, padding, background,
+   font) so it's visually transparent and the img inside sizes exactly
+   as it did before, under whichever more specific selector governs it
+   (.gallery-grid .reveal-img img, .hero-photo img, .essay-photo img —
+   all descendant selectors, so they still reach through the button
+   wrapper without any changes of their own). */
+.lightbox-trigger {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+.gallery-grid .reveal-img {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.gallery-grid .reveal-img img {
+  aspect-ratio: 4 / 3;
+  height: auto;
+  object-fit: cover;
+  cursor: pointer;
+  transition: filter 0.2s ease, transform 0.8s ease, opacity 0.8s ease;
+}
+
+.gallery-grid .reveal-img img:hover {
+  filter: brightness(0.82);
+}
+
+/* crop from the top instead of the center: foto-02 is a portrait
+   shot (464×542) forced into the grid's 4:3 landscape crop, and a
+   centred crop was cutting into the top of the subject's head/face —
+   the part of a portrait a centred crop is least able to afford to
+   lose. Reuses the same idea as .reveal-img.side.crop-top elsewhere
+   in this file, just scoped to the gallery grid instead. */
+.gallery-grid .reveal-img.crop-top img {
+  object-position: top;
+}
+
+/* flavor-text caption: hidden by default, fades in over the bottom of
+   the thumbnail on hover */
+.gallery-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 24px 12px 10px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.82), transparent);
+  color: #fff;
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  font-size: 12.5px;
+  line-height: 1.3;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.gallery-grid .reveal-img:hover .gallery-caption {
+  opacity: 1;
+}
+
+/* larger start offset for the gallery: creates a "two film reels sliding
+   in" effect — the top row from the right, the bottom row from the left */
+.gallery-grid .reveal-img img {
+  transform: translateX(-260px);
+}
+
+.gallery-grid .reveal-img.from-right img {
+  transform: translateX(260px);
+}
+
+.gallery-grid .reveal-img.visible img {
+  transform: translateX(0);
+}
+
+/* --- highlighted words inside the "Un discorso" quotes, pointing to
+   the color-coded image each paragraph refers to --- */
+.hl {
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: #1a1a1a;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* --- lightbox: click a gallery image to see it enlarged in an overlay --- */
+.lightbox-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: rgba(0, 0, 0, 0.88);
+  border: none;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+}
+
+/* dialog sets its own [open] attribute on showModal()/close() — no JS
+   class needed to drive this anymore, unlike the old plain-div overlay. */
+.lightbox-overlay[open] {
+  display: flex;
+}
+
+/* the dialog's own background above already covers the full viewport,
+   so the native ::backdrop layer underneath it doesn't need to draw
+   anything of its own — left at browser default it would double up
+   with our background and read slightly darker than intended. */
+.lightbox-overlay::backdrop {
+  background: transparent;
+}
+
+.lightbox-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 90vw;
+  max-height: 88vh;
+}
+
+.lightbox-overlay img {
+  max-width: 90vw;
+  max-height: 80vh;
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+.lightbox-caption {
+  margin: 14px 0 0;
+  color: #fff;
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  font-size: 14px;
+  text-align: center;
+}
+
+.lightbox-caption:empty {
+  display: none;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 22px;
+  right: 26px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 34px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* prev/next: navigate the gallery without leaving the lightbox, loops
+   at both ends. Keyboard arrows do the same (see animations.js) */
+.lightbox-prev,
+.lightbox-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.4);
+  border: none;
+  color: #fff;
+  font-size: 40px;
+  line-height: 1;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.lightbox-prev:hover,
+.lightbox-next:hover {
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.lightbox-prev {
+  left: 18px;
+}
+
+.lightbox-next {
+  right: 18px;
+}
+
+@media (max-width: 600px) {
+  .lightbox-prev,
+  .lightbox-next {
+    width: 42px;
+    height: 42px;
+    font-size: 30px;
+  }
+  .lightbox-prev { left: 8px; }
+  .lightbox-next { right: 8px; }
+}
+
+/* --- quercia scroll windows: tall Facebook screenshots contained in a
+   fixed-height frame with a native vertical scrollbar, so the page
+   itself doesn't become enormous. The expand button stays pinned to
+   the top-right while scrolling (position: sticky) and opens the
+   full-resolution image in a new tab (plain target="_blank", not
+   .lightbox-trigger — this page has no lightbox-overlay markup at
+   all, unlike the Foto page). --- */
+.quercia-windows {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin: 32px 0;
+}
+
+.quercia-window {
+  position: relative;
+  flex: 1 1 320px;
+  height: 373px;
+  overflow-y: auto;
+  border-radius: 10px;
+  background: #000;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.quercia-window img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: -41px;
+}
+
+.quercia-expand {
+  position: sticky;
+  top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 14px 14px 0 auto;
+  padding: 4px 10px;
+  width: fit-content;
+  border: none;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  text-decoration: none;
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.quercia-expand:hover {
+  background: rgba(0, 0, 0, 0.88);
+}
+
+@media (max-width: 700px) {
+  .quercia-window {
+    height: 280px;
+    flex: 1 1 100%;
+  }
+}
+
+/* single light, translucent band wrapping a block of text (the "Nei
+   ritagli" quotes, or the Quercia intro paragraph) */
+.ritagli-band {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 14px;
+  padding: 22px;
+  margin: 32px 0;
+  font-size: 18px;
+  line-height: 1.65;
+}
+
+.ritagli-band p {
+  color: #ddd;
+}
+
+.ritagli-band p:last-child {
+  margin-bottom: 0;
+}
+
+/* the "1"/"2" footnote-style links (single digits) are otherwise
+   under the 24×24px CSS-pixel minimum target size (WCAG 2.5.8):
+   inline-block lets padding actually enlarge the tappable area
+   instead of just adding whitespace around the glyph the way it
+   would on a still-inline element. */
+.ritagli-band p a.footnote-link {
+  display: inline-block;
+  padding: 2px 4px;
+}
+
+body.page-discorso .ritagli-band p::before {
+  content: ">";
+  display: inline;
+  margin-right: 8px;
+  color: #999;
+  font-weight: 700;
+}
+
+/* overlay hint positioned within the first row of images (not centered
+   on the whole tall clump), so it's visible immediately without any
+   scroll — fades out once the clump scrolls into view instead of
+   taking up permanent space in the reading column (see js/animations.js
+   for the IntersectionObserver that drives it) */
+.discorso-hint {
+  position: absolute;
+  top: 96px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  margin: 0;
+  padding: 10px 22px;
+  border-radius: 24px;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  font-size: 14px;
+  text-align: center;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.discorso-hint.hidden {
+  opacity: 0;
+}
+
+@media (max-width: 640px) {
+  .discorso-hint {
+    top: 70px;
+  }
+}
+
+/* badge on linked images (Logos / Curriculum) indicating what the
+   link opens: PDF, video, an external page, or a larger image */
+.side-row > a {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.side-row > a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
+  transition: background 0.2s ease;
+}
+
+.side-row > a:hover::after {
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.img-badge {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+/* used only where the source image itself has content (a caption, a
+   label) sitting in the default bottom-right corner — e.g. the
+   Einstellungen cover, whose "EINSTELLUNGEN" text can't be cropped
+   away from that corner because object-fit:cover never crops
+   vertically when the box is narrower than the source image. Moves
+   just that one badge, leaves .img-badge (bottom-right) as the site
+   default everywhere else. */
+.img-badge-left {
+  right: auto;
+  left: 10px;
+}
+
+
+/* --- language switcher: two separate elements, not one reused via
+   media queries. On desktop, .lang-link-desktop floats outside the
+   nav bar entirely as a small pill — deliberately no flag colour,
+   just dark background + "IT"/"EN" text, so it doesn't add a
+   saturated note to an otherwise neutral bar. Position tuned
+   visually (not derived from a formula) to sit comfortably right of
+   the bar at ordinary desktop widths; the vw+px hybrid is what makes
+   that tuned position scale reasonably with viewport width rather
+   than staying pinned at a fixed pixel offset. This formula does
+   overlap the nav bar in a narrow band, roughly 1081–1119px (just
+   above the mobile breakpoint) — patched separately below rather
+   than by changing this formula, since nudging the general case to
+   clear that one narrow band would move the pill 60–200px off its
+   visually-tuned position at every ordinary width above it, which is
+   a worse trade for a band few visitors will ever sit at exactly.
+   Living outside the nav bar's DOM subtree on purpose: the pill uses
+   position:fixed and needs to size itself against the true viewport,
+   but .site-nav's own backdrop-filter makes it the containing block
+   for any position:fixed descendant, so nesting the pill inside
+   would size it relative to the bar instead. Same translucent
+   background and blur as the bar, so it reads as part of the same
+   family of chrome, and hides together with it on scroll via the
+   shared .nav-hidden class.
+   Below the breakpoint, .lang-link (flag icon + short label) takes
+   over instead, as the last item in the mobile burger dropdown —
+   see the media query below. --- */
+.lang-link-desktop {
+  position: fixed;
+  top: 32.8px;
+  left: calc(62.5vw + 356.25px);
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  background: rgba(220, 220, 220, 0.68);
+  backdrop-filter: blur(6px);
+  color: #111;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  text-decoration: none;
+  transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+.lang-link-desktop.nav-hidden {
+  transform: translate(-50%, -50%) translateY(-140%);
+  opacity: 0;
+}
+
+.lang-link-desktop:hover {
+  background: rgba(220, 220, 220, 0.85);
+}
+
+/* local patch for the narrow 1081–1119px band where the tuned
+   formula above overlaps .site-nav (see its comment): +8px is
+   enough to clear the worst case, at vw=1081, with ~3px of margin
+   to spare, and the overlap itself shrinks to nothing by 1119px on
+   its own, so the same flat +8px only widens that margin further as
+   vw approaches the upper edge — never needs to scale with vw here.
+   At 1120px the general formula's own gap is already ~0px without
+   any help, so the patch stops exactly where it's no longer needed;
+   the pill does take a small (~8px) rightward step at that boundary
+   as the patch switches off, but only within this one narrow,
+   uncommon band, not at any width most visitors actually sit at. */
+@media (min-width: 1081px) and (max-width: 1119px) {
+  .lang-link-desktop {
+    left: calc(62.5vw + 364.25px);
+  }
+}
+
+.lang-link {
+  display: none;
+}
+
+.lang-flag-icon {
+  display: none;
+}
+
+@media (max-width: 1080px) {
+  .lang-link-desktop {
+    display: none;
+  }
+
+  .lang-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #111 !important;
+  }
+
+  .lang-flag-icon {
+    display: block;
+    width: 20px;
+    height: 14px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .lang-link:hover {
+    background: none;
+  }
+}
+
+/* --- Home essay v2: each paragraph sits in a low-contrast rounded
+   box — flat colour, no blur/transparency needed since the page
+   background is plain black with nothing complex behind to blend
+   with (unlike Quercia/Discorso's ritagli-band, which sits over a
+   busy SVG texture). Boxes are contiguous — margin:0 between them —
+   so the only perceptible seam is where two rounded corners meet,
+   not a gap or a rule; this keeps the read continuous instead of
+   chopping the essay into visibly separate cards. --- */
+.essay-block {
+  background: #232323;
+  border-radius: 14px;
+  padding: 16px 19px;
+  margin: 0;
+  max-width: 620px;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+/* date/signature closing block: with the masthead above now centred,
+   a right-aligned box read as orphaned off to one side — centring the
+   whole box keeps it in the same visual axis as the title. Left-align
+   inside the box (its width is fit-content, set by the widest date
+   line) and pin just the signature to that box's own right edge, so
+   "Valerio" still reads as flush-right against the date above it,
+   exactly as before — just centred as a unit rather than pinned to
+   the column's right edge. */
+.essay-block-signature {
+  width: fit-content;
+  margin: 0 auto;
+  text-align: right;
+}
+
+/* feature masthead (home.html only): title + thin-sans dek + byline-
+   style credit line, New Scientist-style. A self-contained block
+   scoped by class rather than a body.page-home hook, so it only
+   touches h1 here — the plain, left-aligned h1 every other page's
+   title relies on is untouched outside this block. */
+.essay-masthead {
+  max-width: 620px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.essay-masthead h1 {
+  font-size: 44px;
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin-bottom: 18px;
+}
+
+/* the dek: thin sans, quieter grey than body copy — reads as
+   description, not as prose to be read at the same weight as the
+   essay itself */
+.essay-subtitle {
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  font-weight: 300;
+  font-size: 19px;
+  line-height: 1.5;
+  color: #bbb;
+  margin-bottom: 26px;
+}
+
+/* the "Written by" analogue: reuses .fonte's existing type (13px
+   Merriweather Sans, #888) rather than a new size, just re-centred
+   for the masthead context */
+.essay-masthead .fonte {
+  margin-bottom: 0;
+}
+
+@media (max-width: 700px) {
+  .essay-masthead h1 {
+    font-size: 30px;
+    margin-bottom: 10px;
+  }
+
+  .essay-subtitle {
+    font-size: 16px;
+    margin-bottom: 18px;
+  }
+}
+
+/* epigraph: pulled out of the essay-block stack entirely — no box,
+   no shared background — and set larger, closer to a magazine dek
+   than to body copy, so it reads as a threshold the reader crosses
+   before the essay proper (in its own boxed rhythm) begins */
+.essay-epigraph {
+  max-width: 620px;
+  margin: 40px auto 8px;
+  font-size: 22px;
+  line-height: 1.5;
+}
+
+/* the "(*)"/"(**)" marker: same colour as the epigraph text around
+   it (no blue link colour — this isn't a citation link, just a
+   pointer to a note further down the same page). Uses a real
+   text-decoration (not a border-bottom box-model hack) so its
+   thickness is an explicit, intentional value — 1.5px, matched to
+   sit alongside the bold in-body reference links (their underline
+   reads heavier purely because bold font metrics draw a thicker
+   stroke by default, not because anyone set it deliberately) —
+   rather than an accident of two unrelated techniques landing at
+   different weights next to each other. Quiet at rest, consolidates
+   to full brightness on hover/focus, same curve as .brand-text and
+   the ornament link. */
+.epigraph-note {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-decoration-color: rgba(238, 238, 238, 0.4);
+  text-underline-offset: 3px;
+}
+
+.epigraph-note:hover,
+.epigraph-note:focus-visible {
+  text-decoration-color: #eee;
+}
+
+/* offset for anchor jumps to footnotes, so the fixed nav doesn't end
+   up covering the line the reader was just sent to */
+.footnote-target {
+  scroll-margin-top: 100px;
+}
+
+/* drop cap on the essay's first letter ("Teresio") */
+.dropcap {
+  float: left;
+  font-family: 'Merriweather', Georgia, serif;
+  font-weight: 700;
+  font-size: 3.4em;
+  line-height: 0.78;
+  padding: 4px 6px 0 0;
+}
+
+/* full-bleed hero, New Scientist-style: breaks out of main's 760px
+   column to the full viewport width. Relies on body's overflow-x:
+   hidden (set above) to clip the 100vw box so it never creates a
+   horizontal scrollbar. No border-radius — a full-bleed image reads
+   as the page's own edge, not as a card, so rounding it would fight
+   that read. */
+.hero-photo {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  margin-left: -50vw;
+  margin-bottom: 28px;
+}
+
+/* height is tied to width via aspect-ratio here, not to vh: a vh
+   height is independent of viewport width, so on a wide-but-short
+   window the image scales up a lot to fill that width and the
+   vertical crop grows well past what a narrower window would show —
+   this is what was cutting off the lower hand. aspect-ratio keeps
+   the crop fraction constant (~9% off top and bottom) regardless of
+   window width, since height now scales together with it. Mobile
+   portrait gets its own vh-based rule below, where width is already
+   the constraint and a tall aspect-ratio box would be excessive. */
+.hero-photo img {
+  width: 100%;
+  aspect-ratio: 1.9 / 1;
+  height: auto;
+  max-height: 680px;
+  min-height: 320px;
+  object-fit: cover;
+  display: block;
+  cursor: pointer;
+}
+
+.hero-caption {
+  max-width: 620px;
+  margin: 10px auto 0;
+  padding: 0 24px;
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  font-size: 13px;
+  color: #999;
+  text-align: center;
+}
+
+@media (max-width: 700px) {
+  .hero-photo img {
+    aspect-ratio: auto;
+    height: 46vh;
+    min-height: 260px;
+    max-height: 420px;
+  }
+}
+
+/* the rounded, clipped frame around the image only — kept separate
+   from .essay-photo itself since a caption now sits below the image
+   as normal-flow text: if overflow/radius stayed on the outer
+   figure, the box would grow to fit that text too, and the bottom
+   corners would end up rounding around the caption instead of
+   hugging the photo, breaking the "photo reads like the coloured
+   cards" match this radius exists for. */
+.essay-photo {
+  margin: 0 0 28px;
+}
+
+.essay-photo-frame {
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.essay-photo-frame img {
+  width: 100%;
+  height: auto;
+  display: block;
+  cursor: pointer;
+}
+
+/* always-visible caption under the photo, matching .hero-caption's
+   register (same font, size, colour) since both are the same kind
+   of line — what the picture shows — even though this one sits in
+   the normal column instead of breaking out full-bleed. Replaces
+   the old .gallery-caption hover-overlay treatment here: that style
+   still fits the actual thumbnail grid on the Foto page, where many
+   small images make a permanent caption too busy, but for a single
+   large photo in the essay a caption only visible on hover was never
+   reachable on touch at all. */
+.essay-photo-caption {
+  margin: 10px 0 0;
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  font-size: 13px;
+  color: #999;
+  text-align: center;
+}
+
+/* entrance animation: a small, quick rise-and-fade, deliberately
+   subtle enough that repeating it once per paragraph down a long
+   essay reads as "the page settling into place" rather than as a
+   repeated effect — the opposite would work against the continuous,
+   old-style-article reading this page is trying to preserve. */
+.js .essay-anim {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.js .essay-anim.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* finalino after the signature: a minimal mark (ruota.svg, drawn from
+   one of Teresio's own patents) closing the text before the editorial
+   "fonte" note. Kept at the same faint level as the technical-drawing
+   watermarks on the other pages (a 0.75 dark overlay over white lines
+   there works out to the same result as plain opacity here — see the
+   body.page-* background rules above) so it reads as a quiet paper
+   mark, not as an illustration competing with the text. */
+.essay-ornament {
+  width: 14%;
+  max-width: 100px;
+  margin: 48px auto;
+}
+
+/* the finalino doubles as a "back to top" link (closing the loop the
+   footnote markers above open): opacity carries the quiet-mark
+   reading at rest, and rises to full white — the svg's own fill
+   colour — on hover/focus as the only affordance a plain <a> around
+   an <img> needs */
+.ornament-link {
+  display: block;
+  cursor: pointer;
+}
+
+.essay-ornament img {
+  width: 100%;
+  display: block;
+  opacity: 0.25;
+  transition: opacity 0.3s ease;
+}
+
+.ornament-link:hover img,
+.ornament-link:focus-visible img {
+  opacity: 1;
+}
+
+/* paragraph divider: the "vite" mechanical detail, from a Teresio
+   patent, at full opacity (unlike the fregio, this one doesn't fade —
+   confirmed live). Size is 50% of the reading column's width on any
+   breakpoint (not a fixed px value), so it stays "half the column"
+   whether that column is 620px on desktop or narrower on mobile. */
+.essay-divider {
+  width: 50%;
+  max-width: 310px;
+  margin: 48px auto;
+}
+
+.essay-divider img {
+  width: 100%;
+  display: block;
+}
+
+/* on mobile the 14% figure reads smaller against the same fixed 48px
+   margin and the paragraphs' own line-height, so proportionally more
+   empty space collects around it than on desktop — scaling up to 3/2
+   here (21%) restores the same visual weight relative to its margin */
+@media (max-width: 700px) {
+  .essay-ornament {
+    width: 21%;
+  }
+}
