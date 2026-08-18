@@ -395,6 +395,20 @@ main {
   max-width: 760px;
   margin: 0 auto;
   padding: 60px 24px 98px;
+  /* found via Safari's own Web Inspector: this is the actual element
+     behind the reported blue line, not either dialog or their scroll
+     containers (both wrong guesses tried first). tabindex="-1" (on
+     the <main id="main"> tag itself) makes this programmatically
+     focusable purely so the skip link has something to move focus
+     to — that's a mechanical target, never meant to show a visible
+     ring around the entire page's content; the real feedback for a
+     skip-link jump is the page scrolling there, not an outline.
+     Unconditional, not scoped to :focus-visible: why focus lands
+     here after closing a dialog, on Safari specifically, isn't fully
+     understood, so this guarantees no ring renders regardless of the
+     exact mechanism rather than depending on getting that heuristic
+     right too. */
+  outline: none;
 }
 
 h1 {
