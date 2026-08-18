@@ -84,6 +84,21 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* mobile browsers apply their own default tap-highlight (often a
+   translucent blue) to any tapped link/button unless told not to —
+   never reset anywhere in this file before. Best available hypothesis
+   for a reported stray blue line near the nav after closing a
+   lightbox on mobile portrait: a lingering highlight rect from the
+   tap that opened or closed the dialog, surfacing through whatever
+   repaint the scroll-lock/unlock and scroll-to-0 sequence triggers.
+   Not confirmed live this round — couldn't get a mobile browser
+   session working to reproduce it — so treat this as the first,
+   safe thing to try rather than a confirmed fix; flagged in the
+   response to ask for a screenshot if it's still there after this. */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* smooth in-page jumps (footnote <-> ornament round-trip on home.html);
    the prefers-reduced-motion block below already forces this back to
    auto with !important, so it stays a no-op for anyone who has that
@@ -1079,26 +1094,46 @@ body.page-galleria main {
 /* unlike discorso's stage, this one isn't bled past main's own padding
    via a negative margin — asked to keep any overflow bounded by
    ritagli-band's own side margins rather than widening the stage past
-   them. 380px tall: just enough for the two photos' combined vertical
+   them. 420px tall: just enough for the two photos' combined vertical
    extent (see the inline --ty values on the two .clump-photo elements
    in quercia.html) without clipping. */
 body.page-quercia .clump-stage {
-  height: 380px;
+  height: 420px;
   width: 100%;
   margin: 0 0 32px;
 }
 
-/* border color: couldn't locate an existing bordered "text box" on
-   home.html to match — home's own pull-quote (.essay-epigraph) is
-   explicitly borderless by design (see its own comment), and nothing
-   else there carries a border either. Using #eee (the site's own
-   dominant light body-text tone) as a reasoned placeholder rather
-   than inventing an unrelated colour; flagged to Valerio to confirm
-   or correct with an exact value. */
+/* the CSS border from an earlier round is gone: these images
+   (quercia-1/2-clump.webp) now have their own #232323 border baked
+   in by Valerio directly, at the same colour .essay-block's
+   background uses on home.html — a real border on the source file
+   rather than a CSS approximation, so stacking a second one here
+   would just double it up. */
 body.page-quercia .clump-photo {
-  width: 420px;
-  height: 276px;
-  border: 4px solid #eee;
+  /* slower than discorso's 0.9s base — reported too fast with only
+     two photos to watch (discorso's six read fine at the original
+     speed, busier scene, less time to notice any one photo's pace).
+     Overriding just the duration longhand, not the whole `animation`
+     shorthand, keeps the base rule's easing curve and forwards fill. */
+  animation-duration: 1.6s;
+}
+
+/* scoped to min-width:641px — the exact inverse of discorso's own
+   mobile breakpoint (max-width:640px) — so this never fights that
+   rule's width:100% mobile reset on specificity. It was unscoped
+   before: body.page-quercia .clump-photo (0,0,2,1) beats the generic
+   mobile rule's plain .clump-photo (0,0,1,0) regardless of media
+   query, so the 420px desktop width was still winning on phones,
+   pushing quercia-1 off the right edge of the viewport — exactly the
+   overflow reported. 420×305: the source images are 783×568
+   (783/568 ≈ 1.379) with their own border included, so the box now
+   matches that ratio directly rather than object-fit:cover cropping
+   unevenly into one edge of the baked-in border. */
+@media (min-width: 641px) {
+  body.page-quercia .clump-photo {
+    width: 420px;
+    height: 305px;
+  }
 }
 
 /* badge visible unconditionally, on every input type — not hover-only
@@ -1117,12 +1152,13 @@ body.page-quercia .clump-badge {
 /* the generic stacked-mobile rule above (max-width:640px) already
    gives quercia's photos the right portrait treatment for free — same
    static/no-animation reset discorso's own six photos get. This just
-   swaps its generic 14/9 aspect-ratio for these two photos' real one,
-   so the mobile crop matches the desktop object-fit:cover crop rather
-   than a compromise ratio tuned for discorso's varied source scans. */
+   swaps its generic 14/9 aspect-ratio for these two photos' real one
+   (783×568, border included), so the mobile crop matches the desktop
+   object-fit:cover crop rather than a compromise ratio tuned for
+   discorso's varied source scans. */
 @media (max-width: 640px) {
   body.page-quercia .clump-photo {
-    aspect-ratio: 630 / 415;
+    aspect-ratio: 783 / 568;
   }
 }
 
@@ -1154,7 +1190,7 @@ body.page-quercia .clump-badge {
     position: static;
     width: 50%;
     height: auto;
-    aspect-ratio: 630 / 415;
+    aspect-ratio: 783 / 568;
     opacity: 1;
     animation: none;
   }
