@@ -1784,6 +1784,18 @@ footer .cc-logo {
   padding: 0 2px;
 }
 
+/* plain positioning only, unlike .center-line above which also adds
+   bold/sans-serif heading styling — for a line like a "firma" note
+   that needs to sit under/beside a heading-style line without
+   becoming one itself. */
+.doc-viewer-text-inner .align-center {
+  text-align: center;
+}
+
+.doc-viewer-text-inner .align-right {
+  text-align: right;
+}
+
 /* --- quercia scroll windows: tall Facebook screenshots contained in a
    fixed-height frame with a native vertical scrollbar, so the page
    itself doesn't become enormous. The expand button stays pinned to
