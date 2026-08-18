@@ -1104,9 +1104,19 @@ body.page-galleria main {
    the inline --ty values in quercia.html) without clipping there. */
 @media (min-width: 641px) {
   body.page-quercia .clump-stage {
-    height: 380px;
+    height: 370px;
     width: 100%;
     margin: 0 0 32px;
+  }
+  /* neutralizes the anchor as a positioning context — see this
+     block's own opening comment for why: with the anchor out of the
+     way, the two .clump-photo elements' left:0/right:0 (set inline,
+     since one needs left and the other right — not expressible as a
+     single shared custom property the way the old translate-based
+     tx/ty was) resolve against the stage itself instead of the
+     anchor's own 0×0 box, landing exactly on ritagli-band's edges. */
+  body.page-quercia .clump-anchor {
+    position: static;
   }
 }
 
@@ -1172,6 +1182,19 @@ body.page-quercia .clump-badge {
   right: auto;
   bottom: 55px;
   transform: translateX(-50%);
+}
+
+/* desktop reverts to discorso's own hover-only behaviour — mobile
+   (outside this query) stays always-visible, since quercia still has
+   no page-level hint banner (discorso's .discorso-hint) to carry that
+   job on a screen with no hover at all. */
+@media (hover: hover) and (pointer: fine) {
+  body.page-quercia .clump-badge {
+    opacity: 0;
+  }
+  body.page-quercia .clump-photo.settled:hover .clump-badge {
+    opacity: 1;
+  }
 }
 
 /* the generic stacked-mobile rule above (max-width:640px) already
@@ -1508,6 +1531,7 @@ footer .cc-logo {
   padding: 40px;
   background: rgba(0, 0, 0, 0.88);
   border: none;
+  outline: none;
   margin: 0;
   width: 100%;
   height: 100%;
@@ -1660,6 +1684,7 @@ footer .cc-logo {
   flex-direction: column;
   background: #101010;
   border: none;
+  outline: none;
   margin: 0;
   padding: 0;
   width: 100%;
