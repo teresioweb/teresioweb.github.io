@@ -1435,6 +1435,233 @@ footer .cc-logo {
   .lightbox-next { right: 8px; }
 }
 
+/* --- document viewer: a second, deliberately simpler lightbox variant
+   for scanned documents (diploma-cfm, teresio-cavaliere, the Banchelli
+   Facebook screenshots) where the whole point is reading small print,
+   not admiring a photo. .lightbox-overlay scales its image DOWN to
+   fit the viewport (max-width/max-height) — exactly wrong here, since
+   shrinking a dense scan to fit the screen is what made the raw-file
+   new-tab link necessary in the first place. This one instead lets
+   the image sit at its own natural pixel size (or a per-image tuned
+   width via --doc-width, set inline on the trigger once someone's
+   actually tested legibility on real hardware — unset by default,
+   deliberately not guessed at here) inside a container that scrolls
+   both ways. No prev/next: unlike the photo lightbox, each of these
+   is a standalone document, never a sequence to step through, so
+   that whole piece of initLightbox()'s job doesn't exist here. */
+.doc-viewer-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  flex-direction: column;
+  background: #101010;
+  border: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+}
+
+.doc-viewer-overlay[open] {
+  display: flex;
+}
+
+.doc-viewer-overlay::backdrop {
+  background: transparent; /* same reasoning as .lightbox-overlay::backdrop above */
+}
+
+/* fixed top strip — flex: none keeps it pinned while .doc-viewer-scroll
+   underneath does all the scrolling; not position:fixed/absolute,
+   since a flex column with one flexible child already achieves that
+   without taking the toggle/close buttons out of normal Tab order. */
+.doc-viewer-bar {
+  flex: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: rgba(16, 16, 16, 0.92);
+  backdrop-filter: blur(6px);
+}
+
+/* same pill language as .quercia-expand/.img-badge elsewhere on the
+   site, so this reads as the same family of UI chrome rather than a
+   one-off control invented for this single feature. aria-pressed
+   (toggled in JS) carries the actual state to screen readers; the
+   [aria-pressed="true"] rule below is only the sighted equivalent of
+   that, not a substitute for it. */
+.doc-viewer-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.doc-viewer-toggle[hidden] {
+  display: none;
+}
+
+.doc-viewer-toggle[aria-pressed="true"] {
+  background: #fff;
+  color: #101010;
+}
+
+.doc-viewer-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+/* the scrollable stage. overflow:auto (not scroll) so a document that
+   *does* fit needs no scrollbar at all — diploma-cfm on a wide
+   desktop window, say. tabindex="0" in the markup, not here, is what
+   lets a keyboard user actually focus this element and scroll it with
+   arrow keys; that's native browser behaviour for any scrollable
+   element with a tab stop, nothing bespoke to write in JS for it. */
+.doc-viewer-scroll {
+  flex: 1;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  justify-content: center;
+}
+
+.doc-viewer-scroll[hidden] {
+  display: none;
+}
+
+.doc-viewer-scroll img {
+  display: block;
+  /* natural pixel size by default (no max-width/height cap, unlike
+     .lightbox-overlay img) — width only set at all when a trigger
+     supplies --doc-width, e.g. style="--doc-width:1400px", for a
+     document whose natural size tested too small to read comfortably.
+     max-width here is a floor against the variable being left unset
+     AND the browser default of none, not a cap on legibility. */
+  width: var(--doc-width, auto);
+  max-width: none;
+  height: auto;
+  margin: auto; /* centers a document narrower than the viewport in both axes; a wider/taller one just overflows into the container's own scrollbars */
+}
+
+/* transcript panel — same slot as .doc-viewer-scroll, never both
+   visible at once (toggled via [hidden] in JS). Serif body copy,
+   matching the site's own reading typography rather than inventing a
+   document-viewer-specific one, since this *is* body copy once it's
+   transcribed. */
+.doc-viewer-text {
+  flex: 1;
+  overflow: auto;
+  padding: 32px 24px 60px;
+}
+
+.doc-viewer-text[hidden] {
+  display: none;
+}
+
+.doc-viewer-text-inner {
+  max-width: 620px;
+  margin: 0 auto;
+  color: #eee;
+  font-family: 'Merriweather', Georgia, serif;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.doc-viewer-text-inner p {
+  margin: 0 0 1em;
+}
+
+.doc-viewer-text-meta {
+  color: #999;
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  font-size: 13px;
+  margin-bottom: 1.4em;
+}
+
+.doc-viewer-text-inner mark {
+  background: rgba(255, 90, 90, 0.22); /* echoes the red hand-underline visible in the source screenshot, not a generic yellow highlight */
+  color: inherit;
+  padding: 0 2px;
+}
+
+/* section subheads inside a combined transcript (BanchelliFull, two
+   posts in one template) — one level up from .doc-viewer-text-comments
+   h3 below, which marks a much smaller "Commenti" label */
+.doc-viewer-text-inner h2 {
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #ccc;
+  margin: 2em 0 0.6em;
+  padding-top: 1.4em;
+  border-top: 1px solid #333;
+}
+
+.doc-viewer-text-inner h2:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.doc-viewer-text-inner blockquote {
+  margin: 1.4em 0;
+  padding-left: 16px;
+  border-left: 2px solid #444;
+  font-style: italic;
+  color: #ccc;
+}
+
+.doc-viewer-text-comments {
+  margin-top: 2em;
+  padding-top: 1.4em;
+  border-top: 1px solid #333;
+}
+
+.doc-viewer-text-comments h2,
+.doc-viewer-text-comments h3 {
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 1em;
+}
+
+.doc-viewer-text-comments .comment {
+  margin-bottom: 1em;
+  font-size: 15px;
+}
+
+.doc-viewer-text-comments .comment.reply {
+  margin-left: 20px;
+}
+
+.doc-viewer-text-comments .comment-author {
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: #ccc;
+  display: block;
+  margin-bottom: 0.2em;
+}
+
 /* --- quercia scroll windows: tall Facebook screenshots contained in a
    fixed-height frame with a native vertical scrollbar, so the page
    itself doesn't become enormous. The expand button stays pinned to

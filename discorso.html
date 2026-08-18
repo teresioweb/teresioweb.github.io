@@ -89,15 +89,15 @@
       </div>
 
       <div class="clump-photo" style="--fx:-1100px; --fy:144px; --tx:-378px; --ty:144px; --delay:0.57s;">
-        <a href="images/discorso/BanchelliLogos.webp" target="_blank" rel="noopener">
-          <img src="images/discorso/banchelli1.webp" width="800" height="525" alt="Luciano Banchelli">
+        <a href="images/discorso/BanchelliLogos.webp" target="_blank" rel="noopener" class="doc-viewer-trigger" data-doc-src="images/discorso/BanchelliLogos.webp" data-doc-alt="Post Facebook di Luciano Banchelli, 15 luglio 2015, sulla Spilla d'Oro e sulla Logos 27" data-text-target="text-banchelli-logos">
+          <img src="images/discorso/banchelli1.webp" width="800" height="525" alt="Post Facebook di Luciano Banchelli, 15 luglio 2015, sulla Spilla d'Oro e sulla Logos 27">
         <span class="clump-badge">Clicca per il testo completo</span>
         </a>
       </div>
 
       <div class="clump-photo" style="--fx:1100px; --fy:144px; --tx:8px; --ty:144px; --delay:0.7s;">
-        <a href="images/discorso/BanchelliRicordo.webp" target="_blank" rel="noopener">
-          <img src="images/discorso/banchelli2.webp" width="800" height="525" alt="Luciano Banchelli">
+        <a href="images/discorso/BanchelliRicordo.webp" target="_blank" rel="noopener" class="doc-viewer-trigger" data-doc-src="images/discorso/BanchelliRicordo.webp" data-doc-alt="Post Facebook di Luciano Banchelli, 2 settembre 2015, con i suoi ricordi su Teresio e sull'Olivetti" data-text-target="text-banchelli-ricordo">
+          <img src="images/discorso/banchelli2.webp" width="800" height="525" alt="Post Facebook di Luciano Banchelli, 2 settembre 2015, con i suoi ricordi su Teresio e sull'Olivetti">
         <span class="clump-badge">Clicca per il testo completo</span>
         </a>
       </div>
@@ -120,10 +120,116 @@
     </p>
 
     <p id="banchelli" class="footnote-target">
-      I <a href="images/discorso/BanchelliFull.webp" target="_blank" rel="noopener" class="hl" style="background:#CEDCE6;">ricordi</a> di <strong>Luciano Banchelli</strong> sulla sua pagina social (link <a href="https://www.facebook.com/luciano.banchelli.5/posts/910468195707081" target="_blank" rel="noopener" class="footnote-link">1</a> e <a href="https://www.facebook.com/photo?fbid=885829444837623" target="_blank" rel="noopener" class="footnote-link">2</a>). Assunto nel 1936 presso la Scuola Meccanici e dipendente Olivetti per quarant&rsquo;anni, ha pubblicato libri di memorie nei quali racconta anche la sua esperienza nell&rsquo;azienda.
+      I <a href="images/discorso/BanchelliFull.webp" target="_blank" rel="noopener" class="hl doc-viewer-trigger" style="background:#CEDCE6;" data-doc-src="images/discorso/BanchelliFull.webp" data-doc-alt="I due post Facebook di Luciano Banchelli affiancati" data-text-target="text-banchelli-full">ricordi</a> di <strong>Luciano Banchelli</strong> sulla sua pagina social (link <a href="https://www.facebook.com/luciano.banchelli.5/posts/910468195707081" target="_blank" rel="noopener" class="footnote-link">1</a> e <a href="https://www.facebook.com/photo?fbid=885829444837623" target="_blank" rel="noopener" class="footnote-link">2</a>). Assunto nel 1936 presso la Scuola Meccanici e dipendente Olivetti per quarant&rsquo;anni, ha pubblicato libri di memorie nei quali racconta anche la sua esperienza nell&rsquo;azienda.
     </p>
   </div>
 </main>
+
+<!-- document viewer: shared dialog for every .doc-viewer-trigger on
+     this page (see initDocViewer() in animations.js). The toggle
+     button only activates for a trigger whose data-text-target
+     matches one of the <template> ids below. -->
+<dialog class="doc-viewer-overlay" aria-label="Documento ingrandito">
+  <div class="doc-viewer-bar">
+    <button type="button" class="doc-viewer-toggle" aria-pressed="false" hidden>Versione testuale</button>
+    <button type="button" class="doc-viewer-close" aria-label="Chiudi">&times;</button>
+  </div>
+  <div class="doc-viewer-scroll" tabindex="0">
+    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBTAA7" alt="">
+  </div>
+  <div class="doc-viewer-text" hidden></div>
+</dialog>
+
+<!-- transcripts, inert until initDocViewer() clones one into
+     .doc-viewer-text on open — see that function's own comment for
+     why <template> and not a hidden div. Transcribed from the
+     Facebook screenshots directly (images/discorso/Banchelli*.webp);
+     the two source posts and this page's three linked images map as:
+     BanchelliLogos.webp = the 15 July 2015 post alone,
+     BanchelliRicordo.webp = the 2 September 2015 post alone,
+     BanchelliFull.webp = both posts side by side, hence
+     text-banchelli-full below simply combines the other two. -->
+<template id="text-banchelli-logos">
+  <div class="doc-viewer-text-inner">
+    <p class="doc-viewer-text-meta">Post Facebook di Luciano Banchelli &mdash; 15 luglio 2015</p>
+    <p>Spilla d&rsquo;Oro, orologio regalo.</p>
+    <p>Il sig. Teresio Gassino, sempre attento a unire, collegare, per associarsi maggiormente tra il suo ufficio ed il laboratorio esperienze, propose a tutti gli impiegati del Centro Studi a collaborare per regalarci, alla consegna della Spilla d&rsquo;0ro, un orologio Vetta automatico da polso, considerato per gli operai un bene lussuoso, nessuno di noi lo possedeva.</p>
+    <p>Anche i pranzi e le gite nei posti pi&ugrave; incantevoli sono state opere sue. Realizzate il sabato e domenica con i pullman della Ditta.</p>
+    <p>Questi privilegi ebbero fine con il suo allontanamento dal Centro. Anche la situazione interna, ed i tempi, erano mutati e non da poco.</p>
+    <blockquote>
+      <p>1961<br>
+      &laquo;Le Spille d&rsquo;Oro&raquo;<br>
+      Caffaro Rore &ndash; Regruto &ndash; Fornero &ndash; Banchelli<br>
+      Cristoforo &ndash; Pistono</p>
+      <p>Del Laboratorio Meccanico &ndash; A &ndash;<br>
+      riconoscenti ringraziano</p>
+      <p>e invitano la S. V. al trattenimento che si terr&agrave;<br>
+      nei locali del Circolo Olivetti il giorno 19 corrente<br>
+      alle ore 18,45</p>
+    </blockquote>
+    <div class="doc-viewer-text-comments">
+      <h2>Commenti</h2>
+      <p class="comment"><span class="comment-author">Umberto</span>LOgos 27</p>
+      <p class="comment"><span class="comment-author">Ciro</span>peccato la guastosit&agrave; elevata&hellip; calcoli percentuali automatici, elevazioni a potenza&hellip; bella con rumore di mitragliatrice</p>
+      <p class="comment reply"><span class="comment-author">Luciano Banchelli</span>Meccanicamente era un gioiello, nessuno &egrave; riuscito a imitarla, la velocit&agrave; elettronica l&rsquo;ha superata, ma non pensate che tutto sia andato liscio, abbiamo solo assistito il finale della 101 che con molta fortuna e naturalmente ingegno ha superato lo scoglio. In quanto a rumore, il rullo della testina in fase di stampa, superava la vostra vecchia mitragliatrice.</p>
+      <p class="comment"><span class="comment-author">Roberto</span>Bei ricordi, alla 27 ho lavorato al controllo statistico del precollaudo.</p>
+    </div>
+  </div>
+</template>
+
+<template id="text-banchelli-ricordo">
+  <div class="doc-viewer-text-inner">
+    <p class="doc-viewer-text-meta">Post Facebook di Luciano Banchelli &mdash; 2 settembre 2015</p>
+    <p>A quei tempi l&rsquo;America era lontanissima e il sig. Capellaro fu il primo dirigente a beneficiare un viaggio premio negli Stati Uniti e a Walt Disney.</p>
+    <p><mark>Ma sul progetto di queste macchine gi&agrave; era presente l&rsquo;estro creativo di un suo allievo: Teresio Gassino. Sicuramente l&rsquo;ing. Capellaro non avrebbe raggiunto tanto successo senza l&rsquo;ausilio di questo diligente allievo, che unito ai: Daly, Azzalin, Bertino, Giolitti, Vanoni, Ottino, Bellis, Giannitrapani &hellip;girava senza tregua da un tecnigrafo all&rsquo;altro per seguire la concretezza delle sue idee.</mark> Anche il laboratorio a loro disposizione risolveva rapidamente le loro necessit&agrave;. Ognuno di noi ricapitol&ograve; le virt&ugrave; antiche dei padri; onest&agrave;, laboriosit&agrave;, coraggio. Tutti abbiamo cercato di dare il meglio di noi stessi e ci siamo riusciti, senza essere l&rsquo;enfant prodige.</p>
+    <p>La notte di San Savino del 1947 una violentissima grandinata mai vista, formata da pezzi di ghiaccio d&rsquo;ogni dimensione, sconvolse Ivrea e tutta la Olivetti. Le grandiose vetrate vengono frantumate, non si salv&ograve; un solo vetro. Tutti i reparti ed uffici allagati. Danni incalcolabili, il giorno appresso domenica, tutti i vetrai, giunti da ogni dove, gi&agrave; erano all&rsquo;opera per rimettere in sesto i gravi danni.</p>
+    <p>Nel 1949 la S.I.P. (Societ&agrave; Idroelettrica Piemontese) non dispone centrali elettriche per le necessit&agrave; della zona di sua competenza, riduce cos&igrave; la fornitura di energia elettrica a tutto il Piemonte. L&rsquo;azienda stabil&igrave; turni di lavoro notturni e fermate a rotazione che coinvolgevano diversi reparti con la retribuzione all&rsquo;80%.</p>
+    <p>La cassa di integrazione stipendio non esisteva.</p>
+    <p>Per far fronte in parte a questa anomalia, la Ditta si procur&ograve; un motore Diesel di un sottomarino in disarmo con generatore dalla potenza di 1.400 Kw ora, non sufficiente alle necessit&agrave; aziendali. Nelle vicinanze il rumore era assordante con forti vibrazioni ai fabbricati, dopo pochi mesi, con grande sollievo del circondario, questo generatore scompare.</p>
+    <p>Maggio 1961, una seconda rovinosa grandinata sconvolge nuovamente la zona Olivetti, la nuova ICO terminata nel 1957, ebbe la stessa sorte, andarono in frantumi grandiose vetrate ed anche 6.000 mq. di solette in cemento rivestite nei giunti da lastre di lamiera zincata, carta catramata da ripristinare per infiltrazioni acqua e tettoie d&rsquo;amianto. La zona del Centro Studi fu meno colpita, solo alcuni vetri esposti a nord. Il nostro lavoro continu&ograve; senza interruzioni. Il Centro Studi mai perse una sola ora di lavoro: scioperi limitatissimi, mai fermate dal lavoro per mancanza di energia elettrica o altri fattori, integrazione parola sconosciuta. Lo studio per la ricerca di nuovi prodotti da immettere rapidamente sul mercato, non permetteva soste. &Egrave; stato il poi a far scomparire ogni cosa.</p>
+    <p>Tutti questi raccontini di poco conto sono semplici curiosit&agrave; che buona parte dei lavoratori conoscevano, non sono stati certo il fattore che fece grande l&rsquo;azienda. Le grandi manovre industriali e finanziarie erano a conoscenza di un piccolissimo gruppo dirigenziale.</p>
+    <p class="doc-viewer-text-meta">Il passo evidenziato &egrave; sottolineato a mano nello screenshot originale.</p>
+  </div>
+</template>
+
+<template id="text-banchelli-full">
+  <div class="doc-viewer-text-inner">
+    <p class="doc-viewer-text-meta">Due post Facebook di Luciano Banchelli, affiancati nello screenshot</p>
+    <h2>2 settembre 2015</h2>
+    <p>A quei tempi l&rsquo;America era lontanissima e il sig. Capellaro fu il primo dirigente a beneficiare un viaggio premio negli Stati Uniti e a Walt Disney.</p>
+    <p><mark>Ma sul progetto di queste macchine gi&agrave; era presente l&rsquo;estro creativo di un suo allievo: Teresio Gassino. Sicuramente l&rsquo;ing. Capellaro non avrebbe raggiunto tanto successo senza l&rsquo;ausilio di questo diligente allievo, che unito ai: Daly, Azzalin, Bertino, Giolitti, Vanoni, Ottino, Bellis, Giannitrapani &hellip;girava senza tregua da un tecnigrafo all&rsquo;altro per seguire la concretezza delle sue idee.</mark> Anche il laboratorio a loro disposizione risolveva rapidamente le loro necessit&agrave;. Ognuno di noi ricapitol&ograve; le virt&ugrave; antiche dei padri; onest&agrave;, laboriosit&agrave;, coraggio. Tutti abbiamo cercato di dare il meglio di noi stessi e ci siamo riusciti, senza essere l&rsquo;enfant prodige.</p>
+    <p>La notte di San Savino del 1947 una violentissima grandinata mai vista, formata da pezzi di ghiaccio d&rsquo;ogni dimensione, sconvolse Ivrea e tutta la Olivetti. Le grandiose vetrate vengono frantumate, non si salv&ograve; un solo vetro. Tutti i reparti ed uffici allagati. Danni incalcolabili, il giorno appresso domenica, tutti i vetrai, giunti da ogni dove, gi&agrave; erano all&rsquo;opera per rimettere in sesto i gravi danni.</p>
+    <p>Nel 1949 la S.I.P. (Societ&agrave; Idroelettrica Piemontese) non dispone centrali elettriche per le necessit&agrave; della zona di sua competenza, riduce cos&igrave; la fornitura di energia elettrica a tutto il Piemonte. L&rsquo;azienda stabil&igrave; turni di lavoro notturni e fermate a rotazione che coinvolgevano diversi reparti con la retribuzione all&rsquo;80%.</p>
+    <p>La cassa di integrazione stipendio non esisteva.</p>
+    <p>Per far fronte in parte a questa anomalia, la Ditta si procur&ograve; un motore Diesel di un sottomarino in disarmo con generatore dalla potenza di 1.400 Kw ora, non sufficiente alle necessit&agrave; aziendali. Nelle vicinanze il rumore era assordante con forti vibrazioni ai fabbricati, dopo pochi mesi, con grande sollievo del circondario, questo generatore scompare.</p>
+    <p>Maggio 1961, una seconda rovinosa grandinata sconvolge nuovamente la zona Olivetti, la nuova ICO terminata nel 1957, ebbe la stessa sorte, andarono in frantumi grandiose vetrate ed anche 6.000 mq. di solette in cemento rivestite nei giunti da lastre di lamiera zincata, carta catramata da ripristinare per infiltrazioni acqua e tettoie d&rsquo;amianto. La zona del Centro Studi fu meno colpita, solo alcuni vetri esposti a nord. Il nostro lavoro continu&ograve; senza interruzioni. Il Centro Studi mai perse una sola ora di lavoro: scioperi limitatissimi, mai fermate dal lavoro per mancanza di energia elettrica o altri fattori, integrazione parola sconosciuta. Lo studio per la ricerca di nuovi prodotti da immettere rapidamente sul mercato, non permetteva soste. &Egrave; stato il poi a far scomparire ogni cosa.</p>
+    <p>Tutti questi raccontini di poco conto sono semplici curiosit&agrave; che buona parte dei lavoratori conoscevano, non sono stati certo il fattore che fece grande l&rsquo;azienda. Le grandi manovre industriali e finanziarie erano a conoscenza di un piccolissimo gruppo dirigenziale.</p>
+    <p class="doc-viewer-text-meta">Il passo evidenziato &egrave; sottolineato a mano nello screenshot originale.</p>
+    <h2>15 luglio 2015</h2>
+    <p>Spilla d&rsquo;Oro, orologio regalo.</p>
+    <p>Il sig. Teresio Gassino, sempre attento a unire, collegare, per associarsi maggiormente tra il suo ufficio ed il laboratorio esperienze, propose a tutti gli impiegati del Centro Studi a collaborare per regalarci, alla consegna della Spilla d&rsquo;0ro, un orologio Vetta automatico da polso, considerato per gli operai un bene lussuoso, nessuno di noi lo possedeva.</p>
+    <p>Anche i pranzi e le gite nei posti pi&ugrave; incantevoli sono state opere sue. Realizzate il sabato e domenica con i pullman della Ditta.</p>
+    <p>Questi privilegi ebbero fine con il suo allontanamento dal Centro. Anche la situazione interna, ed i tempi, erano mutati e non da poco.</p>
+    <blockquote>
+      <p>1961<br>
+      &laquo;Le Spille d&rsquo;Oro&raquo;<br>
+      Caffaro Rore &ndash; Regruto &ndash; Fornero &ndash; Banchelli<br>
+      Cristoforo &ndash; Pistono</p>
+      <p>Del Laboratorio Meccanico &ndash; A &ndash;<br>
+      riconoscenti ringraziano</p>
+      <p>e invitano la S. V. al trattenimento che si terr&agrave;<br>
+      nei locali del Circolo Olivetti il giorno 19 corrente<br>
+      alle ore 18,45</p>
+    </blockquote>
+    <div class="doc-viewer-text-comments">
+      <h3>Commenti</h3>
+      <p class="comment"><span class="comment-author">Umberto</span>LOgos 27</p>
+      <p class="comment"><span class="comment-author">Ciro</span>peccato la guastosit&agrave; elevata&hellip; calcoli percentuali automatici, elevazioni a potenza&hellip; bella con rumore di mitragliatrice</p>
+      <p class="comment reply"><span class="comment-author">Luciano Banchelli</span>Meccanicamente era un gioiello, nessuno &egrave; riuscito a imitarla, la velocit&agrave; elettronica l&rsquo;ha superata, ma non pensate che tutto sia andato liscio, abbiamo solo assistito il finale della 101 che con molta fortuna e naturalmente ingegno ha superato lo scoglio. In quanto a rumore, il rullo della testina in fase di stampa, superava la vostra vecchia mitragliatrice.</p>
+      <p class="comment"><span class="comment-author">Roberto</span>Bei ricordi, alla 27 ho lavorato al controllo statistico del precollaudo.</p>
+    </div>
+  </div>
+</template>
 
 <footer>
   <img src="images/creative.png" alt="" class="cc-logo">

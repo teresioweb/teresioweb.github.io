@@ -70,9 +70,9 @@
 
   <figure class="reveal-img side from-right align-top color-band" style="--band-color:#FEE8B2;">
     <div class="side-row">
-      <a href="images/diploma-cfm.jpg" target="_blank" rel="noopener">
+      <a href="images/diploma-cfm.jpg" target="_blank" rel="noopener" class="doc-viewer-trigger" data-doc-src="images/diploma-cfm.jpg" data-doc-alt="Scansione del certificato di qualificazione per Disegnatori del CFM">
       <img src="images/diploma-cfm.webp" width="800" height="565" alt="Scansione del certificato di qualificazione per Disegnatori del CFM">
-      <span class="img-badge">&#10530; Immagine</span>
+      <span class="img-badge">&#10530; Ingrandisci</span>
     </a>
       <figcaption>
       <p>Nel 1942 consegue la qualificazione di <strong>Disegnatore</strong> presso il Centro Formazione Meccanici Olivetti.</p>
@@ -83,9 +83,9 @@
 
   <figure class="reveal-img side from-right align-top crop-top color-band" style="--band-color:#CEDCE6;">
     <div class="side-row">
-      <a href="images/teresio-cavaliere.jpg" target="_blank" rel="noopener">
+      <a href="images/teresio-cavaliere.jpg" target="_blank" rel="noopener" class="doc-viewer-trigger" data-doc-src="images/teresio-cavaliere.jpg" data-doc-alt="Diploma dell’onorificenza di Cavaliere">
       <img src="images/teresio-cavaliere.webp" width="800" height="1090" alt="Diploma dell’onorificenza di Cavaliere">
-      <span class="img-badge">&#10530; Immagine</span>
+      <span class="img-badge">&#10530; Ingrandisci</span>
     </a>
       <figcaption>
       <p>Nel 1962 &egrave; nominato <strong>Cavaliere</strong> dell&rsquo;Ordine al Merito della Repubblica Italiana.</p>
@@ -119,6 +119,22 @@
     </div>
   </figure>
 </main>
+
+<!-- document viewer: shared dialog for every .doc-viewer-trigger on
+     this page (see initDocViewer() in animations.js). No transcript
+     <template> elements here yet, unlike discorso.html — the toggle
+     button stays hidden until diploma-cfm/teresio-cavaliere have a
+     confirmed transcription to wire in. -->
+<dialog class="doc-viewer-overlay" aria-label="Documento ingrandito">
+  <div class="doc-viewer-bar">
+    <button type="button" class="doc-viewer-toggle" aria-pressed="false" hidden>Versione testuale</button>
+    <button type="button" class="doc-viewer-close" aria-label="Chiudi">&times;</button>
+  </div>
+  <div class="doc-viewer-scroll" tabindex="0">
+    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBTAA7" alt="">
+  </div>
+  <div class="doc-viewer-text" hidden></div>
+</dialog>
 
 <footer>
   <img src="images/creative.png" alt="" class="cc-logo">

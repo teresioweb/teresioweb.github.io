@@ -385,12 +385,125 @@ function initClumpPhotos() {
   });
 }
 
+// Document viewer: a second dialog, separate from initLightbox()'s,
+// for scanned documents meant to be read rather than admired — see
+// the CSS comment above .doc-viewer-overlay for why it doesn't just
+// reuse .lightbox-overlay. Deliberately the simpler of the two: no
+// prev/next, no carousel index, because every .doc-viewer-trigger on
+// a page is its own standalone document, never a sequence.
+//
+// Triggers stay real <a href="…"> elements pointing at the raw image
+// file, not <button>s like the photo lightbox uses — click is
+// intercepted with preventDefault() when JS runs, but without JS the
+// link still works exactly as it did before this feature existed
+// (opens the full-resolution file in a new tab). Progressive
+// enhancement, not a replacement.
+//
+// The transcript toggle only appears when a trigger actually has a
+// data-text-target pointing at a <template> on the page (see
+// discorso.html) — most .doc-viewer-trigger elements don't yet, and
+// the button stays hidden for those rather than opening onto an
+// empty panel.
+function initDocViewer() {
+  const overlay = document.querySelector(".doc-viewer-overlay");
+  const triggers = document.querySelectorAll(".doc-viewer-trigger");
+  if (!overlay || !triggers.length) return;
+
+  const scrollWrap = overlay.querySelector(".doc-viewer-scroll");
+  const img = scrollWrap.querySelector("img");
+  const textPanel = overlay.querySelector(".doc-viewer-text");
+  const toggleBtn = overlay.querySelector(".doc-viewer-toggle");
+  const closeBtn = overlay.querySelector(".doc-viewer-close");
+  const BLANK_SRC = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBTAA7"; // same inert 1x1 placeholder as initLightbox, same reason: keeps img.src always non-empty/valid between opens
+  let lastFocusedEl = null;
+  let activeTemplateId = null;
+
+  const showImage = () => {
+    scrollWrap.hidden = false;
+    textPanel.hidden = true;
+    toggleBtn.setAttribute("aria-pressed", "false");
+  };
+
+  const showText = () => {
+    scrollWrap.hidden = true;
+    textPanel.hidden = false;
+    toggleBtn.setAttribute("aria-pressed", "true");
+  };
+
+  const open = (trigger) => {
+    const src = trigger.dataset.docSrc;
+    if (!src) return;
+    img.src = src;
+    img.alt = trigger.dataset.docAlt || "";
+    scrollWrap.scrollTop = 0;
+    scrollWrap.scrollLeft = 0;
+
+    activeTemplateId = trigger.dataset.textTarget || null;
+    const template = activeTemplateId && document.getElementById(activeTemplateId);
+    toggleBtn.hidden = !template;
+    textPanel.innerHTML = "";
+    if (template) textPanel.appendChild(template.content.cloneNode(true));
+
+    showImage();
+    lastFocusedEl = document.activeElement;
+    overlay.showModal();
+    closeBtn.focus();
+  };
+
+  triggers.forEach((trigger) => {
+    trigger.addEventListener("click", (e) => {
+      e.preventDefault();
+      open(trigger);
+    });
+  });
+
+  toggleBtn.addEventListener("click", () => {
+    if (textPanel.hidden) showText();
+    else showImage();
+  });
+
+  closeBtn.addEventListener("click", () => overlay.close());
+
+  // backdrop click closes — checks two targets, not just one. Unlike
+  // .lightbox-overlay, this dialog has zero padding (the whole point
+  // is letting the image fill the viewport), so its .doc-viewer-bar
+  // and .doc-viewer-scroll children together cover 100% of the
+  // dialog's own box — e.target === overlay on its own would almost
+  // never fire, since there's no exposed sliver of the dialog element
+  // itself left to click. scrollWrap is the realistic target: it's
+  // the flex container behind the image, hit whenever the document is
+  // narrower/shorter than the viewport (diploma-cfm centered in a
+  // wide window) or the view is scrolled past the image's edge.
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay || e.target === scrollWrap) overlay.close();
+  });
+
+  overlay.addEventListener("close", () => {
+    img.src = BLANK_SRC;
+    textPanel.innerHTML = "";
+    activeTemplateId = null;
+    if (lastFocusedEl) {
+      lastFocusedEl.focus();
+      lastFocusedEl = null;
+    }
+  });
+
+  // Escape and focus trapping are native to showModal(), same as
+  // initLightbox() — nothing to add here. Unlike that function, there's
+  // no arrow-key carousel to wire up and no Tab-wraparound patch: with
+  // only two or three focusable controls (toggle, close, and the
+  // scroll container itself) Chromium's native trap doesn't exhibit
+  // the body-detour behaviour documented on initLightbox()'s own patch,
+  // so it isn't needed here.
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initScrollReveal();
   initEssayReveal();
   initNavHide();
   initMobileMenu();
   initLightbox();
+  initDocViewer();
   initDiscorsoHint();
   initClumpPhotos();
 });
