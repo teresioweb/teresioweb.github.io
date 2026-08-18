@@ -437,6 +437,7 @@ function initDocViewer() {
     if (!src) return;
     img.src = src;
     img.alt = trigger.dataset.docAlt || "";
+    img.classList.toggle("doc-fit-height", trigger.dataset.docFit === "height");
     scrollWrap.scrollTop = 0;
     scrollWrap.scrollLeft = 0;
 

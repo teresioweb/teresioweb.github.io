@@ -903,6 +903,18 @@ body.page-galleria main {
   margin: 0 -24px 32px;
 }
 
+/* the three in-page scroll targets the ritagli-band's highlighted
+   words jump to (#clump-row-1/2/3, see discorso.html) — offset so the
+   fixed .site-nav doesn't land directly on top of the photo. 100px
+   clears the nav's own rendered height (≈58px desktop, ≈50px mobile)
+   with some breathing room to spare, so one value covers both rather
+   than needing a breakpoint-specific one. */
+#clump-row-1,
+#clump-row-2,
+#clump-row-3 {
+  scroll-margin-top: 100px;
+}
+
 .clump-anchor {
   position: absolute;
   top: 50%;
@@ -1569,27 +1581,38 @@ footer .cc-logo {
 
 .doc-viewer-scroll img {
   display: block;
-  /* capped so a document can't run wider than the viewport on desktop
-     or mobile landscape — nowhere for the extra width to go but off
-     both edges, which combined with justify-content:center above was
-     the actual cause of the reported horizontal-scroll bug. On mobile
-     portrait the cap is deliberately relaxed to 200vw (see the media
-     query below): diploma-cfm and similar landscape-oriented scans
-     are legible enough at their natural size there to be worth a
-     little horizontal scroll, rather than shrinking to fit a narrow
-     screen. --doc-width can still request a SMALLER width than
-     whichever cap applies, for a document whose natural size tested
-     too small to read — it only ever shrinks the image, never grows
-     it past the cap. */
+  /* capped so a document can't run wider than the viewport — nowhere
+     for the extra width to go but off both edges, which combined with
+     justify-content:center above was the actual cause of the reported
+     horizontal-scroll bug. Holds on mobile too now: a portrait-shaped
+     scan (banchellilogos, banchellidiscorso, teresio-cavaliere) reads
+     fine capped by width, same as everywhere else. --doc-width can
+     still request a SMALLER width than the cap, for a document whose
+     natural size tested too small to read — it only ever shrinks the
+     image, never grows it past the cap. */
   width: var(--doc-width, auto);
   max-width: 100vw;
   height: auto;
   margin: auto; /* centers a document narrower than the cap in both axes; one AT the cap just fills it edge to edge */
 }
 
+/* the exception: a LANDSCAPE-shaped scan (diploma-cfm) capped by
+   width alone shrinks to a sliver on a narrow portrait phone — most
+   of its height goes unused. Opted in per-trigger via
+   data-doc-fit="height" (see initDocViewer() in animations.js, which
+   toggles this class on open), and only on mobile portrait: elsewhere
+   the plain width cap above already leaves the document at a
+   comfortable size, since the viewport itself is wide there. Sizes
+   from height instead — 100% of .doc-viewer-scroll's own (flex-
+   computed) height, not 100vh directly, so it doesn't run under the
+   top bar — and lets width overflow into the container's horizontal
+   scroll rather than capping it. */
 @media (max-width: 700px) and (orientation: portrait) {
-  .doc-viewer-scroll img {
-    max-width: 200vw;
+  .doc-viewer-scroll img.doc-fit-height {
+    width: auto;
+    height: 100%;
+    max-width: none;
+    max-height: none;
   }
 }
 
