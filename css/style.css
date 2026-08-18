@@ -1094,13 +1094,20 @@ body.page-galleria main {
 /* unlike discorso's stage, this one isn't bled past main's own padding
    via a negative margin — asked to keep any overflow bounded by
    ritagli-band's own side margins rather than widening the stage past
-   them. 420px tall: just enough for the two photos' combined vertical
-   extent (see the inline --ty values on the two .clump-photo elements
-   in quercia.html) without clipping. */
-body.page-quercia .clump-stage {
-  height: 420px;
-  width: 100%;
-  margin: 0 0 32px;
+   them. Scoped to min-width:641px, same reasoning as .clump-photo's
+   width below: left unscoped originally, its fixed height beat the
+   generic mobile rule's height:auto on specificity, so the stage
+   stayed pinned at its desktop height even when the two stacked
+   mobile photos needed more room than that — the actual cause of the
+   lower photo overlapping the .fonte text underneath it. 380px: just
+   enough for the two photos' combined vertical extent on desktop (see
+   the inline --ty values in quercia.html) without clipping there. */
+@media (min-width: 641px) {
+  body.page-quercia .clump-stage {
+    height: 380px;
+    width: 100%;
+    margin: 0 0 32px;
+  }
 }
 
 /* the CSS border from an earlier round is gone: these images
@@ -1116,6 +1123,19 @@ body.page-quercia .clump-photo {
      Overriding just the duration longhand, not the whole `animation`
      shorthand, keeps the base rule's easing curve and forwards fill. */
   animation-duration: 1.6s;
+}
+
+/* visual order swapped on mobile (both portrait and landscape, both
+   flex layouts) so quercia-1 (leafy) reads first — without touching
+   DOM order, which still controls the desktop z-stacking from the
+   "invert which is on top" round. `order` is a flex/grid-only
+   property, a no-op under desktop's position:absolute layout, so this
+   can sit unconditionally rather than needing its own media query. */
+body.page-quercia .clump-photo:first-child {
+  order: 2;
+}
+body.page-quercia .clump-photo:last-child {
+  order: 1;
 }
 
 /* scoped to min-width:641px — the exact inverse of discorso's own
@@ -1141,11 +1161,16 @@ body.page-quercia .clump-photo {
    .discorso-hint) telling a touch user these images are clickable, so
    the badge has to do that job on its own everywhere; and unlike
    discorso, it stays on for a mouse too, always centered rather than
-   discorso's default bottom-right corner position. */
+   discorso's default bottom-right corner position. Moved up from the
+   base rule's bottom:10px — that sat inside the photos' own baked-in
+   border (~41px deep at desktop's display size), so the badge was
+   partly sitting on the border rather than the photo. 55px clears it
+   with room to spare. */
 body.page-quercia .clump-badge {
   opacity: 1;
   left: 50%;
   right: auto;
+  bottom: 55px;
   transform: translateX(-50%);
 }
 
@@ -1155,10 +1180,21 @@ body.page-quercia .clump-badge {
    swaps its generic 14/9 aspect-ratio for these two photos' real one
    (783×568, border included), so the mobile crop matches the desktop
    object-fit:cover crop rather than a compromise ratio tuned for
-   discorso's varied source scans. */
+   discorso's varied source scans. Badge sized up and pushed higher to
+   match: bottom:65px clears the border at mobile's own display width,
+   and the larger font-size/padding/radius matches .discorso-hint's
+   own scale (that page's equivalent page-level hint), since a badge
+   this size is now the primary "these are clickable" signal on a
+   touchscreen, not a small corner label. */
 @media (max-width: 640px) {
   body.page-quercia .clump-photo {
     aspect-ratio: 783 / 568;
+  }
+  body.page-quercia .clump-badge {
+    bottom: 65px;
+    padding: 10px 22px;
+    border-radius: 24px;
+    font-size: 14px;
   }
 }
 
@@ -1197,6 +1233,16 @@ body.page-quercia .clump-badge {
   body.page-quercia .clump-photo,
   body.page-quercia .clump-photo.settled {
     transform: none;
+  }
+  /* same size/position calibration as the portrait badge above —
+     duplicated rather than shared because this block already stands
+     on its own (see its own opening comment) rather than assuming
+     the max-width:640px block ran first. */
+  body.page-quercia .clump-badge {
+    bottom: 65px;
+    padding: 10px 22px;
+    border-radius: 24px;
+    font-size: 14px;
   }
 }
 
@@ -1546,6 +1592,8 @@ footer .cc-logo {
   font-size: 34px;
   line-height: 1;
   cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 /* prev/next: navigate the gallery without leaving the lightbox, loops
@@ -1641,7 +1689,16 @@ footer .cc-logo {
   padding: 10px 16px;
   background: rgba(16, 16, 16, 0.92);
   backdrop-filter: blur(6px);
+  /* reduces how often a stray text selection can even start on the
+     chrome itself (double-tap/drag on the toggle or close button) —
+     paired with the explicit selection clear in initDocViewer()'s
+     close handler in animations.js, which is the deterministic half
+     of the fix. Deliberately NOT applied to .doc-viewer-text below:
+     the transcript is real content someone may want to copy. */
+  -webkit-user-select: none;
+  user-select: none;
 }
+
 
 /* same pill language as .quercia-expand/.img-badge elsewhere on the
    site, so this reads as the same family of UI chrome rather than a

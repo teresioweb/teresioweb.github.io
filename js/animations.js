@@ -219,6 +219,7 @@ function initLightbox() {
     if (overlayCounter) overlayCounter.textContent = "";
     if (overlayCaption) overlayCaption.textContent = "";
     currentIndex = -1;
+    window.getSelection()?.removeAllRanges(); // see initDocViewer()'s own close handler for why
     if (lastFocusedEl) {
       lastFocusedEl.focus();
       lastFocusedEl = null;
@@ -487,6 +488,7 @@ function initDocViewer() {
     img.src = BLANK_SRC;
     textPanel.innerHTML = "";
     activeTemplateId = null;
+    window.getSelection()?.removeAllRanges(); // this dialog has actual selectable text (the transcript) — a stray selection surviving close, confirmed by report as the real cause of the reported line, not the tap-highlight tried last round
     if (lastFocusedEl) {
       lastFocusedEl.focus();
       lastFocusedEl = null;
