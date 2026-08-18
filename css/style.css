@@ -1771,6 +1771,13 @@ footer .cc-logo {
    lets a keyboard user actually focus this element and scroll it with
    arrow keys; that's native browser behaviour for any scrollable
    element with a tab stop, nothing bespoke to write in JS for it. */
+.doc-viewer-scroll:focus-visible,
+.doc-viewer-text:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -3px;
+  border-radius: 2px;
+}
+
 .doc-viewer-scroll {
   flex: 1;
   overflow: auto;
