@@ -59,7 +59,7 @@
     <div class="side-row">
       <a href="pdf/Curriculum.pdf" target="_blank" rel="noopener">
       <img src="images/curriculum-fronte.webp" width="1200" height="849" alt="Scansione in due pagine del curriculum vitae">
-      <span class="img-badge">&#10530; PDF</span>
+      <span class="img-badge">PDF</span>
     </a>
       <figcaption>
       <p><strong>Curriculum vitae</strong> compilato da Teresio presumibilmente in un momento successivo alla nomina a Dirigente del 1956, quando &egrave; responsabile del coordinamento tecnico dei progetti in corso presso tutti gli uffici (Progetto Macchine da Calcolo, Studi e Progetti Macchine Speciali, Progetto Apparecchiature Speciali) e responsabile diretto di alcuni dei progetti.</p>
@@ -70,7 +70,7 @@
 
   <figure class="reveal-img side from-right align-top color-band" style="--band-color:#FEE8B2;">
     <div class="side-row">
-      <a href="images/diploma-cfm.jpg" target="_blank" rel="noopener" class="doc-viewer-trigger" data-doc-src="images/diploma-cfm.jpg" data-doc-alt="Scansione del certificato di qualificazione per Disegnatori del CFM" data-doc-fit="height">
+      <a href="images/diploma-cfm.jpg" target="_blank" rel="noopener" class="doc-viewer-trigger" data-doc-src="images/diploma-cfm.jpg" data-doc-alt="Scansione del certificato di qualificazione per Disegnatori del CFM" data-doc-fit="height" data-text-target="text-diploma-cfm">
       <img src="images/diploma-cfm.webp" width="800" height="565" alt="Scansione del certificato di qualificazione per Disegnatori del CFM">
       <span class="img-badge">&#10530; Ingrandisci</span>
     </a>
@@ -83,7 +83,7 @@
 
   <figure class="reveal-img side from-right align-top crop-top color-band" style="--band-color:#CEDCE6;">
     <div class="side-row">
-      <a href="images/teresio-cavaliere.jpg" target="_blank" rel="noopener" class="doc-viewer-trigger" data-doc-src="images/teresio-cavaliere.jpg" data-doc-alt="Diploma dell’onorificenza di Cavaliere">
+      <a href="images/teresio-cavaliere.jpg" target="_blank" rel="noopener" class="doc-viewer-trigger" data-doc-src="images/teresio-cavaliere.jpg" data-doc-alt="Diploma dell’onorificenza di Cavaliere" data-text-target="text-teresio-cavaliere">
       <img src="images/teresio-cavaliere.webp" width="800" height="1090" alt="Diploma dell’onorificenza di Cavaliere">
       <span class="img-badge">&#10530; Ingrandisci</span>
     </a>
@@ -121,10 +121,7 @@
 </main>
 
 <!-- document viewer: shared dialog for every .doc-viewer-trigger on
-     this page (see initDocViewer() in animations.js). No transcript
-     <template> elements here yet, unlike discorso.html — the toggle
-     button stays hidden until diploma-cfm/teresio-cavaliere have a
-     confirmed transcription to wire in. -->
+     this page (see initDocViewer() in animations.js). -->
 <dialog class="doc-viewer-overlay" aria-label="Documento ingrandito">
   <div class="doc-viewer-bar">
     <button type="button" class="doc-viewer-toggle" aria-pressed="false" hidden>Versione testuale</button>
@@ -135,6 +132,80 @@
   </div>
   <div class="doc-viewer-text" tabindex="0" hidden></div>
 </dialog>
+
+<!-- transcripts, inert until initDocViewer() clones one into
+     .doc-viewer-text on open. Transcribed verbatim from the source
+     documents (images/diploma-cfm.jpg, images/teresio-cavaliere.jpg)
+     — capitalization exactly as in the original, spelling exactly as
+     transcribed, only apostrophes/quotes normalized to their
+     typographic form. .fill spans mark text that was handwritten
+     onto a blank line on the printed form, as opposed to the form's
+     own printed copy. -->
+<template id="text-diploma-cfm">
+  <div class="doc-viewer-text-inner">
+    <p class="doc-viewer-text-meta">Trascrizione del documento</p>
+
+    <div class="doc-viewer-form-columns">
+      <div>MINISTERO DELLA EDUCAZIONE NAZIONALE</div>
+      <div>SOTTOSEGRETARIATO DI STATO PER LE FABBRICAZIONI DI GUERRA</div>
+    </div>
+    <div class="doc-viewer-form-columns">
+      <div>= I.N.F.A.P.L.I. = ISTITUTO NAZIONALE FASCISTA PER L&rsquo;ADDESTRAMENTO ED IL PERFEZIONAMENTO DEI LAVORATORI DELL&rsquo;INDUSTRIA</div>
+      <div>CONFEDERAZIONI FASCISTE DEGLI INDUSTRIALI E DEI LAVORATORI DELL&rsquo;INDUSTRIA</div>
+    </div>
+
+    <p class="doc-viewer-form-title">ATTESTATO DI IDONEIT&agrave;</p>
+
+    <p>rilasciato a <span class="fill">Gassino Teresio</span> di <span class="fill">Giovanni</span> nato a <span class="fill">Ar&egrave; di Caluso</span></p>
+    <p>Ha superato con punti <span class="fill">8&frac12;/10</span> gli esami finali del Corso <span class="fill">triennale</span> di <span class="fill">qualificazione</span></p>
+    <p>per <span class="fill">Disegnatori</span> tenutosi presso <span class="fill">Stab. Ing. C. Olivetti e C.</span></p>
+    <p><span class="fill">S. A. Ivrea</span></p>
+    <p>Roma <span class="fill">25 NOV 1942 Anno XXI</span></p>
+    <p>N&deg; <span class="fill">169464</span></p>
+
+    <div class="doc-viewer-form-columns doc-viewer-form-columns--left">
+      <div>IL DIRETTORE DEL CORSO</div>
+      <div>IL PRESIDENTE DELL&rsquo;I.N.F.A.P.L.I.<br><span class="fill">firma</span></div>
+    </div>
+
+    <div class="doc-viewer-form-columns doc-viewer-form-columns--left">
+      <div>IL SOTTOSEGRETARIO DI STATO<br>PER LE FABBRICAZIONI DI GUERRA<br>IL CAPO DELEGAZIONE <em>(timbro)</em><br>(Colonnello Bozino Osvaldo) <em>(stesso timbro)</em><br><span class="fill">firma</span></div>
+      <div>IL MINISTRO<br>DELL&rsquo;EDUCAZIONE NAZIONALE<br><span class="fill">G. Bottai (firma)</span></div>
+    </div>
+  </div>
+</template>
+
+<template id="text-teresio-cavaliere">
+  <div class="doc-viewer-text-inner">
+    <p class="doc-viewer-text-meta">Trascrizione del documento</p>
+
+    <p class="center-line">IL PRESIDENTE DELLA REPUBBLICA</p>
+    <p class="center-line">CAPO DELL&rsquo;ORDINE &laquo;AL MERITO DELLA REPUBBLICA ITALIANA&raquo;</p>
+
+    <p>In <span class="fill">considerazione di particolari benemerenze</span><br>
+    Sentita la Giunta dell&rsquo;Ordine al Merito della Repubblica Italiana<br>
+    Sulla proposta del Presidente del Consiglio dei Ministri;<br>
+    con Decreto in data <span class="fill">Roma 2 giugno 1962</span></p>
+
+    <p class="center-line">HA CONFERITO</p>
+
+    <p>l&rsquo;onorificienza di <span class="fill">Cavaliere</span><br>
+    <span class="fill">al Sig. Teresio Gassino</span></p>
+
+    <p>con facolt&agrave; di fregiarsi delle insegne stabilite per tale classe. Il Cancelliere dell&rsquo;Ordine Al Merito della Repubblica Italiana &egrave; incaricato dell&rsquo;esecuzione del presente Decreto che sar&agrave; registrato alla Cancelleria dell&rsquo;Ordine medesimo.</p>
+
+    <p>FIRMATO <span class="fill">Segni</span> CONTROFIRMATO <span class="fill">Fanfani</span></p>
+
+    <p>Il Cancelliere dell&rsquo;Ordine dichiara che in esecuzione delle Presidenziali disposizioni<br>
+    <span class="fill">il Sig. Teresio Gassino</span><br>
+    &egrave; stato iscritto nell&rsquo;Elenco <span class="fill">dei Cavv. (Naz.)</span> al N&deg; <span class="fill">121898 Serie 1a</span></p>
+
+    <p class="center-line">IL CANCELLIERE DELL&rsquo;ORDINE</p>
+    <p><em>firma</em></p>
+    <p>IL DIRETTORE CAPOUFFICIO DELLA CANCELLERIA</p>
+    <p><em>firma</em></p>
+  </div>
+</template>
 
 <footer>
   <img src="images/creative.png" alt="" class="cc-logo">

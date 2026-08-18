@@ -1719,6 +1719,71 @@ footer .cc-logo {
   margin-bottom: 0.2em;
 }
 
+/* --- official-document transcripts (diploma-cfm, teresio-cavaliere):
+   printed forms with hand-filled blanks and, in diploma-cfm's case, a
+   two-column masthead. Shares .doc-viewer-text-inner with the
+   Banchelli transcripts above but adds its own small vocabulary. --- */
+
+/* side-by-side blocks — diploma-cfm's masthead (left-aligned left
+   column, right-aligned right column, matching the scan) and both
+   documents' signature blocks (--left modifier: right column also
+   left-aligned, since two signature labels sitting side by side don't
+   call for the same right-justification a letterhead does). */
+.doc-viewer-form-columns {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 1em;
+}
+
+.doc-viewer-form-columns > div:first-child {
+  text-align: left;
+}
+
+.doc-viewer-form-columns > div:last-child {
+  text-align: right;
+}
+
+.doc-viewer-form-columns--left > div:last-child {
+  text-align: left;
+}
+
+/* a document's own printed title (ATTESTATO DI IDONEITÀ, etc.) — not
+   a real heading element: it's transcribed body content, not page
+   structure, so giving it an h-tag would claim a level of document-
+   outline significance it doesn't have. Styled to still read as a
+   title. */
+.doc-viewer-form-title {
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.3px;
+  margin: 1.4em 0 1em;
+}
+
+/* short declarative lines set centered in the original (IL PRESIDENTE
+   DELLA REPUBBLICA, HA CONFERITO, etc.) — same non-heading reasoning
+   as .doc-viewer-form-title above. */
+.doc-viewer-text-inner .center-line {
+  text-align: center;
+  font-family: 'Merriweather Sans', Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  margin-bottom: 0.6em;
+}
+
+/* text hand-written onto a blank line on the printed form — italic
+   plus an underline evokes both "this was written in by hand" and
+   "this sat on a ruled blank", distinct from the surrounding printed
+   copy. Not the same thing as .doc-viewer-text-inner mark above
+   (that's an editorial highlight added after the fact on a Facebook
+   screenshot); this is original to the document itself. */
+.doc-viewer-text-inner .fill {
+  font-style: italic;
+  border-bottom: 1px solid currentColor;
+  padding: 0 2px;
+}
+
 /* --- quercia scroll windows: tall Facebook screenshots contained in a
    fixed-height frame with a native vertical scrollbar, so the page
    itself doesn't become enormous. The expand button stays pinned to
