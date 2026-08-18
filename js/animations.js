@@ -1,3 +1,21 @@
+// iOS Safari specifically (confirmed absent on Android Chrome) has a
+// documented class of bug where a backdrop-filter layer goes stale —
+// doesn't repaint — after something nearby changes render state, like
+// a dialog opening/closing. .site-nav is the only backdrop-filter
+// element that's always on screen near the top of every page, which
+// matches a reported ghost line appearing there after closing either
+// dialog. Toggling the filter off and back on forces WebKit to tear
+// down and rebuild that specific compositing layer instead of trying
+// to reuse the stale one. Called from both dialogs' close handlers.
+function nudgeNavBackdropFilter() {
+  const nav = document.querySelector(".site-nav");
+  if (!nav) return;
+  const prev = nav.style.backdropFilter;
+  nav.style.backdropFilter = "none";
+  void nav.offsetHeight; // forces the browser to apply the change above before the one below
+  nav.style.backdropFilter = prev;
+}
+
 // Reveals each .reveal-img as it scrolls into view: slides in from
 // the side (left by default, or right if it has the "from-right" class)
 // and fades in. Plays once per image.
@@ -225,6 +243,7 @@ function initLightbox() {
       lastFocusedEl = null;
     }
     void document.body.offsetHeight; // forces a synchronous reflow — see initDocViewer()'s own close handler for why
+    nudgeNavBackdropFilter();
   });
 
   items.forEach((el, index) => {
@@ -506,6 +525,7 @@ function initDocViewer() {
     // not any live DOM/CSS state. This doesn't need to know exactly
     // what's stale; it just forces a redraw that discards it.
     void document.body.offsetHeight;
+    nudgeNavBackdropFilter(); // confirmed iOS-Safari-only (absent on Android Chrome) — see this function's own comment
   });
 
   // Escape and focus trapping are native to showModal(), same as
