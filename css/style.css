@@ -1069,6 +1069,107 @@ body.page-galleria main {
   }
 }
 
+/* --- quercia's own clump: same .clump-stage/.clump-anchor/.clump-photo
+   markup and mechanics as discorso (reused wholesale — initClumpPhotos()
+   in animations.js just selects every .clump-photo on the page, so
+   nothing there needed to change), but with only two photos,
+   deliberately overlapping rather than clustered with gaps between
+   them, and a few page-scoped differences below. --- */
+
+/* unlike discorso's stage, this one isn't bled past main's own padding
+   via a negative margin — asked to keep any overflow bounded by
+   ritagli-band's own side margins rather than widening the stage past
+   them. 380px tall: just enough for the two photos' combined vertical
+   extent (see the inline --ty values on the two .clump-photo elements
+   in quercia.html) without clipping. */
+body.page-quercia .clump-stage {
+  height: 380px;
+  width: 100%;
+  margin: 0 0 32px;
+}
+
+body.page-quercia .clump-photo {
+  width: 420px;
+  height: 276px;
+}
+
+/* badge visible unconditionally here, not hover-only like discorso's
+   — quercia has no page-level hint banner (discorso's .discorso-hint)
+   telling a touch user these images are clickable, so the badge has
+   to do that job on its own on every input type. Centered always too,
+   not just inside the hover-capable branch below: discorso's own
+   centering only kicks in there, leaving the base rule's bottom-right
+   corner position for touch — fine on discorso since the badge never
+   renders on touch at all there, but not fine here where it's the
+   only affordance touch users get. */
+body.page-quercia .clump-badge {
+  opacity: 1;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  /* ...then, on an actual mouse, fall back to discorso's own hover-
+     reveal behaviour — "like discorso's on desktop" was the brief. */
+  body.page-quercia .clump-badge {
+    opacity: 0;
+  }
+  body.page-quercia .clump-photo.settled:hover .clump-badge {
+    opacity: 1;
+  }
+}
+
+/* the generic stacked-mobile rule above (max-width:640px) already
+   gives quercia's photos the right portrait treatment for free — same
+   static/no-animation reset discorso's own six photos get. This just
+   swaps its generic 14/9 aspect-ratio for these two photos' real one,
+   so the mobile crop matches the desktop object-fit:cover crop rather
+   than a compromise ratio tuned for discorso's varied source scans. */
+@media (max-width: 640px) {
+  body.page-quercia .clump-photo {
+    aspect-ratio: 630 / 415;
+  }
+}
+
+/* the landscape-phone case is its own thing, not just "the portrait
+   rule at a different width": a phone rotated sideways is very often
+   wider than the 640px breakpoint above (many land in the 660–930px
+   range there), which would otherwise leave it in the desktop/
+   animated branch by mistake. Keyed on viewport HEIGHT instead —
+   reliably short on an actual phone regardless of its rotated width,
+   where a genuine landscape desktop or tablet window is comfortably
+   taller than the 500px cutoff used here. Written to stand on its
+   own (not assuming the max-width:640px rule already ran, since at
+   these wider landscape widths it typically won't have). */
+@media (max-height: 500px) and (orientation: landscape) {
+  body.page-quercia .clump-stage {
+    height: auto;
+    width: 100%;
+    margin: 0 0 32px;
+  }
+  body.page-quercia .clump-anchor {
+    position: static;
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+  }
+  body.page-quercia .clump-photo {
+    position: static;
+    width: 50%;
+    height: auto;
+    aspect-ratio: 630 / 415;
+    opacity: 1;
+    animation: none;
+  }
+  body.page-quercia .clump-photo,
+  body.page-quercia .clump-photo.settled {
+    transform: none;
+  }
+}
+
 footer {
   position: fixed;
   bottom: 0;
