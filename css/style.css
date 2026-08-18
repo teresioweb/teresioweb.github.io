@@ -1088,36 +1088,30 @@ body.page-quercia .clump-stage {
   margin: 0 0 32px;
 }
 
+/* border color: couldn't locate an existing bordered "text box" on
+   home.html to match — home's own pull-quote (.essay-epigraph) is
+   explicitly borderless by design (see its own comment), and nothing
+   else there carries a border either. Using #eee (the site's own
+   dominant light body-text tone) as a reasoned placeholder rather
+   than inventing an unrelated colour; flagged to Valerio to confirm
+   or correct with an exact value. */
 body.page-quercia .clump-photo {
   width: 420px;
   height: 276px;
+  border: 4px solid #eee;
 }
 
-/* badge visible unconditionally here, not hover-only like discorso's
-   — quercia has no page-level hint banner (discorso's .discorso-hint)
-   telling a touch user these images are clickable, so the badge has
-   to do that job on its own on every input type. Centered always too,
-   not just inside the hover-capable branch below: discorso's own
-   centering only kicks in there, leaving the base rule's bottom-right
-   corner position for touch — fine on discorso since the badge never
-   renders on touch at all there, but not fine here where it's the
-   only affordance touch users get. */
+/* badge visible unconditionally, on every input type — not hover-only
+   like discorso's. quercia has no page-level hint banner (discorso's
+   .discorso-hint) telling a touch user these images are clickable, so
+   the badge has to do that job on its own everywhere; and unlike
+   discorso, it stays on for a mouse too, always centered rather than
+   discorso's default bottom-right corner position. */
 body.page-quercia .clump-badge {
   opacity: 1;
   left: 50%;
   right: auto;
   transform: translateX(-50%);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  /* ...then, on an actual mouse, fall back to discorso's own hover-
-     reveal behaviour — "like discorso's on desktop" was the brief. */
-  body.page-quercia .clump-badge {
-    opacity: 0;
-  }
-  body.page-quercia .clump-photo.settled:hover .clump-badge {
-    opacity: 1;
-  }
 }
 
 /* the generic stacked-mobile rule above (max-width:640px) already
