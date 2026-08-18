@@ -1101,45 +1101,43 @@ body.page-galleria main {
 /* --- quercia's own clump: same .clump-stage/.clump-anchor/.clump-photo
    markup and mechanics as discorso (reused wholesale — initClumpPhotos()
    in animations.js just selects every .clump-photo on the page, so
-   nothing there needed to change), but with only two photos,
-   deliberately overlapping rather than clustered with gaps between
-   them, and a few page-scoped differences below. --- */
+   nothing there needed to change) — entrance animation, hover-zoom,
+   hover-reveal badge, all unchanged. Two things differ from the
+   earlier overlapping-diagonal version: (1) the resting position —
+   side by side now, at the same y — and (2) each photo now carries
+   its own padded, translucent, blurred frame — same look as
+   .ritagli-band, at double its 22px padding (44px) — the whole time
+   the animation runs, since it's on .clump-photo itself, the element
+   the animation actually transforms, not something added only once
+   it settles.
+   The horizontal rhythm at rest: ritagli-band's own left edge, then
+   card 1 (44px padding, photo, 44px padding), a gap, card 2 (same),
+   ritagli-band's own right edge — three equal 32px gaps in total
+   (outer-left, between the cards, outer-right), computed against
+   712px (main's typical full-width content column: 760 − 48
+   padding): two 340×254 cards (252×166 photo + 44px padding on every
+   side) plus three 32px gaps sum to exactly that, landing the pair
+   symmetrically on their own by construction (see the inline --tx
+   values in quercia.html) rather than needing a separate centering
+   calculation. The same 32px also reappears vertically, between
+   ritagli-band's own bottom padding-edge and the cards' top padding-
+   edge — already true for free, via ordinary margin collapse between
+   .ritagli-band's bottom margin and .clump-stage's top margin, both
+   already 32px/0 respectively; no extra rule needed for that part. --- */
 
 /* unlike discorso's stage, this one isn't bled past main's own padding
    via a negative margin — asked to keep any overflow bounded by
    ritagli-band's own side margins rather than widening the stage past
-   them. Scoped to min-width:641px, same reasoning as .clump-photo's
-   width below: left unscoped originally, its fixed height beat the
-   generic mobile rule's height:auto on specificity, so the stage
-   stayed pinned at its desktop height even when the two stacked
-   mobile photos needed more room than that — the actual cause of the
-   lower photo overlapping the .fonte text underneath it. 380px: just
-   enough for the two photos' combined vertical extent on desktop (see
-   the inline --ty values in quercia.html) without clipping there. */
+   them. 260px: fits each card's own height (254px, padding included —
+   see the padding rule below) with a touch of slack. */
 @media (min-width: 641px) {
   body.page-quercia .clump-stage {
-    height: 370px;
+    height: 260px;
     width: 100%;
     margin: 0 0 32px;
   }
-  /* neutralizes the anchor as a positioning context — see this
-     block's own opening comment for why: with the anchor out of the
-     way, the two .clump-photo elements' left:0/right:0 (set inline,
-     since one needs left and the other right — not expressible as a
-     single shared custom property the way the old translate-based
-     tx/ty was) resolve against the stage itself instead of the
-     anchor's own 0×0 box, landing exactly on ritagli-band's edges. */
-  body.page-quercia .clump-anchor {
-    position: static;
-  }
 }
 
-/* the CSS border from an earlier round is gone: these images
-   (quercia-1/2-clump.webp) now have their own #232323 border baked
-   in by Valerio directly, at the same colour .essay-block's
-   background uses on home.html — a real border on the source file
-   rather than a CSS approximation, so stacking a second one here
-   would just double it up. */
 body.page-quercia .clump-photo {
   /* slower than discorso's 0.9s base — reported too fast with only
      two photos to watch (discorso's six read fine at the original
@@ -1147,6 +1145,14 @@ body.page-quercia .clump-photo {
      Overriding just the duration longhand, not the whole `animation`
      shorthand, keeps the base rule's easing curve and forwards fill. */
   animation-duration: 1.6s;
+}
+
+body.page-quercia .clump-photo img {
+  /* a light vignette — darkened toward the edges, same trick as a
+     photo-editing vignette but done with an inset shadow instead of
+     a filter, so it layers over object-fit:cover cleanly regardless
+     of how each source photo gets cropped into the box. */
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.35);
 }
 
 /* visual order swapped on mobile (both portrait and landscape, both
@@ -1164,32 +1170,48 @@ body.page-quercia .clump-photo:last-child {
 
 /* scoped to min-width:641px — the exact inverse of discorso's own
    mobile breakpoint (max-width:640px) — so this never fights that
-   rule's width:100% mobile reset on specificity. It was unscoped
-   before: body.page-quercia .clump-photo (0,0,2,1) beats the generic
-   mobile rule's plain .clump-photo (0,0,1,0) regardless of media
-   query, so the 420px desktop width was still winning on phones,
-   pushing quercia-1 off the right edge of the viewport — exactly the
-   overflow reported. 420×305: the source images are 783×568
-   (783/568 ≈ 1.379) with their own border included, so the box now
-   matches that ratio directly rather than object-fit:cover cropping
-   unevenly into one edge of the baked-in border. */
+   rule's width:100% mobile reset on specificity. Left unscoped once
+   before, its fixed width beat the generic mobile rule's width:100%
+   on specificity regardless of media query, pushing a photo off the
+   right edge of the viewport — the actual overflow reported back
+   then. 340×254 is the CARD size — padding included, not just the
+   photo — see this block's own opening comment for the three-equal-
+   gaps math this comes from (252×166 photo + 44px padding on every
+   side = 340×254 card). Because this sizing (and the padding/
+   background/blur right below, which is what makes each card look
+   like a small ritagli-band) is on .clump-photo itself — the element
+   the entrance animation actually transforms — the frame is there
+   from the very first frame of the fly-in, not just at rest. */
 @media (min-width: 641px) {
   body.page-quercia .clump-photo {
-    width: 420px;
-    height: 305px;
+    width: 340px;
+    height: 254px;
+    /* 44px = double .ritagli-band's own 22px text padding, per spec */
+    padding: 44px;
+    /* same values as .ritagli-band, not the same rule — "identical in
+       appearance," as asked, not necessarily identical code */
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 14px;
+  }
+  /* the photo itself sits inset within that padding, so its own
+     corner rounding no longer needs to match the outer frame's 14px —
+     it's not touching the outer edge. A little rounding rather than
+     none, so it doesn't read as a harsh rectangle against the soft
+     frame around it. */
+  body.page-quercia .clump-photo a {
+    border-radius: 4px;
   }
 }
 
-/* badge visible unconditionally, on every input type — not hover-only
-   like discorso's. quercia has no page-level hint banner (discorso's
-   .discorso-hint) telling a touch user these images are clickable, so
-   the badge has to do that job on its own everywhere; and unlike
-   discorso, it stays on for a mouse too, always centered rather than
-   discorso's default bottom-right corner position. Moved up from the
-   base rule's bottom:10px — that sat inside the photos' own baked-in
-   border (~41px deep at desktop's display size), so the badge was
-   partly sitting on the border rather than the photo. 55px clears it
-   with room to spare. */
+/* badge visible unconditionally on touch (no page-level hint banner
+   here, unlike discorso's .discorso-hint, so it has to carry that job
+   on its own on a screen with no hover at all) but hover-only on an
+   actual mouse, matching discorso's own behaviour there — see the
+   hover-capable media query below. Moved up from the base rule's
+   bottom:10px so it sits clearly on the photo itself, not down where
+   a caption might crowd the bottom edge. */
 body.page-quercia .clump-badge {
   opacity: 1;
   left: 50%;
@@ -1198,10 +1220,6 @@ body.page-quercia .clump-badge {
   transform: translateX(-50%);
 }
 
-/* desktop reverts to discorso's own hover-only behaviour — mobile
-   (outside this query) stays always-visible, since quercia still has
-   no page-level hint banner (discorso's .discorso-hint) to carry that
-   job on a screen with no hover at all. */
 @media (hover: hover) and (pointer: fine) {
   body.page-quercia .clump-badge {
     opacity: 0;
@@ -1215,17 +1233,16 @@ body.page-quercia .clump-badge {
    gives quercia's photos the right portrait treatment for free — same
    static/no-animation reset discorso's own six photos get. This just
    swaps its generic 14/9 aspect-ratio for these two photos' real one
-   (783×568, border included), so the mobile crop matches the desktop
-   object-fit:cover crop rather than a compromise ratio tuned for
-   discorso's varied source scans. Badge sized up and pushed higher to
-   match: bottom:65px clears the border at mobile's own display width,
-   and the larger font-size/padding/radius matches .discorso-hint's
-   own scale (that page's equivalent page-level hint), since a badge
-   this size is now the primary "these are clickable" signal on a
-   touchscreen, not a small corner label. */
+   (630×415), so the mobile crop matches the desktop object-fit:cover
+   crop rather than a compromise ratio tuned for discorso's varied
+   source scans. Badge sized up and pushed higher to match:
+   bottom:65px, and the larger font-size/padding/radius matches
+   .discorso-hint's own scale (that page's equivalent page-level
+   hint), since a badge this size is now the primary "these are
+   clickable" signal on a touchscreen, not a small corner label. */
 @media (max-width: 640px) {
   body.page-quercia .clump-photo {
-    aspect-ratio: 783 / 568;
+    aspect-ratio: 630 / 415;
   }
   body.page-quercia .clump-badge {
     bottom: 65px;
@@ -1263,7 +1280,7 @@ body.page-quercia .clump-badge {
     position: static;
     width: 50%;
     height: auto;
-    aspect-ratio: 783 / 568;
+    aspect-ratio: 630 / 415;
     opacity: 1;
     animation: none;
   }
@@ -1282,6 +1299,7 @@ body.page-quercia .clump-badge {
     font-size: 14px;
   }
 }
+
 
 footer {
   position: fixed;
@@ -1872,6 +1890,15 @@ footer .cc-logo {
   font-family: 'Merriweather', Georgia, serif;
   font-size: 16px;
   line-height: 1.7;
+}
+
+/* curriculum's two transcripts (diploma-cfm, teresio-cavaliere) are
+   official documents/forms, not recovered narrative — unlike
+   discorso's and quercia's Facebook-post transcripts, which stay
+   serif to match the site's prose register. Sans here instead,
+   matching how labels/badges already read elsewhere on the site. */
+body.page-curriculum .doc-viewer-text-inner {
+  font-family: 'Merriweather Sans', Arial, sans-serif;
 }
 
 .doc-viewer-text-inner p {
