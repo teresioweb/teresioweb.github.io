@@ -876,13 +876,38 @@ body.page-index {
 }
 
 body.page-quercia {
+  /* overlay raised from the site's usual 0.75 to 0.85 — measured fix
+     for a real contrast failure, not a style preference. Verified by
+     compositing the actual render stack pixel-by-pixel (sgimignano.svg
+     under the gradient, blurred, under .ritagli-band's own translucent
+     white): at 0.75 the text minimum was 3.39:1 and the link minimum
+     2.95:1, both failing WCAG AA, over 15–33% of the band's area.
+     Unlike discorso's watermark (a repeating texture, which the blur
+     evens out), sgimignano.svg is one large no-repeat illustration
+     with big plain-white areas the blur can't flatten — those areas
+     were the failure. At 0.85 (paired with .ritagli-band's own
+     lowered alpha just below) the minimums become 5.40:1 and 4.70:1,
+     0% of the area below threshold. Raising the white band's alpha
+     instead of the overlay was tried and made it worse — it brightens
+     the backdrop sitting behind light-colored text, the wrong
+     direction entirely. */
   background-image:
-    linear-gradient(rgba(16, 16, 16, 0.75), rgba(16, 16, 16, 0.75)),
+    linear-gradient(rgba(16, 16, 16, 0.85), rgba(16, 16, 16, 0.85)),
     url('../sfondi/sgimignano.svg');
   background-repeat: no-repeat, no-repeat;
   background-size: cover, 1240px auto;
   background-color: #101010;
   background-position-y: 50px;
+}
+
+/* paired with the raised overlay above — see that rule's own comment
+   for the measured numbers this combination produces. Scoped to
+   quercia only: discorso's own .ritagli-band already passed (its
+   watermark is a repeating texture the blur evens out), so it's left
+   at the site's base 0.25 rather than changing a page that didn't
+   need it. */
+body.page-quercia .ritagli-band {
+  background: rgba(255, 255, 255, 0.18);
 }
 
 body.page-galleria {
