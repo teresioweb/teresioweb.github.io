@@ -1115,7 +1115,8 @@ body.page-galleria main {
    ritagli-band's own right edge — three equal 32px gaps in total
    (outer-left, between the cards, outer-right), computed against
    712px (main's typical full-width content column: 760 − 48
-   padding): two 340×239 cards (296×195 photo + 22px padding on every
+   padding): two 340×244 cards (281×185 photo + 29.33px padding —
+   22px × 4/3 — on every
    side — equal to .ritagli-band's own text padding, not doubled
    anymore) plus three 32px gaps sum to exactly that, landing the pair
    symmetrically on their own by construction (see the inline --tx
@@ -1138,11 +1139,11 @@ body.page-galleria main {
 /* unlike discorso's stage, this one isn't bled past main's own padding
    via a negative margin — asked to keep any overflow bounded by
    ritagli-band's own side margins rather than widening the stage past
-   them. 246px: exactly the card's own height, no internal slack —
+   them. 244px: exactly the card's own height, no internal slack —
    see this block's opening comment for why that matters here. */
 @media (min-width: 641px) {
   body.page-quercia .clump-stage {
-    height: 246px;
+    height: 244px;
     width: 100%;
     margin: 0 0 32px;
   }
@@ -1186,7 +1187,7 @@ body.page-quercia .clump-photo:last-child {
    right edge of the viewport — the actual overflow reported back
    then. 340×239 is the CARD size — padding included, not just the
    photo — see this block's own opening comment for the three-equal-
-   gaps math this comes from (296×195 photo + 22px padding on every
+   gaps math this comes from (281×185 photo + 29.33px padding on every
    side = 340×239 card). Because this sizing (and the padding/
    background/blur right below, which is what makes each card look
    like a small ritagli-band) is on .clump-photo itself — the element
@@ -1195,9 +1196,10 @@ body.page-quercia .clump-photo:last-child {
 @media (min-width: 641px) {
   body.page-quercia .clump-photo {
     width: 340px;
-    height: 246px;
-    /* 3/2 of .ritagli-band's own 22px text padding (33px) */
-    padding: 33px;
+    height: 244px;
+    /* 4/3 of .ritagli-band's own 22px text padding (≈29.33px) —
+       lowered from an earlier 3/2 */
+    padding: calc(22px * 4 / 3);
     /* same values as .ritagli-band, not the same rule — "identical in
        appearance," as asked, not necessarily identical code */
     background: rgba(255, 255, 255, 0.25);
@@ -1245,7 +1247,7 @@ body.page-quercia .clump-badge {
    gives quercia's photos the right portrait treatment for free — same
    static/no-animation reset discorso's own six photos get. This adds
    the same ritagli-styled frame the desktop cards get above (padding
-   at 3/2 of .ritagli-band's own 22px text padding, so 33px, same
+   at 4/3 of .ritagli-band's own 22px text padding (≈29.33px), same
    background/blur/radius) — missing here before, added now — and
    swaps the generic 14/9 aspect-ratio for these two photos' real one
    (630×415), so the mobile crop matches the desktop object-fit:cover
@@ -1258,7 +1260,7 @@ body.page-quercia .clump-badge {
 @media (max-width: 640px) {
   body.page-quercia .clump-photo {
     aspect-ratio: 630 / 415;
-    padding: 33px;
+    padding: calc(22px * 4 / 3);
     background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -1834,6 +1836,7 @@ footer .cc-logo {
 }
 
 .doc-viewer-scroll {
+  position: relative;
   flex: 1;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
@@ -1869,6 +1872,36 @@ footer .cc-logo {
   max-width: 100vw;
   height: auto;
   margin: auto; /* centers a document narrower than the cap in both axes; one AT the cap just fills it edge to edge */
+  /* fades in once loaded (see initDocViewer()'s open()) instead of
+     popping in abruptly once the file finally arrives */
+  transition: opacity 0.25s ease;
+}
+
+/* shown while the real image is still loading — see initDocViewer()'s
+   open(), which toggles this class and hides the img itself (no
+   intrinsic size yet) until 'load' fires. Without this, the img with
+   no width/height rendered the browser's own tiny default broken-
+   image placeholder, centered by margin:auto above — the "dot at
+   screen center" reported during the load gap on the larger
+   full-resolution scans this dialog often opens. */
+.doc-viewer-loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 32px;
+  height: 32px;
+  margin: -16px 0 0 -16px;
+  border: 3px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #eee;
+  border-radius: 50%;
+  animation: docViewerSpin 0.8s linear infinite;
+}
+
+@keyframes docViewerSpin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* the exception: a LANDSCAPE-shaped scan (diploma-cfm) capped by

@@ -456,6 +456,18 @@ function initDocViewer() {
   const open = (trigger) => {
     const src = trigger.dataset.docSrc;
     if (!src) return;
+    // hidden until 'load' fires — without this, the browser renders
+    // its own tiny default placeholder (no intrinsic size is known
+    // yet) centered by margin:auto, which is exactly the stray dot
+    // reported at screen center during the load gap. scrollWrap gets
+    // a loading class instead, for a visible "it's working" cue on
+    // the large full-resolution files this dialog often loads.
+    img.style.opacity = "0";
+    scrollWrap.classList.add("doc-viewer-loading");
+    img.onload = () => {
+      img.style.opacity = "";
+      scrollWrap.classList.remove("doc-viewer-loading");
+    };
     img.src = src;
     img.alt = trigger.dataset.docAlt || "";
     img.classList.toggle("doc-fit-height", trigger.dataset.docFit === "height");
@@ -506,6 +518,8 @@ function initDocViewer() {
   overlay.addEventListener("close", () => {
     document.body.classList.remove("body-scroll-locked");
     img.src = BLANK_SRC;
+    img.style.opacity = "";
+    scrollWrap.classList.remove("doc-viewer-loading");
     textPanel.innerHTML = "";
     activeTemplateId = null;
     window.getSelection()?.removeAllRanges(); // this dialog has actual selectable text (the transcript) — a stray selection surviving close, confirmed by report as the real cause of the reported line, not the tap-highlight tried last round
