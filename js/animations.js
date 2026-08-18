@@ -224,6 +224,7 @@ function initLightbox() {
       lastFocusedEl.focus();
       lastFocusedEl = null;
     }
+    void document.body.offsetHeight; // forces a synchronous reflow — see initDocViewer()'s own close handler for why
   });
 
   items.forEach((el, index) => {
@@ -493,6 +494,18 @@ function initDocViewer() {
       lastFocusedEl.focus();
       lastFocusedEl = null;
     }
+    // forces a synchronous reflow — targets a known class of WebKit/
+    // iOS Safari bug where a stale compositing layer isn't repainted
+    // after toggling overflow/display until something external forces
+    // one. Matches the reported symptoms closely: not reproducible in
+    // Chromium even with touch emulation (tried live); activeElement
+    // correctly returns to the trigger on close, ruling out a
+    // lingering focus/selection state as the cause; and the report
+    // itself — clears on an unrelated touch elsewhere, persists
+    // through an orientation change — describes a stuck paint layer,
+    // not any live DOM/CSS state. This doesn't need to know exactly
+    // what's stale; it just forces a redraw that discards it.
+    void document.body.offsetHeight;
   });
 
   // Escape and focus trapping are native to showModal(), same as
