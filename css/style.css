@@ -1138,11 +1138,11 @@ body.page-galleria main {
 /* unlike discorso's stage, this one isn't bled past main's own padding
    via a negative margin — asked to keep any overflow bounded by
    ritagli-band's own side margins rather than widening the stage past
-   them. 239px: exactly the card's own height, no internal slack —
+   them. 246px: exactly the card's own height, no internal slack —
    see this block's opening comment for why that matters here. */
 @media (min-width: 641px) {
   body.page-quercia .clump-stage {
-    height: 239px;
+    height: 246px;
     width: 100%;
     margin: 0 0 32px;
   }
@@ -1195,9 +1195,9 @@ body.page-quercia .clump-photo:last-child {
 @media (min-width: 641px) {
   body.page-quercia .clump-photo {
     width: 340px;
-    height: 239px;
-    /* equal to .ritagli-band's own 22px text padding, not doubled */
-    padding: 22px;
+    height: 246px;
+    /* 3/2 of .ritagli-band's own 22px text padding (33px) */
+    padding: 33px;
     /* same values as .ritagli-band, not the same rule — "identical in
        appearance," as asked, not necessarily identical code */
     background: rgba(255, 255, 255, 0.25);
@@ -1205,13 +1205,11 @@ body.page-quercia .clump-photo:last-child {
     -webkit-backdrop-filter: blur(10px);
     border-radius: 14px;
   }
-  /* the photo itself sits inset within that padding, so its own
-     corner rounding no longer needs to match the outer frame's 14px —
-     it's not touching the outer edge. A little rounding rather than
-     none, so it doesn't read as a harsh rectangle against the soft
-     frame around it. */
+  /* corners NOT rounded on the photo itself — only the outer frame
+     (14px above) gets the soft ritagli-band look; the photo inside
+     it stays a sharp rectangle. */
   body.page-quercia .clump-photo a {
-    border-radius: 4px;
+    border-radius: 0;
   }
 }
 
@@ -1219,14 +1217,18 @@ body.page-quercia .clump-photo:last-child {
    here, unlike discorso's .discorso-hint, so it has to carry that job
    on its own on a screen with no hover at all) but hover-only on an
    actual mouse, matching discorso's own behaviour there — see the
-   hover-capable media query below. Moved up from the base rule's
-   bottom:10px so it sits clearly on the photo itself, not down where
-   a caption might crowd the bottom edge. */
+   hover-capable media query below. bottom:1/7 of the photo's own
+   height, not a fixed pixel value: the containing block for this
+   absolute position is .clump-photo a, whose own height IS the
+   photo's rendered height (the padding lives on its parent,
+   .clump-photo, not on this element), so this one rule is correct at
+   any size — desktop or mobile — without separate breakpoint-specific
+   numbers. */
 body.page-quercia .clump-badge {
   opacity: 1;
   left: 50%;
   right: auto;
-  bottom: 55px;
+  bottom: calc(100% / 7);
   transform: translateX(-50%);
 }
 
@@ -1243,30 +1245,29 @@ body.page-quercia .clump-badge {
    gives quercia's photos the right portrait treatment for free — same
    static/no-animation reset discorso's own six photos get. This adds
    the same ritagli-styled frame the desktop cards get above (padding
-   equal to .ritagli-band's own 22px, same background/blur/radius) —
-   missing here before, added now — and swaps the generic 14/9
-   aspect-ratio for these two photos' real one (630×415), so the
-   mobile crop matches the desktop object-fit:cover crop rather than
-   a compromise ratio tuned for discorso's varied source scans. Badge
-   sized up and pushed higher to match: bottom:65px, and the larger
-   font-size/padding/radius matches .discorso-hint's own scale (that
-   page's equivalent page-level hint), since a badge this size is now
-   the primary "these are clickable" signal on a touchscreen, not a
-   small corner label. */
+   at 3/2 of .ritagli-band's own 22px text padding, so 33px, same
+   background/blur/radius) — missing here before, added now — and
+   swaps the generic 14/9 aspect-ratio for these two photos' real one
+   (630×415), so the mobile crop matches the desktop object-fit:cover
+   crop rather than a compromise ratio tuned for discorso's varied
+   source scans. Badge sized up to match .discorso-hint's own scale
+   (that page's equivalent page-level hint), since a badge this size
+   is now the primary "these are clickable" signal on a touchscreen,
+   not a small corner label — its position (bottom:1/7 of the photo's
+   height) comes from the shared rule above, not repeated here. */
 @media (max-width: 640px) {
   body.page-quercia .clump-photo {
     aspect-ratio: 630 / 415;
-    padding: 22px;
+    padding: 33px;
     background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-radius: 14px;
   }
   body.page-quercia .clump-photo a {
-    border-radius: 4px;
+    border-radius: 0;
   }
   body.page-quercia .clump-badge {
-    bottom: 65px;
     padding: 10px 22px;
     border-radius: 24px;
     font-size: 14px;
@@ -1309,12 +1310,13 @@ body.page-quercia .clump-badge {
   body.page-quercia .clump-photo.settled {
     transform: none;
   }
-  /* same size/position calibration as the portrait badge above —
-     duplicated rather than shared because this block already stands
-     on its own (see its own opening comment) rather than assuming
-     the max-width:640px block ran first. */
+  /* size calibration matches the portrait badge above — duplicated
+     rather than shared because this block already stands on its own
+     (see its own opening comment) rather than assuming the
+     max-width:640px block ran first. Position (bottom:1/7 of the
+     photo's height) comes from the shared rule further up, not
+     repeated here. */
   body.page-quercia .clump-badge {
-    bottom: 65px;
     padding: 10px 22px;
     border-radius: 24px;
     font-size: 14px;
