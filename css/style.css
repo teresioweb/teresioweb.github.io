@@ -90,6 +90,7 @@
    setting on */
 html {
   scroll-behavior: smooth;
+  scrollbar-gutter: stable;
 }
 
 /* keyboard-focus outline, kept off for mouse/touch via :focus-visible —
@@ -140,6 +141,18 @@ button:focus-visible {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* applied to <body> for as long as either dialog is open (see
+   initLightbox()/initDocViewer() in animations.js) — without this,
+   the page's own scrollbar stays visible behind the dialog even
+   though showModal() already prevents the page itself from actually
+   scrolling; visually confusing next to the dialog's own scrollbar.
+   scrollbar-gutter:stable on <html> above means this never causes a
+   layout shift: the gutter space stays reserved whether or not a
+   scrollbar is actually drawn in it. */
+.body-scroll-locked {
+  overflow: hidden;
 }
 
 body {
@@ -1538,7 +1551,16 @@ footer .cc-logo {
   overflow: auto;
   -webkit-overflow-scrolling: touch;
   display: flex;
-  justify-content: center;
+  /* no justify-content: center here — see .doc-viewer-scroll img's
+     margin:auto for why the same visual centering is achieved
+     without the bug justify-content:center caused: when a document
+     is wider than the container, justify-content:center gives the
+     flex line a negative starting offset that scrollLeft can never
+     reach in LTR — the image's left edge becomes permanently
+     unreachable, exactly what was reported live. margin:auto on the
+     child centers the same way when there's free space, but
+     collapses to 0 instead of negative when there isn't, so the
+     whole image always stays inside the scrollable range. */
 }
 
 .doc-viewer-scroll[hidden] {
@@ -1547,16 +1569,28 @@ footer .cc-logo {
 
 .doc-viewer-scroll img {
   display: block;
-  /* natural pixel size by default (no max-width/height cap, unlike
-     .lightbox-overlay img) — width only set at all when a trigger
-     supplies --doc-width, e.g. style="--doc-width:1400px", for a
-     document whose natural size tested too small to read comfortably.
-     max-width here is a floor against the variable being left unset
-     AND the browser default of none, not a cap on legibility. */
+  /* capped so a document can't run wider than the viewport on desktop
+     or mobile landscape — nowhere for the extra width to go but off
+     both edges, which combined with justify-content:center above was
+     the actual cause of the reported horizontal-scroll bug. On mobile
+     portrait the cap is deliberately relaxed to 200vw (see the media
+     query below): diploma-cfm and similar landscape-oriented scans
+     are legible enough at their natural size there to be worth a
+     little horizontal scroll, rather than shrinking to fit a narrow
+     screen. --doc-width can still request a SMALLER width than
+     whichever cap applies, for a document whose natural size tested
+     too small to read — it only ever shrinks the image, never grows
+     it past the cap. */
   width: var(--doc-width, auto);
-  max-width: none;
+  max-width: 100vw;
   height: auto;
-  margin: auto; /* centers a document narrower than the viewport in both axes; a wider/taller one just overflows into the container's own scrollbars */
+  margin: auto; /* centers a document narrower than the cap in both axes; one AT the cap just fills it edge to edge */
+}
+
+@media (max-width: 700px) and (orientation: portrait) {
+  .doc-viewer-scroll img {
+    max-width: 200vw;
+  }
 }
 
 /* transcript panel — same slot as .doc-viewer-scroll, never both

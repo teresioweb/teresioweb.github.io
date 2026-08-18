@@ -199,6 +199,7 @@ function initLightbox() {
     if (nextBtn) nextBtn.style.display = currentHasMultiple ? "" : "none";
     showIndex(index);
     lastFocusedEl = document.activeElement;
+    document.body.classList.add("body-scroll-locked");
     overlay.showModal();
     // move focus into the dialog — closeBtn rather than the image itself,
     // since overlayImg has no tabindex and isn't a real control
@@ -213,6 +214,7 @@ function initLightbox() {
   const BLANK_SRC = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBTAA7"; // inert 1x1 transparent gif — keeps overlayImg.src always non-empty/valid between opens
 
   overlay.addEventListener("close", () => {
+    document.body.classList.remove("body-scroll-locked");
     overlayImg.src = BLANK_SRC;
     if (overlayCounter) overlayCounter.textContent = "";
     if (overlayCaption) overlayCaption.textContent = "";
@@ -446,6 +448,7 @@ function initDocViewer() {
 
     showImage();
     lastFocusedEl = document.activeElement;
+    document.body.classList.add("body-scroll-locked");
     overlay.showModal();
     closeBtn.focus();
   };
@@ -479,6 +482,7 @@ function initDocViewer() {
   });
 
   overlay.addEventListener("close", () => {
+    document.body.classList.remove("body-scroll-locked");
     img.src = BLANK_SRC;
     textPanel.innerHTML = "";
     activeTemplateId = null;
@@ -489,12 +493,30 @@ function initDocViewer() {
   });
 
   // Escape and focus trapping are native to showModal(), same as
-  // initLightbox() — nothing to add here. Unlike that function, there's
-  // no arrow-key carousel to wire up and no Tab-wraparound patch: with
-  // only two or three focusable controls (toggle, close, and the
-  // scroll container itself) Chromium's native trap doesn't exhibit
-  // the body-detour behaviour documented on initLightbox()'s own patch,
-  // so it isn't needed here.
+  // initLightbox() — but the Tab-wraparound patch that function needs
+  // turned out to be needed here too, confirmed by testing live: the
+  // same Chromium body-detour behaviour documented on that patch shows
+  // up on this dialog as well. Derived from the DOM rather than a
+  // fixed list for the same reason as initLightbox()'s version: the
+  // toggle button is conditionally hidden (no transcript on this
+  // trigger), and whichever of scrollWrap/textPanel is currently
+  // visible should be the one counted, not both.
+  overlay.addEventListener("keydown", (e) => {
+    if (e.key !== "Tab") return;
+    const focusable = Array.from(
+      overlay.querySelectorAll("button, [tabindex]")
+    ).filter((el) => el.offsetParent !== null);
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
