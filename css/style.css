@@ -1591,6 +1591,23 @@ footer .cc-logo {
 
 .gallery-grid .reveal-img.visible img {
   transform: translateX(0);
+  /* faster than the base rule's 0.8s (tuned for the entrance slide) —
+     once .visible, this is the resting state, and any further
+     transform change (the hover zoom below) should feel snappy, not
+     carry over the slide's own deliberately slow pace. Same idea as
+     .clump-photo.settled's own 0.25s override on discorso. */
+  transition: filter 0.2s ease, transform 0.25s ease;
+}
+
+/* hover-zoom, matching discorso's .clump-photo:hover exactly (same
+   1.5 scale) — safe here without discorso's z-index bump or its own
+   translate offset, because .gallery-grid .reveal-img has
+   overflow:hidden: the scaled image crops to the card's own
+   boundary instead of spilling into neighbouring grid cells. */
+@media (hover: hover) and (pointer: fine) {
+  .gallery-grid .reveal-img.visible img:hover {
+    transform: translateX(0) scale(1.5);
+  }
 }
 
 /* --- highlighted words inside the "Un discorso" quotes, pointing to
