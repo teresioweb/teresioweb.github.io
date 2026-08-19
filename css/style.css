@@ -1192,16 +1192,16 @@ body.page-quercia .clump-photo img {
 }
 
 /* visual order swapped on mobile (both portrait and landscape, both
-   flex layouts) so quercia-1 (leafy) reads first — without touching
-   DOM order, which still controls the desktop z-stacking from the
-   "invert which is on top" round. `order` is a flex/grid-only
-   property, a no-op under desktop's position:absolute layout, so this
-   can sit unconditionally rather than needing its own media query. */
+   flex layouts) — without touching DOM order, which still controls
+   the desktop z-stacking from the "invert which is on top" round.
+   `order` is a flex/grid-only property, a no-op under desktop's
+   position:absolute layout, so this can sit unconditionally rather
+   than needing its own media query. */
 body.page-quercia .clump-photo:first-child {
-  order: 2;
+  order: 1;
 }
 body.page-quercia .clump-photo:last-child {
-  order: 1;
+  order: 2;
 }
 
 /* scoped to min-width:641px — the exact inverse of discorso's own

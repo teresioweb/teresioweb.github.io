@@ -57,39 +57,39 @@
 
   <figure class="reveal-img side from-right align-top color-band" style="--band-color:#FFDDC2;">
     <div class="side-row">
-      <a href="/images/curriculum-fronte.jpg" target="_blank" rel="noopener">
+      <a href="/pdf/Curriculum.pdf" target="_blank" rel="noopener">
       <img src="/images/curriculum-fronte.webp" width="1200" height="849" alt="Two-page scan of the curriculum vitae">
-      <span class="img-badge">&#10530; Image</span>
+      <span class="img-badge">PDF</span>
     </a>
       <figcaption>
       <p><strong>Curriculum vitae</strong> typescript by Teresio, presumably written after he was promoted to executive manager in 1956, when he was technical coordinator of all projects across all departments (&ldquo;Calculating Machines Projects&rdquo;, &ldquo;Special Machines Studies and Projects&rdquo;, &ldquo;Special Equipment Projects&rdquo;) and working directly on some of the projects.</p>
-      <p class="fonte">Source: personal archive (<a href="/pdf/Curriculum.pdf" target="_blank" rel="noopener">pdf&nbsp;available</a>).</p>
+      <p class="fonte">Source: personal archive.</p>
     </figcaption>
     </div>
   </figure>
 
   <figure class="reveal-img side from-right align-top color-band" style="--band-color:#FEE8B2;">
     <div class="side-row">
-      <a href="/images/diploma-cfm.jpg" target="_blank" rel="noopener">
+      <a href="/images/diploma-cfm-full.webp" target="_blank" rel="noopener" class="doc-viewer-trigger" data-doc-src="/images/diploma-cfm-full.webp" data-doc-alt="Scan of the CFM qualification certificate for Draughtsmen" data-doc-fit="height" data-text-target="text-diploma-cfm">
       <img src="/images/diploma-cfm.webp" width="800" height="565" alt="Scan of the CFM qualification certificate for Draughtsmen">
-      <span class="img-badge">&#10530; Image</span>
+      <span class="img-badge">&#10530; Enlarge</span>
     </a>
       <figcaption>
       <p>In 1942 he qualified as a <strong>Disegnatore</strong> (draughtsman) from the Olivetti <em>Centro Formazione Meccanici</em> (&ldquo;Mechanical Training Centre&rdquo;).</p>
-      <p class="fonte">Source: personal archive.</p>
+      <p class="fonte">Source: personal archive. Text translated from the original Italian.</p>
     </figcaption>
     </div>
   </figure>
 
   <figure class="reveal-img side from-right align-top crop-top color-band" style="--band-color:#CEDCE6;">
     <div class="side-row">
-      <a href="/images/teresio-cavaliere.jpg" target="_blank" rel="noopener">
+      <a href="/images/teresio-cavaliere-full.webp" target="_blank" rel="noopener" class="doc-viewer-trigger" data-doc-src="/images/teresio-cavaliere-full.webp" data-doc-alt="Diploma of the Cavaliere honour" data-doc-fit="height" data-text-target="text-teresio-cavaliere">
       <img src="/images/teresio-cavaliere.webp" width="800" height="1090" alt="Diploma of the Cavaliere honour">
-      <span class="img-badge">&#10530; Image</span>
+      <span class="img-badge">&#10530; Enlarge</span>
     </a>
       <figcaption>
       <p>In 1962 he was awarded the honorary title of <strong>Cavaliere</strong> <em>dell&rsquo;Ordine al Merito della Repubblica Italiana</em> (&ldquo;Knight of the Order of Merit of the Italian Republic&rdquo;).</p>
-      <p class="fonte">Source: personal archive.</p>
+      <p class="fonte">Source: personal archive. Text translated from the original Italian.</p>
     </figcaption>
     </div>
   </figure>
@@ -119,6 +119,96 @@
     </div>
   </figure>
 </main>
+
+<!-- document viewer: shared dialog for every .doc-viewer-trigger on
+     this page (see initDocViewer() in animations.js). -->
+<dialog class="doc-viewer-overlay" aria-label="Enlarged document">
+  <div class="doc-viewer-bar">
+    <button type="button" class="doc-viewer-toggle" aria-pressed="false" hidden>Text version</button>
+    <button type="button" class="doc-viewer-close" aria-label="Close">&times;</button>
+  </div>
+  <div class="doc-viewer-scroll" tabindex="0">
+    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBTAA7" alt="">
+  </div>
+  <div class="doc-viewer-text" tabindex="0" hidden></div>
+</dialog>
+
+<!-- transcripts, inert until initDocViewer() clones one into
+     .doc-viewer-text on open. Translated from the Italian transcripts
+     of the source documents (images/diploma-cfm-full.webp,
+     images/teresio-cavaliere-full.webp) — see each figure's own
+     "Source" line above. Institutional/form language translated for
+     readability; personal names, place names, and the "Cavaliere"
+     title itself left as in the original. .fill spans mark text that
+     was handwritten onto a blank line on the printed form, as opposed
+     to the form's own printed copy. -->
+<template id="text-diploma-cfm">
+  <div class="doc-viewer-text-inner">
+    <p class="doc-viewer-text-meta">Transcription of the document</p>
+
+    <div class="doc-viewer-form-columns">
+      <div>MINISTRY OF NATIONAL EDUCATION</div>
+      <div>UNDERSECRETARIAT OF STATE FOR WAR PRODUCTION</div>
+    </div>
+    <div class="doc-viewer-form-columns">
+      <div>= I.N.F.A.P.L.I. = NATIONAL FASCIST INSTITUTE FOR THE TRAINING AND ADVANCEMENT OF INDUSTRIAL WORKERS</div>
+      <div>FASCIST CONFEDERATIONS OF INDUSTRIALISTS AND INDUSTRIAL WORKERS</div>
+    </div>
+
+    <p class="doc-viewer-text-meta">9 images, one larger central one among them, depicting industrial scenes and works.</p>
+
+    <p class="doc-viewer-form-title align-center">CERTIFICATE OF QUALIFICATION</p>
+
+    <p class="align-center">issued to <span class="fill">Gassino Teresio</span>, son of <span class="fill">Giovanni</span>, born in <span class="fill">Ar&egrave; di Caluso</span></p>
+    <p>Passed with a score of <span class="fill">8&frac12;/10</span> the final examinations of the <span class="fill">three-year</span> <span class="fill">qualification</span> course</p>
+    <p>for <span class="fill">Draughtsmen</span>, held at <span class="fill">Stab. Ing. C. Olivetti e C.</span> <span class="fill">S. A. Ivrea</span></p>
+    <p>Rome, <span class="fill">25 NOV 1942 Anno XXI</span></p>
+    <p>No. <span class="fill">169464</span></p>
+
+    <div class="doc-viewer-form-columns doc-viewer-form-columns--left">
+      <div>THE COURSE DIRECTOR</div>
+      <div>THE PRESIDENT OF I.N.F.A.P.L.I.<br><span class="fill">signature</span></div>
+    </div>
+
+    <div class="doc-viewer-form-columns doc-viewer-form-columns--left">
+      <div>THE UNDERSECRETARY OF STATE<br>FOR WAR PRODUCTION<br>THE HEAD OF DELEGATION <em>(stamp)</em><br>(Colonel Bozino Osvaldo) <em>(stamp)</em><br><span class="fill">signature</span></div>
+      <div>THE MINISTER<br>OF NATIONAL EDUCATION<br><span class="fill">G. Bottai (signature)</span></div>
+    </div>
+  </div>
+</template>
+
+<template id="text-teresio-cavaliere">
+  <div class="doc-viewer-text-inner">
+    <p class="doc-viewer-text-meta">Transcription of the document</p>
+
+    <p class="center-line">THE PRESIDENT OF THE REPUBLIC</p>
+    <p class="center-line">HEAD OF THE ORDER &ldquo;OF MERIT OF THE ITALIAN REPUBLIC&bdquo;</p>
+
+    <p>In <span class="fill">consideration of particular merits</span><br>
+    Having heard the Council of the Order of Merit of the Italian Republic<br>
+    On the proposal of the President of the Council of Ministers;<br>
+    by Decree dated <span class="fill">Rome, 2 June 1962</span></p>
+
+    <p class="center-line">HAS CONFERRED</p>
+
+    <p class="align-center">the honour of <span class="fill">Cavaliere</span><br>
+    <span class="fill">to Mr. Teresio Gassino</span></p>
+
+    <p>with the right to bear the insignia established for that class.<br>
+    The Chancellor of the Order of Merit of the Italian Republic is charged with the execution of this Decree, which shall be recorded at the Chancellery of the Order itself.</p>
+
+    <p class="align-center">SIGNED <span class="fill">Segni</span> COUNTERSIGNED <span class="fill">Fanfani</span></p>
+
+    <p>The Chancellor of the Order declares that, in execution of the Presidential provisions,<br>
+    <span class="fill">Mr. Teresio Gassino</span><br>
+    has been entered in the Register <span class="fill">of Cavv. (Naz.)</span> at No. <span class="fill">121898, 1st Series</span></p>
+
+    <p class="center-line">THE CHANCELLOR OF THE ORDER</p>
+    <p class="align-center"><em>signature</em></p>
+    <p class="align-center">THE HEAD OF OFFICE OF THE CHANCELLERY</p>
+    <p class="align-center"><em>signature</em></p>
+  </div>
+</template>
 
 <footer>
   <img src="/images/creative.png" alt="" class="cc-logo">
