@@ -1909,18 +1909,29 @@ footer .cc-logo {
    image placeholder, centered by margin:auto above — the "dot at
    screen center" reported during the load gap on the larger
    full-resolution scans this dialog often opens. */
+/* the gear itself — Valerio's own design (sfondi/spinner-gear.svg),
+   verified centered on its actual pivot point (the small axle hole,
+   not the shape's own bounding box, which is off-center since it's a
+   half gear) via pixel analysis before use. background-size:contain
+   with centered position handles this automatically regardless of
+   the exact box size given here: the SVG's own pivot lands at the
+   box's center either way. Slower than the plain ring this replaced
+   (1.4s vs 0.8s) — a detailed, asymmetric shape reads as a spin
+   rather than a blur at a more measured pace; a simple ring didn't
+   need that. */
 .doc-viewer-loading::after {
   content: "";
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 32px;
-  height: 32px;
-  margin: -16px 0 0 -16px;
-  border: 3px solid rgba(255, 255, 255, 0.25);
-  border-top-color: #eee;
-  border-radius: 50%;
-  animation: docViewerSpin 0.8s linear infinite;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  background-image: url('../sfondi/spinner-gear.svg');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  animation: docViewerSpin 1.4s linear infinite;
 }
 
 @keyframes docViewerSpin {
