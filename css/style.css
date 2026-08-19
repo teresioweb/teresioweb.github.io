@@ -1634,8 +1634,10 @@ footer .cc-logo {
    from the entrance entirely: symmetric in both directions (hover-in
    and hover-out), and immune to ever being sped up by a future change
    to the entrance timing again. */
-.gallery-grid .reveal-img.settled img {
+.js .gallery-grid .reveal-img.settled img {
   animation: none;
+  opacity: 1;
+  transform: translateX(0);
   transition: filter 0.2s ease, transform 0.25s ease;
 }
 
@@ -1645,7 +1647,7 @@ footer .cc-logo {
    overflow:hidden: the scaled image crops to the card's own
    boundary instead of spilling into neighbouring grid cells. */
 @media (hover: hover) and (pointer: fine) {
-  .gallery-grid .reveal-img.settled img:hover {
+  .js .gallery-grid .reveal-img.settled img:hover {
     transform: scale(1.5);
   }
 }
