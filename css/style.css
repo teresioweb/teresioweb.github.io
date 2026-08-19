@@ -1580,22 +1580,62 @@ footer .cc-logo {
 }
 
 /* larger start offset for the gallery: creates a "two film reels sliding
-   in" effect — the top row from the right, the bottom row from the left */
-.gallery-grid .reveal-img img {
+   in" effect — the top row from the right, the bottom row from the left.
+   animation-based (like discorso's clumpIn), NOT transition-based like
+   the shared .reveal-img rule above: that's what lets the hover-zoom
+   below use its own fast, symmetric transition without a repeat of the
+   bug where a shared transition-duration on .visible governed BOTH the
+   entrance reveal and the hover response, speeding up the entrance to
+   match the hover's snappier pace instead of its own intended 0.8s. */
+@keyframes galleryRevealLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-260px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes galleryRevealRight {
+  from {
+    opacity: 0;
+    transform: translateX(260px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.js .gallery-grid .reveal-img img {
+  opacity: 0;
+  /* matches the keyframes' own "from" position, so there's nothing to
+     flash into place before JS adds .visible and the animation starts */
   transform: translateX(-260px);
 }
 
-.gallery-grid .reveal-img.from-right img {
+.js .gallery-grid .reveal-img.from-right img {
   transform: translateX(260px);
 }
 
-.gallery-grid .reveal-img.visible img {
-  transform: translateX(0);
-  /* faster than the base rule's 0.8s (tuned for the entrance slide) —
-     once .visible, this is the resting state, and any further
-     transform change (the hover zoom below) should feel snappy, not
-     carry over the slide's own deliberately slow pace. Same idea as
-     .clump-photo.settled's own 0.25s override on discorso. */
+.js .gallery-grid .reveal-img.visible img {
+  animation: galleryRevealLeft 0.8s ease forwards;
+}
+
+.js .gallery-grid .reveal-img.from-right.visible img {
+  animation: galleryRevealRight 0.8s ease forwards;
+}
+
+/* once the entrance animation ends, initGalleryReveal() in
+   animations.js adds .settled — same handoff pattern as discorso's
+   .clump-photo.settled. From here on it's pure transition, decoupled
+   from the entrance entirely: symmetric in both directions (hover-in
+   and hover-out), and immune to ever being sped up by a future change
+   to the entrance timing again. */
+.gallery-grid .reveal-img.settled img {
+  animation: none;
   transition: filter 0.2s ease, transform 0.25s ease;
 }
 
@@ -1605,8 +1645,8 @@ footer .cc-logo {
    overflow:hidden: the scaled image crops to the card's own
    boundary instead of spilling into neighbouring grid cells. */
 @media (hover: hover) and (pointer: fine) {
-  .gallery-grid .reveal-img.visible img:hover {
-    transform: translateX(0) scale(1.5);
+  .gallery-grid .reveal-img.settled img:hover {
+    transform: scale(1.5);
   }
 }
 

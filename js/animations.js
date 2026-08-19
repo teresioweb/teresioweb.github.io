@@ -38,6 +38,27 @@ function initScrollReveal() {
   images.forEach((img) => observer.observe(img));
 }
 
+// Gallery photos specifically: once the entrance animation
+// (galleryRevealLeft/Right in style.css) finishes, adds .settled so
+// CSS can hand off from animation to a plain transition for the
+// hover-zoom — same handoff pattern as initClumpPhotos() below, and
+// for the same reason: an animation and a transition sharing the
+// same property can fight over timing if left on the same class the
+// whole time (this is what made the entrance itself speed up to
+// match the hover's own pace, before the two were split apart).
+function initGalleryReveal() {
+  const photos = document.querySelectorAll(".gallery-grid .reveal-img");
+  if (!photos.length) return;
+
+  photos.forEach((photo) => {
+    photo.addEventListener(
+      "animationend",
+      () => photo.classList.add("settled"),
+      { once: true }
+    );
+  });
+}
+
 // Home essay: same one-shot reveal-on-scroll pattern as .reveal-img
 // above, applied to each paragraph box and photo individually
 // (.essay-anim). Kept as a separate observer/class rather than
@@ -571,6 +592,7 @@ function initDocViewer() {
 
 document.addEventListener("DOMContentLoaded", () => {
   initScrollReveal();
+  initGalleryReveal();
   initEssayReveal();
   initNavHide();
   initMobileMenu();
