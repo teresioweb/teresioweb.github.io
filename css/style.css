@@ -1246,8 +1246,8 @@ body.page-quercia .clump-photo:last-child {
     /* same value as .ritagli-band, not the same rule — "identical in
        appearance," as asked, not necessarily identical code */
     background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     border-radius: 14px;
   }
   body.page-quercia .clump-photo.settled {
