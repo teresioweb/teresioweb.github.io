@@ -600,4 +600,20 @@ document.addEventListener("DOMContentLoaded", () => {
   initDocViewer();
   initDiscorsoHint();
   initClumpPhotos();
+
+  // Failsafe flag, read by the inline <head> script on window 'load'.
+  // Deliberately the LAST statement of this handler, not the first
+  // line of the file: the point isn't "did this file arrive", it's
+  // "did every reveal observer actually get attached". The CSS that
+  // starts .reveal-img/.essay-anim at opacity:0 is gated behind the
+  // .js class, and only initScrollReveal()/initEssayReveal() ever add
+  // the .visible that undoes it — so if any init above throws, the
+  // ones after it never run and that content would stay invisible
+  // forever. Setting the flag here means a throw anywhere in the
+  // sequence leaves it unset, and the <head> script swaps .js back to
+  // .no-js, which drops the opacity:0 starting state entirely: no
+  // animation, but every paragraph and photo is on screen. Same
+  // outcome if this file 404s or fails to parse — the handler never
+  // registers, the flag never appears.
+  window.__animsReady = true;
 });

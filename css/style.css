@@ -357,6 +357,24 @@ body {
     display: block;
   }
 
+  /* visibility:hidden, not just the max-height/opacity/pointer-events
+     trio this used to rely on. Those three collapse the dropdown
+     visually and block the mouse, but none of them removes anything
+     from the tab order or the accessibility tree — pointer-events
+     stops a pointer, it has no say over the keyboard. So a keyboard
+     user on any screen under 1080px, where these six links are
+     supposed to be folded away behind the burger, tabbed straight
+     into six invisible links after the brand and had focus disappear
+     for six stops. visibility:hidden closes both doors at once (not
+     focusable, not announced) and, unlike display:none, still
+     animates, since it's a transitionable property.
+     The 0s delay equal to the open animation's own duration is what
+     keeps that animation intact: on close, visibility flips only
+     once max-height has finished collapsing, so the panel is still
+     painted while it slides shut instead of vanishing on frame one.
+     On open, .nav-links.open resets the delay to 0s so it becomes
+     visible immediately and the slide-down is visible from the
+     start. */
   .nav-links {
     display: flex;
     position: absolute;
@@ -373,7 +391,8 @@ body {
     opacity: 0;
     overflow: hidden;
     pointer-events: none;
-    transition: max-height 0.55s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.4s ease, padding 0.55s ease;
+    visibility: hidden;
+    transition: max-height 0.55s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.4s ease, padding 0.55s ease, visibility 0s 0.55s;
   }
 
   .nav-links a {
@@ -385,6 +404,8 @@ body {
     opacity: 1;
     padding: 22px 24px 26px;
     pointer-events: auto;
+    visibility: visible;
+    transition-delay: 0s;
   }
 }
 
@@ -1086,8 +1107,22 @@ body.page-galleria main {
 }
 
 /* on narrow screens, drop the clustered layout entirely and stack the
-   images vertically at a readable size, instead of shrinking them */
-@media (max-width: 640px) {
+   images vertically at a readable size, instead of shrinking them.
+   Threshold raised from 640px to 800px — this was a real clipping
+   bug, not a taste adjustment. The clustered layout is built from
+   fixed pixel offsets: two 370px-wide photos at --tx:-378px and
+   --tx:8px span 756px in total, centred on .clump-anchor, and
+   quercia's own pair spans 712px the same way. Neither shrinks with
+   the viewport. Between 641px (where the old mobile rule stopped
+   applying) and roughly 760px the cluster was therefore wider than
+   the column it sits in, and because body carries overflow-x:hidden
+   the overflow wasn't even scrollable — the outer edge of each
+   column was simply cut off, with no way to reach it. That band is
+   not hypothetical: it's iPad mini portrait (744px) and a good part
+   of the Android tablet range. 800px clears 756px with room for the
+   photos' own drop shadow, and the clustered layout only starts
+   where there's actually space to draw it. */
+@media (max-width: 800px) {
   .clump-stage {
     height: auto;
     width: 100%;
@@ -1176,8 +1211,11 @@ body.page-galleria main {
    via a negative margin — asked to keep any overflow bounded by
    ritagli-band's own side margins rather than widening the stage past
    them. 244px: exactly the card's own height, no internal slack —
-   see this block's opening comment for why that matters here. */
-@media (min-width: 641px) {
+   see this block's opening comment for why that matters here.
+   Kept as the exact inverse of the generic stacking rule above, so
+   it moved from 641px to 801px along with it — see that rule's own
+   comment for the clipping bug behind the change. */
+@media (min-width: 801px) {
   body.page-quercia .clump-stage {
     height: 244px;
     width: 100%;
@@ -1216,9 +1254,12 @@ body.page-quercia .clump-photo:last-child {
   order: 2;
 }
 
-/* scoped to min-width:641px — the exact inverse of discorso's own
-   mobile breakpoint (max-width:640px) — so this never fights that
-   rule's width:100% mobile reset on specificity. Left unscoped once
+/* scoped to min-width:801px — the exact inverse of discorso's own
+   mobile breakpoint (max-width:800px) — so this never fights that
+   rule's width:100% mobile reset on specificity. Both numbers moved
+   up together (from 641/640) when that rule's clipping bug was
+   fixed; the inverse relationship, which is the part that matters
+   here, is unchanged. Left unscoped once
    before, its fixed width beat the generic mobile rule's width:100%
    on specificity regardless of media query, pushing a photo off the
    right edge of the viewport — the actual overflow reported back
@@ -1230,7 +1271,7 @@ body.page-quercia .clump-photo:last-child {
    like a small ritagli-band) is on .clump-photo itself — the element
    the entrance animation actually transforms — the frame is there
    from the very first frame of the fly-in, not just at rest. */
-@media (min-width: 641px) {
+@media (min-width: 801px) {
   body.page-quercia .clump-photo {
     width: 340px;
     height: 244px;
@@ -1280,7 +1321,7 @@ body.page-quercia .clump-badge {
   }
 }
 
-/* the generic stacked-mobile rule above (max-width:640px) already
+/* the generic stacked-mobile rule above (max-width:800px) already
    gives quercia's photos the right portrait treatment for free — same
    static/no-animation reset discorso's own six photos get. This adds
    the same ritagli-styled frame the desktop cards get above (padding
@@ -1294,7 +1335,7 @@ body.page-quercia .clump-badge {
    is now the primary "these are clickable" signal on a touchscreen,
    not a small corner label — its position (bottom:1/7 of the photo's
    height) comes from the shared rule above, not repeated here. */
-@media (max-width: 640px) {
+@media (max-width: 800px) {
   body.page-quercia .clump-photo {
     aspect-ratio: 630 / 415;
     padding: calc(22px * 4 / 3);
@@ -1315,14 +1356,14 @@ body.page-quercia .clump-badge {
 
 /* the landscape-phone case is its own thing, not just "the portrait
    rule at a different width": a phone rotated sideways is very often
-   wider than the 640px breakpoint above (many land in the 660–930px
+   wider than the 800px breakpoint above (some land in the 800–930px
    range there), which would otherwise leave it in the desktop/
    animated branch by mistake. Keyed on viewport HEIGHT instead —
    reliably short on an actual phone regardless of its rotated width,
    where a genuine landscape desktop or tablet window is comfortably
    taller than the 500px cutoff used here. Written to stand on its
-   own (not assuming the max-width:640px rule already ran, since at
-   these wider landscape widths it typically won't have). */
+   own (not assuming the max-width:800px rule already ran, since at
+   these wider landscape widths it may not have). */
 @media (max-height: 500px) and (orientation: landscape) {
   body.page-quercia .clump-stage {
     height: auto;
@@ -1352,7 +1393,7 @@ body.page-quercia .clump-badge {
   /* size calibration matches the portrait badge above — duplicated
      rather than shared because this block already stands on its own
      (see its own opening comment) rather than assuming the
-     max-width:640px block ran first. Position (bottom:1/7 of the
+     max-width:800px block ran first. Position (bottom:1/7 of the
      photo's height) comes from the shared rule further up, not
      repeated here. */
   body.page-quercia .clump-badge {
@@ -2292,7 +2333,12 @@ body.page-discorso .ritagli-band p::before {
   opacity: 0;
 }
 
-@media (max-width: 640px) {
+/* the hint is absolutely positioned inside .clump-stage, so its
+   offset has to follow whichever layout that stage is in, not a
+   breakpoint of its own: 96px sits inside the first row of the
+   clustered grid, 70px inside the first stacked photo. Moved from
+   640px to 800px with the stacking rule itself. */
+@media (max-width: 800px) {
   .discorso-hint {
     top: 70px;
   }

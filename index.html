@@ -2,7 +2,7 @@
 <html lang="it" class="no-js">
 <head>
 <meta charset="UTF-8">
-<script>document.documentElement.classList.replace('no-js','js'); if ('scrollRestoration' in history) history.scrollRestoration = 'manual';</script>
+<script>document.documentElement.classList.replace('no-js','js'); if ('scrollRestoration' in history) { var __nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0]; history.scrollRestoration = (__nav && __nav.type === 'back_forward') ? 'auto' : 'manual'; } addEventListener('load', function () { if (!window.__animsReady) document.documentElement.classList.replace('js', 'no-js'); });</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Teresio Gassino | Progettista meccanico Olivetti</title>
 <meta name="description" content="Teresio Gassino progettista meccanico di macchine da calcolo Olivetti, geniale alter ego di Capellaro">
