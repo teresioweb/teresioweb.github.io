@@ -1130,11 +1130,13 @@ body.page-galleria main {
    hover-reveal badge, all unchanged. Two things differ from the
    earlier overlapping-diagonal version: (1) the resting position —
    side by side now, at the same y — and (2) each photo now carries
-   its own padded, translucent, blurred frame — same look as
-   .ritagli-band, at double its 22px padding (44px) — the whole time
-   the animation runs, since it's on .clump-photo itself, the element
-   the animation actually transforms, not something added only once
-   it settles.
+   its own padded, translucent frame — same look as .ritagli-band, at
+   double its 22px padding (44px) — present the whole time the
+   animation runs, since it's on .clump-photo itself, the element the
+   animation actually transforms. Only the frame's frosted-glass blur
+   waits for landing (.settled) rather than running the whole flight —
+   see the performance note further down, right above where that
+   split happens, for why.
    The horizontal rhythm at rest: ritagli-band's own left edge, then
    card 1 (44px padding, photo, 44px padding), a gap, card 2 (same),
    ritagli-band's own right edge — three equal 32px gaps in total
@@ -1213,11 +1215,25 @@ body.page-quercia .clump-photo:last-child {
    then. 340×239 is the CARD size — padding included, not just the
    photo — see this block's own opening comment for the three-equal-
    gaps math this comes from (281×185 photo + 29.33px padding on every
-   side = 340×239 card). Because this sizing (and the padding/
-   background/blur right below, which is what makes each card look
-   like a small ritagli-band) is on .clump-photo itself — the element
-   the entrance animation actually transforms — the frame is there
-   from the very first frame of the fly-in, not just at rest. */
+   side = 340×239 card).
+
+   background vs. backdrop-filter, split on purpose: background is on
+   .clump-photo itself, present from the very first frame of the
+   fly-in — a solid translucent panel costs the browser nothing extra
+   while the element is being transform-animated. backdrop-filter is
+   NOT here; it moves to .clump-photo.settled below. Confirmed live:
+   with blur running on the same element as the clumpIn transform,
+   the browser has to resample the live backdrop at every frame of
+   the 1.6s flight (quercia's own animation-duration, longer than
+   discorso's 0.9s makes it worse) — expensive, and the actual cause
+   of the reported lag. discorso's own .clump-photo never carries a
+   backdrop-filter at all, which is why it stays smooth. Deferring the
+   blur to .settled — added by JS on animationend, once the transform
+   is no longer changing — keeps the frosted-glass look at rest with
+   none of the per-frame cost while airborne. The panel's own colour
+   doesn't change between the two states, only whether it's blurred,
+   so landing reads as the glass "focusing" rather than a frame
+   popping in from nothing. */
 @media (min-width: 641px) {
   body.page-quercia .clump-photo {
     width: 340px;
@@ -1225,12 +1241,14 @@ body.page-quercia .clump-photo:last-child {
     /* 4/3 of .ritagli-band's own 22px text padding (≈29.33px) —
        lowered from an earlier 3/2 */
     padding: calc(22px * 4 / 3);
-    /* same values as .ritagli-band, not the same rule — "identical in
+    /* same value as .ritagli-band, not the same rule — "identical in
        appearance," as asked, not necessarily identical code */
     background: rgba(255, 255, 255, 0.25);
+    border-radius: 14px;
+  }
+  body.page-quercia .clump-photo.settled {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border-radius: 14px;
   }
   /* corners NOT rounded on the photo itself — only the outer frame
      (14px above) gets the soft ritagli-band look; the photo inside
