@@ -1463,12 +1463,12 @@ footer .cc-logo {
 }
 
 /* fixed-height scrollable window for a long bulleted list inside a card
-   (e.g. the patents list) — same principle as .quercia-window (a fixed
-   box with overflow-y:auto instead of letting the card grow to fit
-   everything), but for text instead of an image. Set in the Fonte's
-   own typeface/size: this content is a citation-style list (titles +
-   patent numbers + links), not narrative prose, so it reads as the
-   same register as the "Fonte:" lines rather than body text. */
+   (e.g. the patents list) — a fixed box with overflow-y:auto instead
+   of letting the card grow to fit everything, for text instead of an
+   image. Set in the Fonte's own typeface/size: this content is a
+   citation-style list (titles + patent numbers + links), not
+   narrative prose, so it reads as the same register as the "Fonte:"
+   lines rather than body text. */
 .text-window {
   height: 130px;
   overflow-y: auto;
@@ -1633,8 +1633,18 @@ footer .cc-logo {
    .clump-photo.settled. From here on it's pure transition, decoupled
    from the entrance entirely: symmetric in both directions (hover-in
    and hover-out), and immune to ever being sped up by a future change
-   to the entrance timing again. */
-.js .gallery-grid .reveal-img.settled img {
+   to the entrance timing again.
+   Two selectors, not one: .reveal-img.from-right.visible img (the
+   entrance rule two blocks up) has 5 classes of specificity, one more
+   than a plain .reveal-img.settled img (4). For from-right photos
+   that outranks animation: none below, so the finished animation's
+   forwards-fill effect never actually lets go of transform — hover
+   then has nothing to override, confirmed live (only the from-right
+   thumbnails were stuck; the rest hover-zoomed fine). Repeating the
+   settled rule with .from-right added matches that 5-class specificity
+   and, coming later in the file, wins the tie for those photos too. */
+.js .gallery-grid .reveal-img.settled img,
+.js .gallery-grid .reveal-img.from-right.settled img {
   animation: none;
   opacity: 1;
   transform: translateX(0);
@@ -1866,7 +1876,7 @@ footer .cc-logo {
 }
 
 
-/* same pill language as .quercia-expand/.img-badge elsewhere on the
+/* same pill language as .clump-badge/.img-badge elsewhere on the
    site, so this reads as the same family of UI chrome rather than a
    one-off control invented for this single feature. aria-pressed
    (toggled in JS) carries the actual state to screen readers; the
@@ -2206,70 +2216,6 @@ body.page-curriculum .doc-viewer-text-inner {
 
 .doc-viewer-text-inner .align-right {
   text-align: right;
-}
-
-/* --- quercia scroll windows: tall Facebook screenshots contained in a
-   fixed-height frame with a native vertical scrollbar, so the page
-   itself doesn't become enormous. The expand button stays pinned to
-   the top-right while scrolling (position: sticky) and opens the
-   full-resolution image in a new tab (plain target="_blank", not
-   .lightbox-trigger — this page has no lightbox-overlay markup at
-   all, unlike the Foto page). --- */
-.quercia-windows {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  margin: 32px 0;
-}
-
-.quercia-window {
-  position: relative;
-  flex: 1 1 320px;
-  height: 373px;
-  overflow-y: auto;
-  border-radius: 10px;
-  background: #000;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-}
-
-.quercia-window img {
-  display: block;
-  width: 100%;
-  height: auto;
-  margin-top: -41px;
-}
-
-.quercia-expand {
-  position: sticky;
-  top: 14px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin: 14px 14px 0 auto;
-  padding: 4px 10px;
-  width: fit-content;
-  border: none;
-  border-radius: 20px;
-  background: rgba(0, 0, 0, 0.72);
-  color: #fff;
-  text-decoration: none;
-  font-family: 'Merriweather Sans', Arial, sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  cursor: pointer;
-  z-index: 2;
-}
-
-.quercia-expand:hover {
-  background: rgba(0, 0, 0, 0.88);
-}
-
-@media (max-width: 700px) {
-  .quercia-window {
-    height: 280px;
-    flex: 1 1 100%;
-  }
 }
 
 /* single light, translucent band wrapping a block of text (the "Nei
