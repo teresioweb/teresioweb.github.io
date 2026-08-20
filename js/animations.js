@@ -16,26 +16,47 @@ function nudgeNavBackdropFilter() {
   nav.style.backdropFilter = prev;
 }
 
-// Reveals each .reveal-img as it scrolls into view: slides in from
-// the side (left by default, or right if it has the "from-right" class)
-// and fades in. Plays once per image.
-function initScrollReveal() {
-  const images = document.querySelectorAll(".reveal-img");
-  if (!images.length) return;
+// One-shot reveal-on-scroll: adds .visible to each element matching
+// `selector` the first time it comes into view, then stops watching
+// it. The CSS behind .visible is what actually animates — which
+// animation plays is a property of the selector, not of this
+// function, so the same three lines drive both reveals on the site
+// (see the two call sites at the bottom of this file):
+//
+//   .reveal-img   slides in from the left, or from the right with
+//                 the "from-right" class
+//   .essay-anim   rises and fades, on the Home essay
+//
+// Each call builds its OWN observer over its own element set, which
+// is what the two hand-written copies of this did before it was
+// parameterised — the duplication was in the plumbing, never in the
+// behaviour, and nothing about the two reveals is shared at runtime.
+// Worth keeping in mind before "simplifying" the two calls into one
+// selector list: the classes stay separate on purpose. .essay-anim
+// is applied to specific elements and deliberately skips others on
+// that page (title, epigraph, closing source note) that a blanket
+// .reveal-img would otherwise catch, and the two animations differ.
+//
+// threshold 0.2 — fires once a fifth of the element is on screen,
+// not at first pixel, so an element doesn't start animating while
+// still effectively off the bottom edge.
+function observeReveal(selector) {
+  const targets = document.querySelectorAll(selector);
+  if (!targets.length) return;
 
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           entry.target.classList.add("visible");
-          observer.unobserve(entry.target);
+          observer.unobserve(entry.target); // one-shot: never replays
         }
       });
     },
     { threshold: 0.2 }
   );
 
-  images.forEach((img) => observer.observe(img));
+  targets.forEach((el) => observer.observe(el));
 }
 
 // Gallery photos specifically: once the entrance animation
@@ -57,32 +78,6 @@ function initGalleryReveal() {
       { once: true }
     );
   });
-}
-
-// Home essay: same one-shot reveal-on-scroll pattern as .reveal-img
-// above, applied to each paragraph box and photo individually
-// (.essay-anim). Kept as a separate observer/class rather than
-// reusing .reveal-img because the animation itself is different
-// (rise + fade, not a side slide) and deliberately excludes specific
-// elements (title, epigraph, closing source note) that .reveal-img's
-// blanket selector would otherwise catch.
-function initEssayReveal() {
-  const blocks = document.querySelectorAll(".essay-anim");
-  if (!blocks.length) return;
-
-  const essayObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("visible");
-          essayObserver.unobserve(entry.target);
-        }
-      });
-    },
-    { threshold: 0.2 }
-  );
-
-  blocks.forEach((el) => essayObserver.observe(el));
 }
 
 // Nav bar: hides when scrolling down, reappears when scrolling up.
@@ -485,10 +480,27 @@ function initDocViewer() {
     // the large full-resolution files this dialog often loads.
     img.style.opacity = "0";
     scrollWrap.classList.add("doc-viewer-loading");
-    img.onload = () => {
+    // load and error are the only two ways this ever finishes, so both
+    // have to undo the two lines above. Without the error half, a file
+    // that never arrives (bad path after a rename, a dropped
+    // connection mid-download on the multi-hundred-KB scans this
+    // dialog opens) left the spinner turning forever over an image
+    // held at opacity:0 — a dialog that looks busy and never isn't,
+    // with nothing to read and nothing to say what went wrong.
+    // Restoring opacity on error is deliberate rather than tidy-up:
+    // the browser's own broken-image placeholder and the alt text
+    // become visible, which at least reads as "this failed". Where the
+    // document has a transcript the "Versione testuale" button is
+    // already there beside it and still works — the transcript is
+    // cloned from an inline <template>, so it doesn't depend on the
+    // image having loaded at all, and on those documents the failure
+    // costs the scan but not the content.
+    const settle = () => {
       img.style.opacity = "";
       scrollWrap.classList.remove("doc-viewer-loading");
     };
+    img.onload = settle;
+    img.onerror = settle;
     img.src = src;
     img.alt = trigger.dataset.docAlt || "";
     img.classList.toggle("doc-fit-height", trigger.dataset.docFit === "height");
@@ -591,9 +603,10 @@ function initDocViewer() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  initScrollReveal();
+  // two separate calls, two separate observers — see observeReveal()
+  observeReveal(".reveal-img");
+  observeReveal(".essay-anim");
   initGalleryReveal();
-  initEssayReveal();
   initNavHide();
   initMobileMenu();
   initLightbox();
@@ -606,9 +619,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // line of the file: the point isn't "did this file arrive", it's
   // "did every reveal observer actually get attached". The CSS that
   // starts .reveal-img/.essay-anim at opacity:0 is gated behind the
-  // .js class, and only initScrollReveal()/initEssayReveal() ever add
-  // the .visible that undoes it — so if any init above throws, the
-  // ones after it never run and that content would stay invisible
+  // .js class, and only the two observeReveal() calls above ever add
+  // the .visible that undoes it — so if anything above throws, the
+  // calls after it never run and that content would stay invisible
   // forever. Setting the flag here means a throw anywhere in the
   // sequence leaves it unset, and the <head> script swaps .js back to
   // .no-js, which drops the opacity:0 starting state entirely: no
