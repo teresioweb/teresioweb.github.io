@@ -1131,12 +1131,10 @@ body.page-galleria main {
    earlier overlapping-diagonal version: (1) the resting position —
    side by side now, at the same y — and (2) each photo now carries
    its own padded, translucent, blurred frame — same look as
-   .ritagli-band, at double its 22px padding (44px) — present the
-   whole time the animation runs, since it's on .clump-photo itself,
-   the element the animation actually transforms. The blur's radius
-   is reduced during the flight itself and only reaches its full
-   value on landing (.settled) — see the performance note further
-   down, right above where that split happens, for why.
+   .ritagli-band, at double its 22px padding (44px) — the whole time
+   the animation runs, since it's on .clump-photo itself, the element
+   the animation actually transforms, not something added only once
+   it settles.
    The horizontal rhythm at rest: ritagli-band's own left edge, then
    card 1 (44px padding, photo, 44px padding), a gap, card 2 (same),
    ritagli-band's own right edge — three equal 32px gaps in total
@@ -1180,13 +1178,9 @@ body.page-quercia .clump-photo {
   /* slower than discorso's 0.9s base — reported too fast with only
      two photos to watch (discorso's six read fine at the original
      speed, busier scene, less time to notice any one photo's pace).
-     Shortened again from an earlier 1.6s once blur was reintroduced
-     during the flight itself (see the comment further down) — less
-     time spent paying the resample cost, even at the reduced radius
-     used in flight. Overriding just the duration longhand, not the
-     whole `animation` shorthand, keeps the base rule's easing curve
-     and forwards fill. */
-  animation-duration: 1.1s;
+     Overriding just the duration longhand, not the whole `animation`
+     shorthand, keeps the base rule's easing curve and forwards fill. */
+  animation-duration: 1.6s;
 }
 
 body.page-quercia .clump-photo img {
@@ -1219,23 +1213,11 @@ body.page-quercia .clump-photo:last-child {
    then. 340×239 is the CARD size — padding included, not just the
    photo — see this block's own opening comment for the three-equal-
    gaps math this comes from (281×185 photo + 29.33px padding on every
-   side = 340×239 card).
-
-   background vs. backdrop-filter radius, split on purpose: blur runs
-   for the whole flight now, not just at rest, but at a reduced 4px
-   radius rather than the 10px used once settled. Confirmed live: with
-   the full 10px blur running on the same element as the clumpIn
-   transform for the whole flight, the browser has to resample the
-   live backdrop at every frame — expensive, and the actual cause of
-   an earlier reported lag (worse still at the original 1.6s duration,
-   since shortened to 1.1s above). discorso's own .clump-photo never
-   carries a backdrop-filter at all, which is why it stays smooth by
-   comparison. A smaller radius is cheaper to resample per frame than
-   a larger one, so 4px in flight keeps the frosted-glass look present
-   throughout (rather than popping in only at rest) while cutting most
-   of that per-frame cost; the jump to 10px on .settled — added by JS
-   on animationend, once the transform is no longer changing — costs
-   nothing extra at that point, since nothing is moving anymore. */
+   side = 340×239 card). Because this sizing (and the padding/
+   background/blur right below, which is what makes each card look
+   like a small ritagli-band) is on .clump-photo itself — the element
+   the entrance animation actually transforms — the frame is there
+   from the very first frame of the fly-in, not just at rest. */
 @media (min-width: 641px) {
   body.page-quercia .clump-photo {
     width: 340px;
@@ -1243,16 +1225,12 @@ body.page-quercia .clump-photo:last-child {
     /* 4/3 of .ritagli-band's own 22px text padding (≈29.33px) —
        lowered from an earlier 3/2 */
     padding: calc(22px * 4 / 3);
-    /* same value as .ritagli-band, not the same rule — "identical in
+    /* same values as .ritagli-band, not the same rule — "identical in
        appearance," as asked, not necessarily identical code */
     background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    border-radius: 14px;
-  }
-  body.page-quercia .clump-photo.settled {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    border-radius: 14px;
   }
   /* corners NOT rounded on the photo itself — only the outer frame
      (14px above) gets the soft ritagli-band look; the photo inside
