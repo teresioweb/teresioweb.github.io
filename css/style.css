@@ -1,16 +1,7 @@
-/* Merriweather & Merriweather Sans, self-hosted (SIL Open Font License —
-   see fonts/OFL-merriweather.txt and fonts/OFL-merriweather-sans.txt,
-   two separate families/copyright holders despite the shared name)
-   instead of loaded from Google Fonts, so no request/IP is ever sent
-   to a third-party server. Weights loaded: Merriweather 300/400/700/900
-   (+ 400 italic); Merriweather Sans 300/400/700/800 (+ 400 italic) — the
-   800 face was added for the five sans page titles below, which
-   previously declared font-weight:900 with no matching sans face at
-   all, silently resolving to 700 (see the h1 rule further down).
-   Every font-weight declaration in this file now matches an actual
-   loaded face for whichever family is active at that point, never a
-   value like 600 that would just resolve to the nearest one available
-   instead of rendering as requested. */
+/* Merriweather and Merriweather Sans, self-hosted under the SIL OFL, so no
+   request ever leaves for a third-party font server. Every font-weight
+   declared in this file has a real loaded face behind it.  → DECISIONS.md
+   §1 */
 @font-face {
   font-family: 'Merriweather';
   font-style: normal;
@@ -84,17 +75,15 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* mobile browsers apply their own default tap-highlight (often a
-   translucent blue) to any tapped link/button unless told not to —
-   never reset anywhere in this file before. Best available hypothesis
-   for a reported stray blue line near the nav after closing a
-   lightbox on mobile portrait: a lingering highlight rect from the
-   tap that opened or closed the dialog, surfacing through whatever
-   repaint the scroll-lock/unlock and scroll-to-0 sequence triggers.
-   Not confirmed live this round — couldn't get a mobile browser
-   session working to reproduce it — so treat this as the first,
-   safe thing to try rather than a confirmed fix; flagged in the
-   response to ask for a screenshot if it's still there after this. */
+/* Every font-size in this file is in rem, and they all resolve against this
+   one value — which is the reader's own browser setting, not a number of
+   ours.  → DECISIONS.md §2, §B */
+html {
+  font-size: 100%;
+}
+
+/* Suppresses the default tap highlight mobile browsers draw over any tapped
+   link or button.  → DECISIONS.md §3 */
 * {
   -webkit-tap-highlight-color: transparent;
 }
@@ -118,12 +107,8 @@ button:focus-visible {
   border-radius: 2px;
 }
 
-/* skip link: the first focusable thing on every page, so a keyboard
-   user doesn't have to tab through the whole nav bar on every single
-   page load just to reach the content. Off-screen until focused
-   (not display:none/visibility:hidden, which would also remove it
-   from the tab order) — then it drops into view above the nav so it
-   reads before the brand/links, not on top of them. */
+/* Skip link: the first focusable thing on every page. Off-screen until
+   focused, then it drops into view above the nav.  → DECISIONS.md §4 */
 .skip-link {
   position: fixed;
   top: -60px;
@@ -133,7 +118,7 @@ button:focus-visible {
   background: #101010;
   color: #eee;
   font-family: 'Merriweather Sans', Arial, sans-serif;
-  font-size: 14px;
+  font-size: 0.875rem;
   text-decoration: none;
   border-radius: 0 0 6px 6px;
   transition: top 0.2s ease;
@@ -158,14 +143,8 @@ button:focus-visible {
   }
 }
 
-/* applied to <body> for as long as either dialog is open (see
-   initLightbox()/initDocViewer() in animations.js) — without this,
-   the page's own scrollbar stays visible behind the dialog even
-   though showModal() already prevents the page itself from actually
-   scrolling; visually confusing next to the dialog's own scrollbar.
-   scrollbar-gutter:stable on <html> above means this never causes a
-   layout shift: the gutter space stays reserved whether or not a
-   scrollbar is actually drawn in it. */
+/* On <body> for as long as either dialog is open, so the page's own
+   scrollbar doesn't sit visible behind it.  → DECISIONS.md §5 */
 .body-scroll-locked {
   overflow: hidden;
 }
@@ -177,32 +156,18 @@ body {
   min-height: 100vh;
   line-height: 1.8;
   overflow-x: hidden;
-  /* stop iOS Safari from silently rescaling text size based on the
-     ratio of a block's width to the viewport (its "font boosting"
-     heuristic for readability in narrow columns) — without this,
-     the same element can render at a different visual size between
-     portrait and landscape purely from that ratio changing, with no
-     font-size rule of ours actually changing */
+  /* Stops iOS Safari's "font boosting" heuristic from rescaling text on
+     its own between portrait and landscape.  → DECISIONS.md §6 */
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  /* reserve space so fixed nav doesn't cover the top of the page content */
-  padding-top: 66px;
+  /* Reserves room for the fixed nav, in rem so the gap grows together
+     with the bar's own type.  → DECISIONS.md §7 */
+  padding-top: 4.125rem;
 }
 
-/* --- site nav: fixed bar, hides on scroll down, reappears on scroll up.
-   Floats narrower than full width (max-width 950px — measured to
-   comfortably fit brand + 5 links on one line with real margin, while
-   still reading as a floating panel like the footer). Flush with the
-   top edge, so only the bottom corners round — mirrors the footer,
-   which is flush with the bottom edge and rounds only its top corners.
-   950px doesn't match main/footer's 760px on purpose, not from
-   inconsistency: main and footer already share the same value, and
-   the clump's resting frame (further down) lines up with them too,
-   within a couple of pixels for the photos' drop shadow. The nav
-   stays wider deliberately — narrowing it to match would cramp the
-   menu items and the space around the signature, tuned separately
-   for its own reason (breathing room for a horizontal menu, not the
-   text-reading measure the other three share). --- */
+/* Site nav: fixed bar, hides on scroll down and returns on scroll up.
+   Floats at max-width 950px — wider than main and footer's shared 760px, on
+   purpose.  → DECISIONS.md §8 */
 .site-nav {
   position: fixed;
   top: 0;
@@ -243,7 +208,7 @@ body {
   font-family: 'Merriweather Sans', Arial, sans-serif;
   color: #111;
   font-weight: 700;
-  font-size: 17px;
+  font-size: 1.0625rem;
   letter-spacing: 0.3px;
   text-decoration: none;
   white-space: nowrap;
@@ -261,8 +226,12 @@ body {
   border-bottom-color: #111;
 }
 
+/* in rem so the signature scales with the brand text beside it: with
+   everything else in the bar sized from the root font, a fixed 26px
+   mark would grow visibly smaller relative to the wordmark as soon as
+   the reader raises their default font size. */
 .brand-signature {
-  height: 26px;
+  height: 1.625rem;
   width: auto;
   display: block;
 }
@@ -278,16 +247,28 @@ body {
   font-family: 'Merriweather Sans', Arial, sans-serif;
   color: #111;
   text-decoration: none;
-  font-size: 14.5px;
+  font-size: 0.90625rem;
   letter-spacing: 0.2px;
   white-space: nowrap;
-  transition: opacity 0.2s ease;
+  /* the underline is reserved from the start, transparent until it's
+     wanted — same trick already used on .brand-text just above, and
+     for the same reason: a border that appears only on :hover adds a
+     pixel of height to the row the moment the cursor lands on a link,
+     and the whole bar twitches. */
+  border-bottom: 1px solid transparent;
+  transition: opacity 0.2s ease, border-bottom-color 0.2s ease;
 }
 
-.nav-links a:hover,
+/* Hover carries the underline only; the weight change is on .active, which
+   is set in the markup and never changes while the page is open.  →
+   DECISIONS.md §9 */
+.nav-links a:hover {
+  border-bottom-color: #111;
+}
+
 .nav-links a.active {
   font-weight: 700;
-  border-bottom: 1px solid #111;
+  border-bottom-color: #111;
 }
 
 .menu-toggle {
@@ -330,20 +311,14 @@ body {
   transform: rotate(-45deg);
 }
 
-/* mobile: thin bar with brand left, burger right; links become a dropdown.
-   Threshold raised to 1080px: with the real Merriweather Sans font (wider
-   than the fallback), the nav-inner needs more room before it fits on
-   one line without wrapping. */
-@media (max-width: 1080px) {
+/* Mobile: thin bar with brand left and burger right, links folding into a
+   dropdown. In em rather than px, because what this threshold measures is
+   how much room six text labels need.  → DECISIONS.md §10 */
+@media (max-width: 67.5em) {
   .site-nav {
-    /* max(), not a plain env() fallback: keeps the normal 20px on
-       phones without a notch (env() resolves to 0 there, and max()
-       just keeps the 20px), but grows past it in landscape on a
-       notched iPhone, where the notch relocates to a side edge and
-       can otherwise sit right on top of "Teresio Gassino" or the
-       burger icon. Only takes effect together with the page's
-       viewport-fit=cover meta tag, already set — without it env()
-       always resolves to 0 and this is a no-op. */
+    /* Keeps the normal 20px on phones without a notch, and grows past
+       it where a landscape notch would otherwise sit on the brand or
+       the burger.  → DECISIONS.md §11 */
     padding: 0 max(20px, env(safe-area-inset-right)) 0 max(20px, env(safe-area-inset-left));
     max-width: none;
     border-radius: 0;
@@ -357,24 +332,9 @@ body {
     display: block;
   }
 
-  /* visibility:hidden, not just the max-height/opacity/pointer-events
-     trio this used to rely on. Those three collapse the dropdown
-     visually and block the mouse, but none of them removes anything
-     from the tab order or the accessibility tree — pointer-events
-     stops a pointer, it has no say over the keyboard. So a keyboard
-     user on any screen under 1080px, where these six links are
-     supposed to be folded away behind the burger, tabbed straight
-     into six invisible links after the brand and had focus disappear
-     for six stops. visibility:hidden closes both doors at once (not
-     focusable, not announced) and, unlike display:none, still
-     animates, since it's a transitionable property.
-     The 0s delay equal to the open animation's own duration is what
-     keeps that animation intact: on close, visibility flips only
-     once max-height has finished collapsing, so the panel is still
-     painted while it slides shut instead of vanishing on frame one.
-     On open, .nav-links.open resets the delay to 0s so it becomes
-     visible immediately and the slide-down is visible from the
-     start. */
+  /* visibility:hidden takes the closed dropdown out of the tab order and
+     the accessibility tree, which the max-height/opacity/pointer-events
+     trio never did.  → DECISIONS.md §12 */
   .nav-links {
     display: flex;
     position: absolute;
@@ -415,34 +375,22 @@ main {
      on purpose while the nav's own 950px isn't. */
   max-width: 760px;
   margin: 0 auto;
-  padding: 60px 24px 98px;
-  /* found via Safari's own Web Inspector: this is the actual element
-     behind the reported blue line, not either dialog or their scroll
-     containers (both wrong guesses tried first). tabindex="-1" (on
-     the <main id="main"> tag itself) makes this programmatically
-     focusable purely so the skip link has something to move focus
-     to — that's a mechanical target, never meant to show a visible
-     ring around the entire page's content; the real feedback for a
-     skip-link jump is the page scrolling there, not an outline.
-     Unconditional, not scoped to :focus-visible: why focus lands
-     here after closing a dialog, on Safari specifically, isn't fully
-     understood, so this guarantees no ring renders regardless of the
-     exact mechanism rather than depending on getting that heuristic
-     right too. */
+  padding: 60px 24px 6.125rem;
+  /* No focus ring on <main> itself: its tabindex="-1" exists only as a
+     target for the skip link to move focus to, never as something to draw
+     a box around.  → DECISIONS.md §13 */
   outline: none;
 }
 
 h1 {
-  font-size: 30px;
+  font-size: 1.875rem;
   font-weight: 700;
   margin-bottom: 28px;
 }
 
-/* whatever type of element happens to close a page (p, figure, div...)
-   carries its own trailing margin, which otherwise stacks on top of
-   main's own padding-bottom and makes the gap to the footer vary by
-   page depending on content type. Zeroing it here makes that gap a
-   single, predictable value everywhere. */
+/* Zeroes the trailing margin of whatever element happens to close a page,
+   so the gap down to the footer is one predictable value everywhere.  →
+   DECISIONS.md §14 */
 main > *:last-child {
   margin-bottom: 0;
 }
@@ -461,39 +409,17 @@ main > *:last-child {
     margin-bottom: 12px;
   }
 
-  /* the fregio is now main's own last child (the fonte line that used
-     to close the page moved up into the masthead), so the last-child
-     rule above zeroes its own 48px bottom margin — the same 48px it
-     still keeps above itself. On mobile that leaves only the generic
-     61px padding-bottom to clear the fixed footer, which on notched
-     phones (safe-area-inset-bottom padding pushing the footer past
-     ~65-70px tall with its two-line credit text) can eat the padding
-     entirely and leave the fregio with no visible gap at all. Adding
-     back the 48px it lost keeps the gap below it equal to the gap
-     above it, clearing even the tallest notched-phone footer with
-     room to spare. Desktop doesn't need this: its footer is short
-     enough (~38px, see body.page-galleria main below) that the
-     generic 98px padding already clears 48px+38px on its own. */
+  /* Extra bottom padding on Home, so the closing fregio keeps a visible
+     gap above the fixed footer even on a notched phone.  → DECISIONS.md
+     §15 */
   body.page-home main {
-    padding-bottom: 116px;
+    padding-bottom: 7.25rem;
   }
 }
 
-/* five section-index pages (landing, Logos 27, Discorso, Curriculum,
-   Foto) get a sans title instead of the default serif — home.html's
-   essay masthead and quercia.html keep the serif h1 untouched.
-   font-weight:800, not 900: Merriweather Sans has no 900 cut at all
-   (the family tops out at 800 — see the new @font-face above), so a
-   900 request here was silently resolving to 700 the whole time,
-   same as the plain h1 rule everywhere else on the site. 800 is
-   the heaviest weight that's actually real for this family.
-   No letter-spacing here (unlike .brand/.nav-links a below): the old
-   700-fallback made this rule render as literally the same face the
-   navbar uses, so the same +0.3px tracking read as consistent by
-   coincidence. Now that this loads its own real 800 cut — a
-   different, more tightly-drawn face — that coincidence is gone, and
-   adding navbar tracking on top of it has no remaining reason. Left
-   at the font's own natural spacing. */
+/* The five section-index pages take a sans title; Home's masthead and
+   Quercia keep the serif h1. Weight 800, the heaviest cut this family
+   actually has.  → DECISIONS.md §16 */
 body.page-index h1,
 body.page-logos h1,
 body.page-discorso h1,
@@ -510,12 +436,8 @@ body.page-quercia h1 {
   font-weight: 900;
 }
 
-/* dek-style subtitle under the h1 on the five sans-title pages above:
-   serif italic, quieter than body copy, deliberately a different
-   register from the now-sans title just above it. Tightens the gap
-   to the title (h1's normal margin-bottom is sized for body content,
-   not for a subtitle sitting right underneath) and takes over h1's
-   usual role of separating the title area from whatever follows. */
+/* Dek-style subtitle under those five titles: serif italic, deliberately a
+   different register from the sans title just above it.  → DECISIONS.md §17 */
 h1:has(+ .page-subtitle) {
   margin-bottom: 8px;
 }
@@ -524,7 +446,7 @@ h1:has(+ .page-subtitle) {
   font-family: 'Merriweather', Georgia, serif;
   font-style: italic;
   font-weight: 400;
-  font-size: 18px;
+  font-size: 1.125rem;
   line-height: 1.5;
   color: #bbb;
   margin-bottom: 28px;
@@ -536,24 +458,21 @@ h1:has(+ .page-subtitle) {
   }
 
   .page-subtitle {
-    font-size: 16px;
+    font-size: 1rem;
     margin-bottom: 12px;
   }
 }
 
-/* Logos 27 and Curriculum: the bold lead-ins inside the color-band
-   figcaptions (article headings, document names, patent labels) get
-   the heavier 900 cut instead of the browser-default bold (700) —
-   these two pages are dense with short bold labels, so the extra
-   weight helps them read as landmarks in the text rather than
-   blending into ordinary emphasis. */
+/* On these two label-dense pages the short bold lead-ins take the 900 cut,
+   so they read as landmarks rather than as ordinary emphasis.  →
+   DECISIONS.md §18 */
 body.page-logos strong,
 body.page-curriculum strong {
   font-weight: 900;
 }
 
 h2 {
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: 700;
   margin: 36px 0 12px;
 }
@@ -563,27 +482,13 @@ p {
   color: #ddd;
 }
 
-/* link colour, as a custom property so each background context can
-   override it locally instead of every context needing its own
-   fully-specified selector: :root sets the default for the dark page
-   background and .essay-block cards (8.49:1 on #101010), and the two
-   contexts below override --link where the default would fail or
-   read poorly — .color-band (light pastel cards) needs something
-   much darker, .ritagli-band (translucent light-grey band) needs
-   something lighter again. Every `a` just reads var(--link); which
-   value wins is resolved by normal inheritance/cascade, not by
-   selector specificity, so there's no risk of one context's rule
-   accidentally outranking another's the way two selectors targeting
-   the same property can. */
+/* Link colour as a custom property, so each background context can override
+   it locally instead of every context needing its own fully-specified
+   selector.  → DECISIONS.md §19 */
 :root {
-  /* same hue as the brand blue (#2974AE, itself derived from the
-     #CEDCE6 card band — see sfondi/firma.svg) and as .color-band's
-     link colour below: one hue family across three lightness/
-     saturation points tuned per context, not one recycled hex value.
-     6.62 on #101010, 5.47 on .essay-block (#232323, this page's
-     strictest context) — comfortable margin above the 4.5 AA floor
-     without drifting into the highlighter-bright territory a lighter
-     step on this scan lands in. */
+  /* Same hue family as the brand blue, at a lightness tuned for this
+     context: 6.62:1 on the page background, 5.47:1 on .essay-block.  →
+     DECISIONS.md §20 */
   --link: #699EC6;
 }
 
@@ -606,7 +511,7 @@ figure {
 }
 
 figcaption {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: #888;
   margin-top: 8px;
 }
@@ -632,34 +537,17 @@ figcaption {
   transform: translateX(60px);
 }
 
-/* .js prefix added here too, purely to match the specificity of the
-   .from-right rule above (both now: .js + 2 more classes + img).
-   Without it, this rule's lower specificity (.reveal-img.visible img,
-   one class short) lost to .js .reveal-img.from-right img regardless
-   of source order once both classes were present on the same element
-   — so a "from-right" image would reach .visible but stay stuck at
-   its +60px starting offset forever, never settling into place. The
-   .js prefix is functionally redundant on its own (.visible is only
-   ever added by the same script that adds .js), but it's what
-   restores the tie that lets source order decide again, same as
-   before the .no-js/.js split existed. */
+/* The .js prefix is here purely to match the specificity of the .from-right
+   rule above, so source order gets to decide again.  → DECISIONS.md §21 */
 .js .reveal-img.visible img {
   opacity: 1;
   transform: translateX(0);
 }
 
-/* --- side-by-side figure: image + description next to each other ---
-   figcaption sits inside .side-row here, not as <figure>'s direct
-   first/last child — a W3C validator flags this as a content-model
-   error. Left as-is deliberately: making figcaption a true direct
-   child means switching this layout from flex to CSS Grid, which
-   changes how row height gets computed for the text-driven image
-   stretch used on the Logos 27 page, and needs its own compensating
-   fix per card (cropping, column width) to match. Tried once,
-   reverted — the validator warning has no real accessibility cost
-   (screen readers still associate the caption correctly regardless
-   of DOM position within the figure), so it wasn't worth the risk to
-   a hand-tuned layout. --- */
+/* Side-by-side figure: image and description next to each other. The
+   figcaption sits inside .side-row rather than as a direct child of
+   <figure>, which the W3C validator flags as a content-model error.  →
+   DECISIONS.md §22 */
 .side-row {
   display: flex;
   gap: 28px;
@@ -671,12 +559,9 @@ figcaption {
   flex-shrink: 0;
 }
 
-/* fonte-row: a second side-row below the image+text one, with an
-   invisible spacer standing in for the image column, so the Fonte
-   line stays visually indented in line with the text — without
-   contributing its height to the image's stretch (see Logos 27,
-   where letting Fonte's height affect the stretch crushed the image
-   into an oddly narrow crop for the two longer entries). */
+/* A second row below the image+text one, with an invisible spacer standing
+   in for the image column, so the Fonte line stays indented in line with
+   the text.  → DECISIONS.md §23 */
 .fonte-row {
   margin-top: 6px;
 }
@@ -697,10 +582,50 @@ figcaption {
   }
 }
 
+/* --- section headings and real lists inside the colour-band
+   figcaptions (Logos 27, Curriculum). Semantics only: nothing about
+   these two rules is meant to change what the pages look like. See
+   DECISIONS.md §A. --- */
+
+/* The line already doing a title's job — the document's name and what it is
+   — is a real <h2> now; font:inherit undoes h2's own defaults so it renders
+   exactly as that first line did.  → DECISIONS.md §24 */
+.reveal-img.side figcaption .doc-heading {
+  font: inherit;
+  font-weight: 400;
+  margin: 0;
+}
+
+/* the four articles (Logos 27) and the seven patents (Curriculum)
+   were each a single <p> held together by "&gt;" characters and <br>
+   line breaks. The ">" marker is redrawn as a ::before so the lists
+   render identically: no bullet, no indent, no gap between items. */
+.doc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.doc-list li {
+  margin: 0;
+}
+
+.doc-list li::before {
+  content: ">";
+  margin-right: 8px;
+}
+
+/* on Logos 27 the old marker sat inside the <strong>, so it inherited
+   the 900 weight that page gives <strong>; the Curriculum patent list
+   marker was plain text and still inherits normally. */
+body.page-logos .doc-list li::before {
+  font-weight: 900;
+}
+
 .reveal-img.side figcaption {
   flex: 1;
   margin-top: 0;
-  font-size: 15px;
+  font-size: 0.9375rem;
   color: #ccc;
   line-height: 1.7;
 }
@@ -726,11 +651,9 @@ figcaption {
   object-position: top;
 }
 
-/* Logos 27 specifically: the image stretches to match whatever height
-   the text naturally takes (rather than a fixed aspect ratio), since
-   the four entries have different amounts of text — this keeps every
-   image/text pair matched in height without picking one fixed size
-   that would only fit one of them correctly. */
+/* On Logos 27 the image stretches to whatever height the text naturally
+   takes, since the four entries carry very different amounts of it.  →
+   DECISIONS.md §25 */
 body.page-logos .side-row {
   align-items: stretch;
 }
@@ -813,13 +736,9 @@ body.page-discorso {
   background-color: #101010;
 }
 
-/* index landing page: the four link-cards to the site's main sections.
-   Previously duplicated as an inline <style> block on index.html and
-   en/index.html — identical in both, so it belongs here instead.
-   The image darkens on hover using the same technique and value as
-   the color-band photo links elsewhere (.side-row > a::after), so the
-   two "photo you can click" patterns on the site read as one
-   convention rather than two different darken amounts. */
+/* The landing page's four link-cards, moved here from an inline <style>
+   block that was duplicated identically in both index files.  →
+   DECISIONS.md §26 */
 .cards {
   display: flex;
   flex-direction: column;
@@ -844,11 +763,9 @@ body.page-discorso {
 .card:nth-child(3) { background: #FCC1C1; }
 .card:nth-child(4) { background: #FFDDC2; }
 
-/* hover-darken the whole colored band, not just the photo — an
-   overlay on .card itself, clipped to its own border-radius by
-   overflow:hidden above, using the same value as the color-band
-   photo-link darkening elsewhere (.side-row > a::after) so it's the
-   same convention, just scoped to the full card here. */
+/* Hover darkens the whole coloured card rather than just the photo, at the
+   same value used for the photo links elsewhere on the site.  →
+   DECISIONS.md §27 */
 .card::after {
   content: "";
   position: absolute;
@@ -858,7 +775,8 @@ body.page-discorso {
   pointer-events: none;
 }
 
-.card:hover::after {
+.card:hover::after,
+.card:focus-visible::after {
   background: rgba(0, 0, 0, 0.18);
 }
 
@@ -877,8 +795,8 @@ body.page-discorso {
   border-radius: 8px;
 }
 
-.card h2 { margin: 0 0 8px; font-size: 19px; color: #1a1a1a; }
-.card p { margin: 0; color: #333; font-style: italic; font-size: 15px; }
+.card h2 { margin: 0 0 8px; font-size: 1.1875rem; color: #1a1a1a; }
+.card p { margin: 0; color: #333; font-style: italic; font-size: 0.9375rem; }
 .card p .plain { font-style: normal; }
 .card:nth-child(4) p { font-style: normal; }
 
@@ -897,21 +815,9 @@ body.page-index {
 }
 
 body.page-quercia {
-  /* overlay raised from the site's usual 0.75 to 0.85 — measured fix
-     for a real contrast failure, not a style preference. Verified by
-     compositing the actual render stack pixel-by-pixel (sgimignano.svg
-     under the gradient, blurred, under .ritagli-band's own translucent
-     white): at 0.75 the text minimum was 3.39:1 and the link minimum
-     2.95:1, both failing WCAG AA, over 15–33% of the band's area.
-     Unlike discorso's watermark (a repeating texture, which the blur
-     evens out), sgimignano.svg is one large no-repeat illustration
-     with big plain-white areas the blur can't flatten — those areas
-     were the failure. At 0.85 (paired with .ritagli-band's own
-     lowered alpha just below) the minimums become 5.40:1 and 4.70:1,
-     0% of the area below threshold. Raising the white band's alpha
-     instead of the overlay was tried and made it worse — it brightens
-     the backdrop sitting behind light-colored text, the wrong
-     direction entirely. */
+  /* Overlay raised from the site's usual 0.75 to 0.85 — a measured fix
+     for a real contrast failure, not a style preference.  → DECISIONS.md
+     §28 */
   background-image:
     linear-gradient(rgba(16, 16, 16, 0.85), rgba(16, 16, 16, 0.85)),
     url('../sfondi/sgimignano.svg');
@@ -921,12 +827,8 @@ body.page-quercia {
   background-position-y: 50px;
 }
 
-/* paired with the raised overlay above — see that rule's own comment
-   for the measured numbers this combination produces. Scoped to
-   quercia only: discorso's own .ritagli-band already passed (its
-   watermark is a repeating texture the blur evens out), so it's left
-   at the site's base 0.25 rather than changing a page that didn't
-   need it. */
+/* Paired with the raised overlay above, and scoped to Quercia only:
+   Discorso's own band already passed.  → DECISIONS.md §29 */
 body.page-quercia .ritagli-band {
   background: rgba(255, 255, 255, 0.18);
 }
@@ -941,14 +843,11 @@ body.page-galleria {
   background-position-y: -20px;
 }
 
-/* the background SVG on this page loses its opacity control and its
-   lines render solid white (#fff) if the last row of photos sits too
-   close to the footer bar — the footer itself is position:fixed and
-   38px tall, eating into whatever padding is reserved here, so this
-   is 105px (the real target) + 38px (footer's own height) = 143px,
-   not 105px directly, to get a true 105px of visible clearance */
+/* Extra clearance under the last row of photos: this page's background SVG
+   renders its lines solid white if the grid crowds the fixed footer.  →
+   DECISIONS.md §30 */
 body.page-galleria main {
-  padding-bottom: 143px;
+  padding-bottom: 8.9375rem;
 }
 
 @media (max-width: 640px) {
@@ -965,12 +864,9 @@ body.page-galleria main {
   }
 }
 
-/* --- clump: several images slide in together from different sides
-   and land clustered with spacing between them, then page text follows below.
-   Each .clump-photo sets its own --fx/--fy (start offset) and --tx/--ty
-   (resting offset) inline, so the same keyframe works for all of them.
-   The stage bleeds slightly past main's padding (negative margin) to
-   give the photos more room to actually grow larger. --- */
+/* Clump: several images slide in together from different sides and land
+   clustered, with the page's text below. Each photo sets its own start and
+   resting offsets inline.  → DECISIONS.md §31 */
 .clump-stage {
   position: relative;
   height: 800px;
@@ -978,12 +874,8 @@ body.page-galleria main {
   margin: 0 -24px 32px;
 }
 
-/* the three in-page scroll targets the ritagli-band's highlighted
-   words jump to (#clump-row-1/2/3, see discorso.html) — offset so the
-   fixed .site-nav doesn't land directly on top of the photo. 100px
-   clears the nav's own rendered height (≈58px desktop, ≈50px mobile)
-   with some breathing room to spare, so one value covers both rather
-   than needing a breakpoint-specific one. */
+/* Scroll targets for the highlighted words in the ritagli-band, offset so
+   the fixed nav doesn't land on top of the photo.  → DECISIONS.md §32 */
 #clump-row-1,
 #clump-row-2,
 #clump-row-3 {
@@ -1026,13 +918,9 @@ body.page-galleria main {
 }
 
 
-/* badge: sits over the blank paper margin at the bottom of each scan
-   (verified on all six images — narrowest is sartor.webp, still ~7%
-   of clear white space even after the crop), not over the typed
-   text, so it doesn't compete with the exact thing the zoom exists
-   to make legible. Hidden by default; only ever shown inside the
-   hover-capable block below — on touch it never renders, which is
-   deliberate (see that block's comment). */
+/* The badge sits over the blank paper margin at the bottom of each scan,
+   never over the typed text the zoom exists to make legible.  →
+   DECISIONS.md §33 */
 .clump-badge {
   position: absolute;
   bottom: 10px;
@@ -1042,11 +930,19 @@ body.page-galleria main {
   background: rgba(0, 0, 0, 0.55);
   color: #fff;
   font-family: 'Merriweather Sans', Arial, sans-serif;
-  font-size: 11px;
+  font-size: 0.6875rem;
   white-space: nowrap;
   opacity: 0;
   transition: opacity 0.2s ease;
   pointer-events: none;
+}
+
+/* keyboard parity for the badge, outside the (hover: hover) block on
+   purpose so it holds on any input device — including Quercia, where
+   the badge is normally forced back to opacity:0 on a real mouse.
+   Higher specificity than that rule, so focus wins over it. */
+.clump-photo:focus-within .clump-badge {
+  opacity: 1;
 }
 
 @keyframes clumpIn {
@@ -1054,19 +950,9 @@ body.page-galleria main {
   to   { transform: translate(var(--tx), var(--ty)); opacity: 1; }
 }
 
-/* hover zoom: gated two ways on purpose.
-   1) .settled — added by JS on animationend. While clumpIn is still
-      running, the animation's forwards fill holds `transform` at a
-      priority normal author rules can't beat (CSS animations outrank
-      plain-specificity author declarations in the cascade), so a
-      :hover transform here would silently do nothing until the
-      animation ends anyway. Waiting for .settled sidesteps that
-      entirely instead of fighting it with !important, and also
-      avoids the transform being reset mid-flight if the cursor
-      happens to already be sitting where a photo lands.
-   2) (hover: hover) and (pointer: fine) — real mouse only. Touch
-      has no true hover; a tap would latch the zoomed state until
-      the next tap elsewhere, which reads as broken, not zoomed. */
+/* Hover zoom gated twice on purpose: on .settled, because an animation's
+   forwards fill outranks a :hover transform, and on a real mouse, because
+   touch has no true hover.  → DECISIONS.md §34 */
 .clump-photo.settled {
   animation: none;
   opacity: 1;
@@ -1080,7 +966,8 @@ body.page-galleria main {
     z-index: 5;
   }
 
-  .clump-photo.settled:hover .clump-badge {
+  .clump-photo.settled:hover .clump-badge,
+  .clump-photo.settled:focus-within .clump-badge {
     opacity: 1;
   }
 
@@ -1094,34 +981,17 @@ body.page-galleria main {
     transform: translateX(-50%);
   }
 
-  /* the top-of-page hint is what told touch users (and mouse users,
-     before this) to click a photo. On a hover-capable pointer the
-     per-photo badge now does that job at the moment it's actually
-     useful, so the page-level banner would just be saying the same
-     thing twice — once abstractly at the top, once concretely on
-     the image itself. Left untouched for touch, where the badge
-     never appears and the banner is still the only signal there is. */
+  /* On a hover-capable pointer the per-photo badge already does this job,
+     so the page-level banner would only be saying the same thing twice.
+     → DECISIONS.md §35 */
   .discorso-hint {
     display: none;
   }
 }
 
-/* on narrow screens, drop the clustered layout entirely and stack the
-   images vertically at a readable size, instead of shrinking them.
-   Threshold raised from 640px to 800px — this was a real clipping
-   bug, not a taste adjustment. The clustered layout is built from
-   fixed pixel offsets: two 370px-wide photos at --tx:-378px and
-   --tx:8px span 756px in total, centred on .clump-anchor, and
-   quercia's own pair spans 712px the same way. Neither shrinks with
-   the viewport. Between 641px (where the old mobile rule stopped
-   applying) and roughly 760px the cluster was therefore wider than
-   the column it sits in, and because body carries overflow-x:hidden
-   the overflow wasn't even scrollable — the outer edge of each
-   column was simply cut off, with no way to reach it. That band is
-   not hypothetical: it's iPad mini portrait (744px) and a good part
-   of the Android tablet range. 800px clears 756px with room for the
-   photos' own drop shadow, and the clustered layout only starts
-   where there's actually space to draw it. */
+/* Below this the clustered layout gives way to a plain vertical stack.
+   Raised from 640px: the cluster's fixed pixel offsets were being clipped
+   between 641px and roughly 760px.  → DECISIONS.md §36 */
 @media (max-width: 800px) {
   .clump-stage {
     height: auto;
@@ -1145,76 +1015,21 @@ body.page-galleria main {
     opacity: 1;
     animation: none;
   }
-  /* explicit reset, matching .clump-photo.settled's specificity: that
-     rule pins a translate() offset once the entrance animation ends,
-     which only ever happens in the desktop/landscape grid layout.
-     Rotating from there to portrait doesn't remove the .settled class
-     (nothing tells it to), so without this the old grid offset was
-     still being applied on top of the new stacked layout — the
-     "scattered with big gaps" bug. */
+  /* Explicit reset at .settled's own specificity: rotating to portrait
+     doesn't remove that class, and the old grid offset was surviving into
+     the stacked layout.  → DECISIONS.md §37 */
   .clump-photo,
   .clump-photo.settled {
     transform: none;
   }
 }
 
-/* --- quercia's own clump: same .clump-stage/.clump-anchor/.clump-photo
-   markup and mechanics as discorso (reused wholesale — initClumpPhotos()
-   in animations.js just selects every .clump-photo on the page, so
-   nothing there needed to change) — entrance animation, hover-zoom,
-   hover-reveal badge, all unchanged. Three things differ from the
-   earlier overlapping-diagonal version: (1) the resting position —
-   side by side now, at the same y; (2) each photo now carries its own
-   padded, translucent, blurred frame — same look as .ritagli-band, at
-   double its 22px padding (44px) — the whole time the animation runs,
-   since it's on .clump-photo itself, the element the animation
-   actually transforms, not something added only once it settles; and
-   (3) both photos now launch from the same off-screen point on the
-   right (--fx:900px on both, in quercia.html / en/quercia.html), not
-   from opposite sides — confirmed live that having one photo fly in
-   from the left was itself the source of a Chrome-only animation lag
-   (absent on Firefox, and never affecting the photo arriving from the
-   right), unrelated to the backdrop-filter blur also on this element.
-   Since both now share a launch point, they're staggered instead:
-   different --delay/animation-duration per photo (set inline, not
-   here — see the comment above .clump-photo img below) so the
-   left-bound photo starts first and lands first, while the
-   right-bound one enters mid-flight and lands just after — still
-   reads as motion from two directions despite the shared origin.
-   The horizontal rhythm at rest: ritagli-band's own left edge, then
-   card 1 (44px padding, photo, 44px padding), a gap, card 2 (same),
-   ritagli-band's own right edge — three equal 32px gaps in total
-   (outer-left, between the cards, outer-right), computed against
-   712px (main's typical full-width content column: 760 − 48
-   padding): two 340×244 cards (281×185 photo + 29.33px padding —
-   22px × 4/3 — on every
-   side — equal to .ritagli-band's own text padding, not doubled
-   anymore) plus three 32px gaps sum to exactly that, landing the pair
-   symmetrically on their own by construction (see the inline --tx
-   values in quercia.html) rather than needing a separate centering
-   calculation. The same 32px also reappears vertically, between
-   ritagli-band's own bottom padding-edge and the cards' top padding-
-   edge — via ordinary margin collapse between .ritagli-band's bottom
-   margin and .clump-stage's top margin (32px/0). That collapse logic
-   was right, but the numbers behind it weren't: the stage was taller
-   than the card (260 vs 254) with ty:0, and .clump-anchor sits at
-   top:50% of the stage — so the card's top edge actually landed 130px
-   down into the stage before the margin collapse ever got a chance to
-   apply, not flush with the stage's own top edge like the math
-   assumed. That's the "enormous" gap reported. Fixed by making the
-   stage exactly as tall as the card (no slack) and centering the card
-   on the anchor via ty = −half its own height (−120px), so its top
-   edge lands exactly on the stage's own top edge, where the collapse
-   math actually applies. --- */
+/* Quercia's clump reuses Discorso's markup and mechanics wholesale; only
+   the resting position, the per-card frame and the shared launch side
+   differ.  → DECISIONS.md §38 */
 
-/* unlike discorso's stage, this one isn't bled past main's own padding
-   via a negative margin — asked to keep any overflow bounded by
-   ritagli-band's own side margins rather than widening the stage past
-   them. 244px: exactly the card's own height, no internal slack —
-   see this block's opening comment for why that matters here.
-   Kept as the exact inverse of the generic stacking rule above, so
-   it moved from 641px to 801px along with it — see that rule's own
-   comment for the clipping bug behind the change. */
+/* Unlike Discorso's, this stage isn't bled past main's padding, and it is
+   exactly as tall as the card, with no internal slack.  → DECISIONS.md §39 */
 @media (min-width: 801px) {
   body.page-quercia .clump-stage {
     height: 244px;
@@ -1223,15 +1038,9 @@ body.page-galleria main {
   }
 }
 
-/* animation-duration is NOT set here anymore — the two photos now
-   launch from the same off-screen point on the right but travel
-   different distances and land at different times by design (the
-   left-bound photo arrives first; the right-bound one enters
-   mid-flight and lands just after), so each carries its own
-   animation-duration inline in quercia.html / en/quercia.html
-   instead of sharing one page-level value — same place --delay has
-   always lived, via the base .clump-photo rule's animation-delay:
-   var(--delay, 0s). */
+/* animation-duration is set inline per photo in quercia.html, not here: the
+   two travel different distances and are meant to land at different times.
+   → DECISIONS.md §40 */
 
 body.page-quercia .clump-photo img {
   /* a light vignette — darkened toward the edges, same trick as a
@@ -1241,12 +1050,8 @@ body.page-quercia .clump-photo img {
   box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.35);
 }
 
-/* visual order swapped on mobile (both portrait and landscape, both
-   flex layouts) — without touching DOM order, which still controls
-   the desktop z-stacking from the "invert which is on top" round.
-   `order` is a flex/grid-only property, a no-op under desktop's
-   position:absolute layout, so this can sit unconditionally rather
-   than needing its own media query. */
+/* Visual order swapped on mobile without touching DOM order, which still
+   controls the desktop z-stacking.  → DECISIONS.md §41 */
 body.page-quercia .clump-photo:first-child {
   order: 1;
 }
@@ -1254,23 +1059,9 @@ body.page-quercia .clump-photo:last-child {
   order: 2;
 }
 
-/* scoped to min-width:801px — the exact inverse of discorso's own
-   mobile breakpoint (max-width:800px) — so this never fights that
-   rule's width:100% mobile reset on specificity. Both numbers moved
-   up together (from 641/640) when that rule's clipping bug was
-   fixed; the inverse relationship, which is the part that matters
-   here, is unchanged. Left unscoped once
-   before, its fixed width beat the generic mobile rule's width:100%
-   on specificity regardless of media query, pushing a photo off the
-   right edge of the viewport — the actual overflow reported back
-   then. 340×244 is the CARD size — padding included, not just the
-   photo — see this block's own opening comment for the three-equal-
-   gaps math this comes from (281×185 photo + 29.33px padding on every
-   side = 340×244 card). Because this sizing (and the padding/
-   background/blur right below, which is what makes each card look
-   like a small ritagli-band) is on .clump-photo itself — the element
-   the entrance animation actually transforms — the frame is there
-   from the very first frame of the fly-in, not just at rest. */
+/* The exact inverse of the stacking breakpoint above, so this fixed width
+   never outranks that rule's width:100% reset on specificity.  →
+   DECISIONS.md §42 */
 @media (min-width: 801px) {
   body.page-quercia .clump-photo {
     width: 340px;
@@ -1293,17 +1084,9 @@ body.page-quercia .clump-photo:last-child {
   }
 }
 
-/* badge visible unconditionally on touch (no page-level hint banner
-   here, unlike discorso's .discorso-hint, so it has to carry that job
-   on its own on a screen with no hover at all) but hover-only on an
-   actual mouse, matching discorso's own behaviour there — see the
-   hover-capable media query below. bottom:1/7 of the photo's own
-   height, not a fixed pixel value: the containing block for this
-   absolute position is .clump-photo a, whose own height IS the
-   photo's rendered height (the padding lives on its parent,
-   .clump-photo, not on this element), so this one rule is correct at
-   any size — desktop or mobile — without separate breakpoint-specific
-   numbers. */
+/* Always visible on touch, where this page has no hint banner to carry the
+   job, and positioned at 1/7 of the photo's own height so one rule holds at
+   any size.  → DECISIONS.md §43 */
 body.page-quercia .clump-badge {
   opacity: 1;
   left: 50%;
@@ -1316,25 +1099,15 @@ body.page-quercia .clump-badge {
   body.page-quercia .clump-badge {
     opacity: 0;
   }
-  body.page-quercia .clump-photo.settled:hover .clump-badge {
+  body.page-quercia .clump-photo.settled:hover .clump-badge,
+  body.page-quercia .clump-photo.settled:focus-within .clump-badge {
     opacity: 1;
   }
 }
 
-/* the generic stacked-mobile rule above (max-width:800px) already
-   gives quercia's photos the right portrait treatment for free — same
-   static/no-animation reset discorso's own six photos get. This adds
-   the same ritagli-styled frame the desktop cards get above (padding
-   at 4/3 of .ritagli-band's own 22px text padding (≈29.33px), same
-   background/blur/radius) — missing here before, added now — and
-   swaps the generic 14/9 aspect-ratio for these two photos' real one
-   (630×415), so the mobile crop matches the desktop object-fit:cover
-   crop rather than a compromise ratio tuned for discorso's varied
-   source scans. Badge sized up to match .discorso-hint's own scale
-   (that page's equivalent page-level hint), since a badge this size
-   is now the primary "these are clickable" signal on a touchscreen,
-   not a small corner label — its position (bottom:1/7 of the photo's
-   height) comes from the shared rule above, not repeated here. */
+/* The generic stacking rule above already handles the portrait layout; this
+   adds the ritagli-styled frame and the two photos' real aspect ratio.  →
+   DECISIONS.md §44 */
 @media (max-width: 800px) {
   body.page-quercia .clump-photo {
     aspect-ratio: 630 / 415;
@@ -1350,20 +1123,13 @@ body.page-quercia .clump-badge {
   body.page-quercia .clump-badge {
     padding: 10px 22px;
     border-radius: 24px;
-    font-size: 14px;
+    font-size: 0.875rem;
   }
 }
 
-/* the landscape-phone case is its own thing, not just "the portrait
-   rule at a different width": a phone rotated sideways is very often
-   wider than the 800px breakpoint above (some land in the 800–930px
-   range there), which would otherwise leave it in the desktop/
-   animated branch by mistake. Keyed on viewport HEIGHT instead —
-   reliably short on an actual phone regardless of its rotated width,
-   where a genuine landscape desktop or tablet window is comfortably
-   taller than the 500px cutoff used here. Written to stand on its
-   own (not assuming the max-width:800px rule already ran, since at
-   these wider landscape widths it may not have). */
+/* The landscape-phone case, keyed on viewport height rather than width: a
+   rotated phone is very often wider than the breakpoint above.  →
+   DECISIONS.md §45 */
 @media (max-height: 500px) and (orientation: landscape) {
   body.page-quercia .clump-stage {
     height: auto;
@@ -1390,16 +1156,12 @@ body.page-quercia .clump-badge {
   body.page-quercia .clump-photo.settled {
     transform: none;
   }
-  /* size calibration matches the portrait badge above — duplicated
-     rather than shared because this block already stands on its own
-     (see its own opening comment) rather than assuming the
-     max-width:800px block ran first. Position (bottom:1/7 of the
-     photo's height) comes from the shared rule further up, not
-     repeated here. */
+  /* Badge sizing repeated rather than shared, because this block
+     deliberately stands on its own.  → DECISIONS.md §46 */
   body.page-quercia .clump-badge {
     padding: 10px 22px;
     border-radius: 24px;
-    font-size: 14px;
+    font-size: 0.875rem;
   }
 }
 
@@ -1425,7 +1187,7 @@ footer {
   border-radius: 10px 10px 0 0;
   color: #000;
   font-family: 'Merriweather Sans', Arial, sans-serif;
-  font-size: 12.5px;
+  font-size: 0.78125rem;
 }
 
 footer a { color: #000; }
@@ -1464,7 +1226,7 @@ footer .cc-logo {
 @media (max-width: 700px) {
   footer {
     padding: 8px 14px calc(5px + (env(safe-area-inset-bottom) * 0.8));
-    font-size: 10.5px;
+    font-size: 0.65625rem;
     gap: 6px;
     border-radius: 0;
   }
@@ -1478,19 +1240,8 @@ footer .cc-logo {
   }
 }
 
-/* landscape phones: width is often generous (700px+) even on small
-   devices, so the max-width breakpoint above doesn't catch them — but
-   height is very short (350-420px), and the footer is position:fixed,
-   so it needs to be even more compact here regardless of width. Force
-   everything onto a single line since landscape width is rarely the
-   constraint, height always is. No border-radius override here on
-   purpose: whether the footer should be square (edge-to-edge, on a
-   narrow phone that also matches the max-width:700px block above) or
-   rounded (floating with visible side margins, its own max-width:760px
-   never reaching the actual screen edges — the common case on
-   iPhone-mini-and-up-width landscape phones, where this query alone
-   applies) depends on width, not on being in landscape as such, so
-   it's left to whichever of those two width-based rules applies. */
+/* Landscape phones are generously wide but very short, and the footer is
+   fixed: everything goes onto one line here.  → DECISIONS.md §47 */
 @media (orientation: landscape) and (max-height: 500px) {
   .mobile-break {
     display: none;
@@ -1502,7 +1253,7 @@ footer .cc-logo {
 
   footer {
     padding: 7px 14px calc(4px + (env(safe-area-inset-bottom) * 0.8));
-    font-size: 10px;
+    font-size: 0.625rem;
     gap: 6px;
   }
 
@@ -1515,13 +1266,9 @@ footer .cc-logo {
   }
 }
 
-/* fixed-height scrollable window for a long bulleted list inside a card
-   (e.g. the patents list) — a fixed box with overflow-y:auto instead
-   of letting the card grow to fit everything, for text instead of an
-   image. Set in the Fonte's own typeface/size: this content is a
-   citation-style list (titles + patent numbers + links), not
-   narrative prose, so it reads as the same register as the "Fonte:"
-   lines rather than body text. */
+/* Fixed-height scrollable box for a long list inside a card, set in the
+   Fonte's own typeface — this content is citation, not prose.  →
+   DECISIONS.md §48 */
 .text-window {
   height: 130px;
   overflow-y: auto;
@@ -1530,7 +1277,7 @@ footer .cc-logo {
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.06);
   font-family: 'Merriweather Sans', Arial, sans-serif;
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.6;
   /* #4A4A4A, not #555: this box adds its own rgba(0,0,0,0.06) tint on
      top of whichever card colour it sits on, which on the pink card
@@ -1551,7 +1298,7 @@ footer .cc-logo {
 /* small print / citation lines ("Fonte: ...") throughout the site */
 .fonte {
   font-family: 'Merriweather Sans', Arial, sans-serif;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: #888;
 }
 
@@ -1561,14 +1308,9 @@ footer .cc-logo {
   gap: 16px;
 }
 
-/* lightbox-trigger is a real <button> wrapping the <img> now, not the
-   img itself with tabindex/role="button" bolted on — this reset just
-   strips the browser's own button chrome (border, padding, background,
-   font) so it's visually transparent and the img inside sizes exactly
-   as it did before, under whichever more specific selector governs it
-   (.gallery-grid .reveal-img img, .hero-photo img, .essay-photo img —
-   all descendant selectors, so they still reach through the button
-   wrapper without any changes of their own). */
+/* The trigger is a real <button> wrapping the image; this only strips the
+   browser's own button chrome so the image sizes exactly as before.  →
+   DECISIONS.md §49 */
 .lightbox-trigger {
   display: block;
   width: 100%;
@@ -1598,12 +1340,8 @@ footer .cc-logo {
   filter: brightness(0.82);
 }
 
-/* crop from the top instead of the center: foto-02 is a portrait
-   shot (464×542) forced into the grid's 4:3 landscape crop, and a
-   centred crop was cutting into the top of the subject's head/face —
-   the part of a portrait a centred crop is least able to afford to
-   lose. Reuses the same idea as .reveal-img.side.crop-top elsewhere
-   in this file, just scoped to the gallery grid instead. */
+/* foto-02 is a portrait shot forced into the grid's 4:3 cell, and a centred
+   crop was cutting into the subject's head.  → DECISIONS.md §50 */
 .gallery-grid .reveal-img.crop-top img {
   object-position: top;
 }
@@ -1620,7 +1358,7 @@ footer .cc-logo {
   background: linear-gradient(to top, rgba(0, 0, 0, 0.82), transparent);
   color: #fff;
   font-family: 'Merriweather Sans', Arial, sans-serif;
-  font-size: 12.5px;
+  font-size: 0.78125rem;
   line-height: 1.3;
   text-align: center;
   opacity: 0;
@@ -1628,18 +1366,26 @@ footer .cc-logo {
   pointer-events: none;
 }
 
-.gallery-grid .reveal-img:hover .gallery-caption {
+/* Keyboard parity for the reveal-on-hover affordances, here and on the two
+   rules below: focus now shows what hovering would have shown.  →
+   DECISIONS.md §51 */
+.gallery-grid .reveal-img:hover .gallery-caption,
+.gallery-grid .reveal-img:focus-within .gallery-caption {
   opacity: 1;
 }
 
-/* larger start offset for the gallery: creates a "two film reels sliding
-   in" effect — the top row from the right, the bottom row from the left.
-   animation-based (like discorso's clumpIn), NOT transition-based like
-   the shared .reveal-img rule above: that's what lets the hover-zoom
-   below use its own fast, symmetric transition without a repeat of the
-   bug where a shared transition-duration on .visible governed BOTH the
-   entrance reveal and the hover response, speeding up the entrance to
-   match the hover's snappier pace instead of its own intended 1.2s. */
+/* On a screen with no pointer at all the captions are simply always on — on
+   touch they were reachable only by opening each photo in the lightbox.  →
+   DECISIONS.md §52 */
+@media (hover: none) {
+  .gallery-caption {
+    opacity: 1;
+  }
+}
+
+/* A larger start offset for the gallery, animation-based rather than
+   transition-based so the hover-zoom below can keep its own timing.  →
+   DECISIONS.md §53 */
 @keyframes galleryRevealLeft {
   from {
     opacity: 0;
@@ -1681,21 +1427,8 @@ footer .cc-logo {
   animation: galleryRevealRight 1.2s ease forwards;
 }
 
-/* once the entrance animation ends, initGalleryReveal() in
-   animations.js adds .settled — same handoff pattern as discorso's
-   .clump-photo.settled. From here on it's pure transition, decoupled
-   from the entrance entirely: symmetric in both directions (hover-in
-   and hover-out), and immune to ever being sped up by a future change
-   to the entrance timing again.
-   Two selectors, not one: .reveal-img.from-right.visible img (the
-   entrance rule two blocks up) has 5 classes of specificity, one more
-   than a plain .reveal-img.settled img (4). For from-right photos
-   that outranks animation: none below, so the finished animation's
-   forwards-fill effect never actually lets go of transform — hover
-   then has nothing to override, confirmed live (only the from-right
-   thumbnails were stuck; the rest hover-zoomed fine). Repeating the
-   settled rule with .from-right added matches that 5-class specificity
-   and, coming later in the file, wins the tie for those photos too. */
+/* Once the entrance animation ends, JS adds .settled and the hover-zoom
+   takes over as a plain, symmetric transition.  → DECISIONS.md §54 */
 .js .gallery-grid .reveal-img.settled img,
 .js .gallery-grid .reveal-img.from-right.settled img {
   animation: none;
@@ -1704,11 +1437,8 @@ footer .cc-logo {
   transition: filter 0.2s ease, transform 0.25s ease;
 }
 
-/* hover-zoom, matching discorso's .clump-photo:hover exactly (same
-   1.5 scale) — safe here without discorso's z-index bump or its own
-   translate offset, because .gallery-grid .reveal-img has
-   overflow:hidden: the scaled image crops to the card's own
-   boundary instead of spilling into neighbouring grid cells. */
+/* The same 1.5 scale as Discorso's clump, safe here without a z-index bump
+   because the grid cell clips it.  → DECISIONS.md §55 */
 @media (hover: hover) and (pointer: fine) {
   .js .gallery-grid .reveal-img.settled img:hover {
     transform: scale(1.5);
@@ -1772,17 +1502,13 @@ footer .cc-logo {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
 }
 
-/* position counter ("3 / 6"), shown above the caption only when the
-   lightbox has more than one photo to step through (see showIndex()
-   in animations.js — same currentHasMultiple gate that shows/hides
-   prev/next). Quieter than .lightbox-caption since it's secondary
-   wayfinding, not editorial content; empty and collapsed the rest of
-   the time via the same :empty pattern .lightbox-caption already uses. */
+/* Position counter, shown above the caption only when the lightbox has more
+   than one photo to step through.  → DECISIONS.md §56 */
 .lightbox-counter {
   margin: 14px 0 0;
   color: #999;
   font-family: 'Merriweather Sans', Arial, sans-serif;
-  font-size: 12px;
+  font-size: 0.75rem;
   letter-spacing: 0.3px;
   text-align: center;
 }
@@ -1802,7 +1528,7 @@ footer .cc-logo {
   margin: 14px 0 0;
   color: #fff;
   font-family: 'Merriweather Sans', Arial, sans-serif;
-  font-size: 14px;
+  font-size: 0.875rem;
   text-align: center;
 }
 
@@ -1817,7 +1543,7 @@ footer .cc-logo {
   background: none;
   border: none;
   color: #fff;
-  font-size: 34px;
+  font-size: 2.125rem;
   line-height: 1;
   cursor: pointer;
   -webkit-user-select: none;
@@ -1834,7 +1560,7 @@ footer .cc-logo {
   background: rgba(0, 0, 0, 0.4);
   border: none;
   color: #fff;
-  font-size: 40px;
+  font-size: 2.5rem;
   line-height: 1;
   width: 52px;
   height: 52px;
@@ -1861,26 +1587,15 @@ footer .cc-logo {
   .lightbox-next {
     width: 42px;
     height: 42px;
-    font-size: 30px;
+    font-size: 1.875rem;
   }
   .lightbox-prev { left: 8px; }
   .lightbox-next { right: 8px; }
 }
 
-/* --- document viewer: a second, deliberately simpler lightbox variant
-   for scanned documents (diploma-cfm, teresio-cavaliere, the Banchelli
-   Facebook screenshots) where the whole point is reading small print,
-   not admiring a photo. .lightbox-overlay scales its image DOWN to
-   fit the viewport (max-width/max-height) — exactly wrong here, since
-   shrinking a dense scan to fit the screen is what made the raw-file
-   new-tab link necessary in the first place. This one instead lets
-   the image sit at its own natural pixel size (or a per-image tuned
-   width via --doc-width, set inline on the trigger once someone's
-   actually tested legibility on real hardware — unset by default,
-   deliberately not guessed at here) inside a container that scrolls
-   both ways. No prev/next: unlike the photo lightbox, each of these
-   is a standalone document, never a sequence to step through, so
-   that whole piece of initLightbox()'s job doesn't exist here. */
+/* A second, deliberately simpler lightbox for scanned documents: this one
+   lets the image sit at its natural size and scroll, instead of shrinking
+   it to fit.  → DECISIONS.md §57 */
 .doc-viewer-overlay {
   display: none;
   position: fixed;
@@ -1918,23 +1633,17 @@ footer .cc-logo {
   padding: 10px 16px;
   background: rgba(16, 16, 16, 0.92);
   backdrop-filter: blur(6px);
-  /* reduces how often a stray text selection can even start on the
-     chrome itself (double-tap/drag on the toggle or close button) —
-     paired with the explicit selection clear in initDocViewer()'s
-     close handler in animations.js, which is the deterministic half
-     of the fix. Deliberately NOT applied to .doc-viewer-text below:
-     the transcript is real content someone may want to copy. */
+  /* Keeps a stray text selection from starting on the dialog's own
+     chrome. Deliberately not applied to the transcript, which someone may
+     want to copy.  → DECISIONS.md §58 */
   -webkit-user-select: none;
   user-select: none;
 }
 
 
-/* same pill language as .clump-badge/.img-badge elsewhere on the
-   site, so this reads as the same family of UI chrome rather than a
-   one-off control invented for this single feature. aria-pressed
-   (toggled in JS) carries the actual state to screen readers; the
-   [aria-pressed="true"] rule below is only the sighted equivalent of
-   that, not a substitute for it. */
+/* The same pill language as the badges elsewhere on the site; aria-pressed
+   in JS carries the real state, this is only its sighted equivalent.  →
+   DECISIONS.md §59 */
 .doc-viewer-toggle {
   display: flex;
   align-items: center;
@@ -1945,7 +1654,7 @@ footer .cc-logo {
   background: rgba(255, 255, 255, 0.12);
   color: #fff;
   font-family: 'Merriweather Sans', Arial, sans-serif;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
   cursor: pointer;
 }
@@ -1963,18 +1672,15 @@ footer .cc-logo {
   background: none;
   border: none;
   color: #fff;
-  font-size: 30px;
+  font-size: 1.875rem;
   line-height: 1;
   cursor: pointer;
   padding: 0 4px;
 }
 
-/* the scrollable stage. overflow:auto (not scroll) so a document that
-   *does* fit needs no scrollbar at all — diploma-cfm on a wide
-   desktop window, say. tabindex="0" in the markup, not here, is what
-   lets a keyboard user actually focus this element and scroll it with
-   arrow keys; that's native browser behaviour for any scrollable
-   element with a tab stop, nothing bespoke to write in JS for it. */
+/* The scrollable stage. Its tabindex="0" lives in the markup, and is what
+   lets a keyboard user focus it and scroll with the arrow keys.  →
+   DECISIONS.md §60 */
 .doc-viewer-scroll:focus-visible,
 .doc-viewer-text:focus-visible {
   outline: 2px solid currentColor;
@@ -1988,16 +1694,9 @@ footer .cc-logo {
   overflow: auto;
   -webkit-overflow-scrolling: touch;
   display: flex;
-  /* no justify-content: center here — see .doc-viewer-scroll img's
-     margin:auto for why the same visual centering is achieved
-     without the bug justify-content:center caused: when a document
-     is wider than the container, justify-content:center gives the
-     flex line a negative starting offset that scrollLeft can never
-     reach in LTR — the image's left edge becomes permanently
-     unreachable, exactly what was reported live. margin:auto on the
-     child centers the same way when there's free space, but
-     collapses to 0 instead of negative when there isn't, so the
-     whole image always stays inside the scrollable range. */
+  /* Centring is done by margin:auto on the child instead: justify-
+     content:center made the left edge of a wider-than-container document
+     permanently unreachable.  → DECISIONS.md §61 */
 }
 
 .doc-viewer-scroll[hidden] {
@@ -2006,15 +1705,9 @@ footer .cc-logo {
 
 .doc-viewer-scroll img {
   display: block;
-  /* capped so a document can't run wider than the viewport — nowhere
-     for the extra width to go but off both edges, which combined with
-     justify-content:center above was the actual cause of the reported
-     horizontal-scroll bug. Holds on mobile too now: a portrait-shaped
-     scan (banchellilogos, banchellidiscorso, teresio-cavaliere) reads
-     fine capped by width, same as everywhere else. --doc-width can
-     still request a SMALLER width than the cap, for a document whose
-     natural size tested too small to read — it only ever shrinks the
-     image, never grows it past the cap. */
+  /* Caps a document at the viewport width, with nowhere for extra width
+     to go but off both edges. --doc-width can still ask for less, never
+     more.  → DECISIONS.md §62 */
   width: var(--doc-width, auto);
   max-width: 100vw;
   height: auto;
@@ -2024,23 +1717,10 @@ footer .cc-logo {
   transition: opacity 0.25s ease;
 }
 
-/* shown while the real image is still loading — see initDocViewer()'s
-   open(), which toggles this class and hides the img itself (no
-   intrinsic size yet) until 'load' fires. Without this, the img with
-   no width/height rendered the browser's own tiny default broken-
-   image placeholder, centered by margin:auto above — the "dot at
-   screen center" reported during the load gap on the larger
-   full-resolution scans this dialog often opens. */
-/* the gear itself — Valerio's own design (sfondi/spinner-gear.svg),
-   verified centered on its actual pivot point (the small axle hole,
-   not the shape's own bounding box, which is off-center since it's a
-   half gear) via pixel analysis before use. background-size:contain
-   with centered position handles this automatically regardless of
-   the exact box size given here: the SVG's own pivot lands at the
-   box's center either way. Slower than the plain ring this replaced
-   (1.4s vs 0.8s) — a detailed, asymmetric shape reads as a spin
-   rather than a blur at a more measured pace; a simple ring didn't
-   need that. */
+/* Shown while the real image is still loading, with the image itself hidden
+   until 'load' fires.  → DECISIONS.md §63 */
+/* The gear is Valerio's own drawing, verified centred on its real pivot —
+   the axle hole, not the shape's bounding box.  → DECISIONS.md §64 */
 .doc-viewer-loading::after {
   content: "";
   position: absolute;
@@ -2062,17 +1742,9 @@ footer .cc-logo {
   }
 }
 
-/* the exception: a LANDSCAPE-shaped scan (diploma-cfm) capped by
-   width alone shrinks to a sliver on a narrow portrait phone — most
-   of its height goes unused. Opted in per-trigger via
-   data-doc-fit="height" (see initDocViewer() in animations.js, which
-   toggles this class on open), and only on mobile portrait: elsewhere
-   the plain width cap above already leaves the document at a
-   comfortable size, since the viewport itself is wide there. Sizes
-   from height instead — 100% of .doc-viewer-scroll's own (flex-
-   computed) height, not 100vh directly, so it doesn't run under the
-   top bar — and lets width overflow into the container's horizontal
-   scroll rather than capping it. */
+/* The exception: a landscape-shaped scan capped by width alone shrinks to a
+   sliver on a narrow portrait phone, so this one sizes from height instead.
+   → DECISIONS.md §65 */
 @media (max-width: 700px) and (orientation: portrait) {
   .doc-viewer-scroll img.doc-fit-height {
     width: auto;
@@ -2102,15 +1774,13 @@ footer .cc-logo {
   margin: 0 auto;
   color: #eee;
   font-family: 'Merriweather', Georgia, serif;
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.7;
 }
 
-/* curriculum's two transcripts (diploma-cfm, teresio-cavaliere) are
-   official documents/forms, not recovered narrative — unlike
-   discorso's and quercia's Facebook-post transcripts, which stay
-   serif to match the site's prose register. Sans here instead,
-   matching how labels/badges already read elsewhere on the site. */
+/* Curriculum's two transcripts are official forms rather than recovered
+   narrative, so they read in sans instead of the site's prose serif.  →
+   DECISIONS.md §66 */
 body.page-curriculum .doc-viewer-text-inner {
   font-family: 'Merriweather Sans', Arial, sans-serif;
 }
@@ -2122,7 +1792,7 @@ body.page-curriculum .doc-viewer-text-inner {
 .doc-viewer-text-meta {
   color: #999;
   font-family: 'Merriweather Sans', Arial, sans-serif;
-  font-size: 13px;
+  font-size: 0.8125rem;
   margin-bottom: 1.4em;
 }
 
@@ -2137,7 +1807,7 @@ body.page-curriculum .doc-viewer-text-inner {
    h3 below, which marks a much smaller "Commenti" label */
 .doc-viewer-text-inner h2 {
   font-family: 'Merriweather Sans', Arial, sans-serif;
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 700;
   color: #ccc;
   margin: 2em 0 0.6em;
@@ -2168,7 +1838,7 @@ body.page-curriculum .doc-viewer-text-inner {
 .doc-viewer-text-comments h2,
 .doc-viewer-text-comments h3 {
   font-family: 'Merriweather Sans', Arial, sans-serif;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
   color: #999;
   text-transform: uppercase;
@@ -2178,7 +1848,7 @@ body.page-curriculum .doc-viewer-text-inner {
 
 .doc-viewer-text-comments .comment {
   margin-bottom: 1em;
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 
 .doc-viewer-text-comments .comment.reply {
@@ -2188,7 +1858,7 @@ body.page-curriculum .doc-viewer-text-inner {
 .doc-viewer-text-comments .comment-author {
   font-family: 'Merriweather Sans', Arial, sans-serif;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: #ccc;
   display: block;
   margin-bottom: 0.2em;
@@ -2199,11 +1869,8 @@ body.page-curriculum .doc-viewer-text-inner {
    two-column masthead. Shares .doc-viewer-text-inner with the
    Banchelli transcripts above but adds its own small vocabulary. --- */
 
-/* side-by-side blocks — diploma-cfm's masthead (left-aligned left
-   column, right-aligned right column, matching the scan) and both
-   documents' signature blocks (--left modifier: right column also
-   left-aligned, since two signature labels sitting side by side don't
-   call for the same right-justification a letterhead does). */
+/* Side-by-side blocks reproducing the scans' own mastheads and signature
+   rows.  → DECISIONS.md §67 */
 .doc-viewer-form-columns {
   display: flex;
   justify-content: space-between;
@@ -2231,7 +1898,7 @@ body.page-curriculum .doc-viewer-text-inner {
 .doc-viewer-form-title {
   font-family: 'Merriweather Sans', Arial, sans-serif;
   font-weight: 700;
-  font-size: 17px;
+  font-size: 1.0625rem;
   letter-spacing: 0.3px;
   margin: 1.4em 0 1em;
 }
@@ -2247,12 +1914,8 @@ body.page-curriculum .doc-viewer-text-inner {
   margin-bottom: 0.6em;
 }
 
-/* text hand-written onto a blank line on the printed form — italic
-   plus an underline evokes both "this was written in by hand" and
-   "this sat on a ruled blank", distinct from the surrounding printed
-   copy. Not the same thing as .doc-viewer-text-inner mark above
-   (that's an editorial highlight added after the fact on a Facebook
-   screenshot); this is original to the document itself. */
+/* Text hand-written onto a blank line of a printed form, as distinct from
+   the form's own printed copy.  → DECISIONS.md §68 */
 .doc-viewer-text-inner .fill {
   font-style: italic;
   border-bottom: 1px solid currentColor;
@@ -2276,7 +1939,7 @@ body.page-curriculum .doc-viewer-text-inner {
   border-radius: 14px;
   padding: 22px;
   margin: 32px 0;
-  font-size: 18px;
+  font-size: 1.125rem;
   line-height: 1.65;
 }
 
@@ -2306,11 +1969,9 @@ body.page-discorso .ritagli-band p::before {
   font-weight: 700;
 }
 
-/* overlay hint positioned within the first row of images (not centered
-   on the whole tall clump), so it's visible immediately without any
-   scroll — fades out once the clump scrolls into view instead of
-   taking up permanent space in the reading column (see js/animations.js
-   for the IntersectionObserver that drives it) */
+/* Overlay hint sitting inside the first row of images, so it's visible
+   without any scroll, and fading out once the clump comes into view.  →
+   DECISIONS.md §69 */
 .discorso-hint {
   position: absolute;
   top: 96px;
@@ -2323,7 +1984,7 @@ body.page-discorso .ritagli-band p::before {
   background: rgba(0, 0, 0, 0.5);
   color: #fff;
   font-family: 'Merriweather Sans', Arial, sans-serif;
-  font-size: 14px;
+  font-size: 0.875rem;
   text-align: center;
   transition: opacity 0.4s ease;
   pointer-events: none;
@@ -2361,7 +2022,8 @@ body.page-discorso .ritagli-band p::before {
   transition: background 0.2s ease;
 }
 
-.side-row > a:hover::after {
+.side-row > a:hover::after,
+.side-row > a:focus-visible::after {
   background: rgba(0, 0, 0, 0.18);
 }
 
@@ -2378,56 +2040,31 @@ body.page-discorso .ritagli-band p::before {
   background: rgba(0, 0, 0, 0.72);
   color: #fff;
   font-family: 'Merriweather Sans', Arial, sans-serif;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.3px;
   white-space: nowrap;
 }
 
-/* used only where the source image itself has content (a caption, a
-   label) sitting in the default bottom-right corner — e.g. the
-   Einstellungen cover, whose "EINSTELLUNGEN" text can't be cropped
-   away from that corner because object-fit:cover never crops
-   vertically when the box is narrower than the source image. Moves
-   just that one badge, leaves .img-badge (bottom-right) as the site
-   default everywhere else. */
+/* Used only where the source image already has content of its own in the
+   default bottom-right corner.  → DECISIONS.md §70 */
 .img-badge-left {
   right: auto;
   left: 10px;
 }
 
 
-/* --- language switcher: two separate elements, not one reused via
-   media queries. On desktop, .lang-link-desktop floats outside the
-   nav bar entirely as a small pill — deliberately no flag colour,
-   just dark background + "IT"/"EN" text, so it doesn't add a
-   saturated note to an otherwise neutral bar. Position tuned
-   visually (not derived from a formula) to sit comfortably right of
-   the bar at ordinary desktop widths; the vw+px hybrid is what makes
-   that tuned position scale reasonably with viewport width rather
-   than staying pinned at a fixed pixel offset. This formula does
-   overlap the nav bar in a narrow band, roughly 1081–1119px (just
-   above the mobile breakpoint) — patched separately below rather
-   than by changing this formula, since nudging the general case to
-   clear that one narrow band would move the pill 60–200px off its
-   visually-tuned position at every ordinary width above it, which is
-   a worse trade for a band few visitors will ever sit at exactly.
-   Living outside the nav bar's DOM subtree on purpose: the pill uses
-   position:fixed and needs to size itself against the true viewport,
-   but .site-nav's own backdrop-filter makes it the containing block
-   for any position:fixed descendant, so nesting the pill inside
-   would size it relative to the bar instead. Same translucent
-   background and blur as the bar, so it reads as part of the same
-   family of chrome, and hides together with it on scroll via the
-   shared .nav-hidden class.
-   Below the breakpoint, .lang-link (flag icon + short label) takes
-   over instead, as the last item in the mobile burger dropdown —
-   see the media query below. --- */
+/* Language switcher: a floating pill on desktop, the last item of the
+   burger dropdown below the breakpoint. It lives outside the nav's DOM
+   subtree because the bar's own backdrop-filter would otherwise become its
+   containing block.  → DECISIONS.md §71 */
+/* Left edge derived from the bar's own right edge plus a 12px gap, rather
+   than tuned by eye.  → DECISIONS.md §72, §C */
 .lang-link-desktop {
   position: fixed;
-  top: 32.8px;
-  left: calc(62.5vw + 356.25px);
-  transform: translate(-50%, -50%);
+  top: 2.05rem;
+  left: calc(50% + min(475px, 50vw) + 12px);
+  transform: translateY(-50%);
   z-index: 100;
   display: flex;
   align-items: center;
@@ -2437,7 +2074,7 @@ body.page-discorso .ritagli-band p::before {
   padding: 4px 12px;
   border-radius: 20px;
   font-family: 'Merriweather Sans', Arial, sans-serif;
-  font-size: 12.5px;
+  font-size: 0.78125rem;
   font-weight: 700;
   letter-spacing: 0.2px;
   text-decoration: none;
@@ -2445,29 +2082,12 @@ body.page-discorso .ritagli-band p::before {
 }
 
 .lang-link-desktop.nav-hidden {
-  transform: translate(-50%, -50%) translateY(-140%);
+  transform: translateY(-50%) translateY(-140%);
   opacity: 0;
 }
 
 .lang-link-desktop:hover {
   background: rgba(220, 220, 220, 0.85);
-}
-
-/* local patch for the narrow 1081–1119px band where the tuned
-   formula above overlaps .site-nav (see its comment): +8px is
-   enough to clear the worst case, at vw=1081, with ~3px of margin
-   to spare, and the overlap itself shrinks to nothing by 1119px on
-   its own, so the same flat +8px only widens that margin further as
-   vw approaches the upper edge — never needs to scale with vw here.
-   At 1120px the general formula's own gap is already ~0px without
-   any help, so the patch stops exactly where it's no longer needed;
-   the pill does take a small (~8px) rightward step at that boundary
-   as the patch switches off, but only within this one narrow,
-   uncommon band, not at any width most visitors actually sit at. */
-@media (min-width: 1081px) and (max-width: 1119px) {
-  .lang-link-desktop {
-    left: calc(62.5vw + 364.25px);
-  }
 }
 
 .lang-link {
@@ -2478,7 +2098,7 @@ body.page-discorso .ritagli-band p::before {
   display: none;
 }
 
-@media (max-width: 1080px) {
+@media (max-width: 67.5em) {
   .lang-link-desktop {
     display: none;
   }
@@ -2503,14 +2123,8 @@ body.page-discorso .ritagli-band p::before {
   }
 }
 
-/* --- Home essay v2: each paragraph sits in a low-contrast rounded
-   box — flat colour, no blur/transparency needed since the page
-   background is plain black with nothing complex behind to blend
-   with (unlike Quercia/Discorso's ritagli-band, which sits over a
-   busy SVG texture). Boxes are contiguous — margin:0 between them —
-   so the only perceptible seam is where two rounded corners meet,
-   not a gap or a rule; this keeps the read continuous instead of
-   chopping the essay into visibly separate cards. --- */
+/* Home essay: each paragraph in a low-contrast rounded box, contiguous with
+   its neighbours so the read stays continuous.  → DECISIONS.md §73 */
 .essay-block {
   background: #232323;
   border-radius: 14px;
@@ -2519,29 +2133,20 @@ body.page-discorso .ritagli-band p::before {
   max-width: 620px;
   margin-left: auto;
   margin-right: auto;
-  font-size: 17px;
+  font-size: 1.0625rem;
   line-height: 1.7;
 }
 
-/* date/signature closing block: with the masthead above now centred,
-   a right-aligned box read as orphaned off to one side — centring the
-   whole box keeps it in the same visual axis as the title. Left-align
-   inside the box (its width is fit-content, set by the widest date
-   line) and pin just the signature to that box's own right edge, so
-   "Valerio" still reads as flush-right against the date above it,
-   exactly as before — just centred as a unit rather than pinned to
-   the column's right edge. */
+/* The closing date/signature block, centred as a unit with the signature
+   still flush right inside it.  → DECISIONS.md §74 */
 .essay-block-signature {
   width: fit-content;
   margin: 0 auto;
   text-align: right;
 }
 
-/* feature masthead (home.html only): title + thin-sans dek + byline-
-   style credit line, New Scientist-style. A self-contained block
-   scoped by class rather than a body.page-home hook, so it only
-   touches h1 here — the plain, left-aligned h1 every other page's
-   title relies on is untouched outside this block. */
+/* Feature masthead, home.html only: title, thin-sans dek, byline-style
+   credit line.  → DECISIONS.md §75 */
 .essay-masthead {
   max-width: 620px;
   margin: 0 auto;
@@ -2549,7 +2154,7 @@ body.page-discorso .ritagli-band p::before {
 }
 
 .essay-masthead h1 {
-  font-size: 44px;
+  font-size: 2.75rem;
   font-weight: 900;
   line-height: 1.15;
   letter-spacing: -0.01em;
@@ -2562,7 +2167,7 @@ body.page-discorso .ritagli-band p::before {
 .essay-subtitle {
   font-family: 'Merriweather Sans', Arial, sans-serif;
   font-weight: 300;
-  font-size: 19px;
+  font-size: 1.1875rem;
   line-height: 1.5;
   color: #bbb;
   margin-bottom: 26px;
@@ -2577,12 +2182,12 @@ body.page-discorso .ritagli-band p::before {
 
 @media (max-width: 700px) {
   .essay-masthead h1 {
-    font-size: 30px;
+    font-size: 1.875rem;
     margin-bottom: 10px;
   }
 
   .essay-subtitle {
-    font-size: 16px;
+    font-size: 1rem;
     margin-bottom: 18px;
   }
 }
@@ -2594,22 +2199,13 @@ body.page-discorso .ritagli-band p::before {
 .essay-epigraph {
   max-width: 620px;
   margin: 40px auto 8px;
-  font-size: 22px;
+  font-size: 1.375rem;
   line-height: 1.5;
 }
 
-/* the "(*)"/"(**)" marker: same colour as the epigraph text around
-   it (no blue link colour — this isn't a citation link, just a
-   pointer to a note further down the same page). Uses a real
-   text-decoration (not a border-bottom box-model hack) so its
-   thickness is an explicit, intentional value — 1.5px, matched to
-   sit alongside the bold in-body reference links (their underline
-   reads heavier purely because bold font metrics draw a thicker
-   stroke by default, not because anyone set it deliberately) —
-   rather than an accident of two unrelated techniques landing at
-   different weights next to each other. Quiet at rest, consolidates
-   to full brightness on hover/focus, same curve as .brand-text and
-   the ornament link. */
+/* The "(*)" marker takes the text colour rather than link blue: it points
+   to a note further down the same page, it isn't a citation link.  →
+   DECISIONS.md §76 */
 .epigraph-note {
   color: inherit;
   text-decoration: underline;
@@ -2639,12 +2235,8 @@ body.page-discorso .ritagli-band p::before {
   padding: 4px 6px 0 0;
 }
 
-/* full-bleed hero, New Scientist-style: breaks out of main's 760px
-   column to the full viewport width. Relies on body's overflow-x:
-   hidden (set above) to clip the 100vw box so it never creates a
-   horizontal scrollbar. No border-radius — a full-bleed image reads
-   as the page's own edge, not as a card, so rounding it would fight
-   that read. */
+/* Full-bleed hero breaking out of main's 760px column to the full viewport
+   width, clipped by body's own overflow-x.  → DECISIONS.md §77 */
 .hero-photo {
   width: 100vw;
   position: relative;
@@ -2653,15 +2245,8 @@ body.page-discorso .ritagli-band p::before {
   margin-bottom: 28px;
 }
 
-/* height is tied to width via aspect-ratio here, not to vh: a vh
-   height is independent of viewport width, so on a wide-but-short
-   window the image scales up a lot to fill that width and the
-   vertical crop grows well past what a narrower window would show —
-   this is what was cutting off the lower hand. aspect-ratio keeps
-   the crop fraction constant (~9% off top and bottom) regardless of
-   window width, since height now scales together with it. Mobile
-   portrait gets its own vh-based rule below, where width is already
-   the constraint and a tall aspect-ratio box would be excessive. */
+/* Height tied to width via aspect-ratio rather than to vh, so the crop
+   fraction stays constant at any window width.  → DECISIONS.md §78 */
 .hero-photo img {
   width: 100%;
   aspect-ratio: 1.9 / 1;
@@ -2678,7 +2263,7 @@ body.page-discorso .ritagli-band p::before {
   margin: 10px auto 0;
   padding: 0 24px;
   font-family: 'Merriweather Sans', Arial, sans-serif;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: #999;
   text-align: center;
 }
@@ -2692,13 +2277,8 @@ body.page-discorso .ritagli-band p::before {
   }
 }
 
-/* the rounded, clipped frame around the image only — kept separate
-   from .essay-photo itself since a caption now sits below the image
-   as normal-flow text: if overflow/radius stayed on the outer
-   figure, the box would grow to fit that text too, and the bottom
-   corners would end up rounding around the caption instead of
-   hugging the photo, breaking the "photo reads like the coloured
-   cards" match this radius exists for. */
+/* Radius and clipping on the frame alone, so the caption sitting below in
+   normal flow doesn't get rounded into the box.  → DECISIONS.md §79 */
 .essay-photo {
   margin: 0 0 28px;
 }
@@ -2715,28 +2295,18 @@ body.page-discorso .ritagli-band p::before {
   cursor: pointer;
 }
 
-/* always-visible caption under the photo, matching .hero-caption's
-   register (same font, size, colour) since both are the same kind
-   of line — what the picture shows — even though this one sits in
-   the normal column instead of breaking out full-bleed. Replaces
-   the old .gallery-caption hover-overlay treatment here: that style
-   still fits the actual thumbnail grid on the Foto page, where many
-   small images make a permanent caption too busy, but for a single
-   large photo in the essay a caption only visible on hover was never
-   reachable on touch at all. */
+/* Always-visible caption under the photo, in the same register as .hero-
+   caption.  → DECISIONS.md §80 */
 .essay-photo-caption {
   margin: 10px 0 0;
   font-family: 'Merriweather Sans', Arial, sans-serif;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: #999;
   text-align: center;
 }
 
-/* entrance animation: a small, quick rise-and-fade, deliberately
-   subtle enough that repeating it once per paragraph down a long
-   essay reads as "the page settling into place" rather than as a
-   repeated effect — the opposite would work against the continuous,
-   old-style-article reading this page is trying to preserve. */
+/* A small rise-and-fade per paragraph, subtle enough that repeating it down
+   a long essay reads as the page settling into place.  → DECISIONS.md §81 */
 .js .essay-anim {
   opacity: 0;
   transform: translateY(20px);
@@ -2748,13 +2318,8 @@ body.page-discorso .ritagli-band p::before {
   transform: translateY(0);
 }
 
-/* finalino after the signature: a minimal mark (ruota.svg, drawn from
-   one of Teresio's own patents) closing the text before the editorial
-   "fonte" note. Kept at the same faint level as the technical-drawing
-   watermarks on the other pages (a 0.75 dark overlay over white lines
-   there works out to the same result as plain opacity here — see the
-   body.page-* background rules above) so it reads as a quiet paper
-   mark, not as an illustration competing with the text. */
+/* Closing mark drawn from one of Teresio's own patents, kept at the same
+   faint level as the watermarks on the other pages.  → DECISIONS.md §82 */
 .essay-ornament {
   width: 14%;
   max-width: 100px;
@@ -2783,11 +2348,8 @@ body.page-discorso .ritagli-band p::before {
   opacity: 1;
 }
 
-/* paragraph divider: the "vite" mechanical detail, from a Teresio
-   patent, at full opacity (unlike the fregio, this one doesn't fade —
-   confirmed live). Size is 50% of the reading column's width on any
-   breakpoint (not a fixed px value), so it stays "half the column"
-   whether that column is 620px on desktop or narrower on mobile. */
+/* Paragraph divider from a Teresio patent, sized at half the reading
+   column's width on any breakpoint.  → DECISIONS.md §83 */
 .essay-divider {
   width: 50%;
   max-width: 310px;
@@ -2809,12 +2371,8 @@ body.page-discorso .ritagli-band p::before {
   }
 }
 
-/* visually-hidden: standard clip technique. Content stays in the
-   accessibility tree (unlike display:none/visibility:hidden) so
-   screen readers read it, but it takes up no visual space. Used to
-   give screen-reader users the full transcription of a scanned
-   ritaglio next to its <img>, without duplicating that much text
-   on-screen for sighted users who already see the photographed page. */
+/* Standard clip technique: content stays in the accessibility tree so
+   screen readers read it, but takes up no visual space.  → DECISIONS.md §84 */
 .visually-hidden {
   position: absolute;
   width: 1px;
