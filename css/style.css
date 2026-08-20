@@ -1127,14 +1127,25 @@ body.page-galleria main {
    markup and mechanics as discorso (reused wholesale — initClumpPhotos()
    in animations.js just selects every .clump-photo on the page, so
    nothing there needed to change) — entrance animation, hover-zoom,
-   hover-reveal badge, all unchanged. Two things differ from the
+   hover-reveal badge, all unchanged. Three things differ from the
    earlier overlapping-diagonal version: (1) the resting position —
-   side by side now, at the same y — and (2) each photo now carries
-   its own padded, translucent, blurred frame — same look as
-   .ritagli-band, at double its 22px padding (44px) — the whole time
-   the animation runs, since it's on .clump-photo itself, the element
-   the animation actually transforms, not something added only once
-   it settles.
+   side by side now, at the same y; (2) each photo now carries its own
+   padded, translucent, blurred frame — same look as .ritagli-band, at
+   double its 22px padding (44px) — the whole time the animation runs,
+   since it's on .clump-photo itself, the element the animation
+   actually transforms, not something added only once it settles; and
+   (3) both photos now launch from the same off-screen point on the
+   right (--fx:900px on both, in quercia.html / en/quercia.html), not
+   from opposite sides — confirmed live that having one photo fly in
+   from the left was itself the source of a Chrome-only animation lag
+   (absent on Firefox, and never affecting the photo arriving from the
+   right), unrelated to the backdrop-filter blur also on this element.
+   Since both now share a launch point, they're staggered instead:
+   different --delay/animation-duration per photo (set inline, not
+   here — see the comment above .clump-photo img below) so the
+   left-bound photo starts first and lands first, while the
+   right-bound one enters mid-flight and lands just after — still
+   reads as motion from two directions despite the shared origin.
    The horizontal rhythm at rest: ritagli-band's own left edge, then
    card 1 (44px padding, photo, 44px padding), a gap, card 2 (same),
    ritagli-band's own right edge — three equal 32px gaps in total
@@ -1174,14 +1185,15 @@ body.page-galleria main {
   }
 }
 
-body.page-quercia .clump-photo {
-  /* slower than discorso's 0.9s base — reported too fast with only
-     two photos to watch (discorso's six read fine at the original
-     speed, busier scene, less time to notice any one photo's pace).
-     Overriding just the duration longhand, not the whole `animation`
-     shorthand, keeps the base rule's easing curve and forwards fill. */
-  animation-duration: 1.6s;
-}
+/* animation-duration is NOT set here anymore — the two photos now
+   launch from the same off-screen point on the right but travel
+   different distances and land at different times by design (the
+   left-bound photo arrives first; the right-bound one enters
+   mid-flight and lands just after), so each carries its own
+   animation-duration inline in quercia.html / en/quercia.html
+   instead of sharing one page-level value — same place --delay has
+   always lived, via the base .clump-photo rule's animation-delay:
+   var(--delay, 0s). */
 
 body.page-quercia .clump-photo img {
   /* a light vignette — darkened toward the edges, same trick as a
@@ -1210,10 +1222,10 @@ body.page-quercia .clump-photo:last-child {
    before, its fixed width beat the generic mobile rule's width:100%
    on specificity regardless of media query, pushing a photo off the
    right edge of the viewport — the actual overflow reported back
-   then. 340×239 is the CARD size — padding included, not just the
+   then. 340×244 is the CARD size — padding included, not just the
    photo — see this block's own opening comment for the three-equal-
    gaps math this comes from (281×185 photo + 29.33px padding on every
-   side = 340×239 card). Because this sizing (and the padding/
+   side = 340×244 card). Because this sizing (and the padding/
    background/blur right below, which is what makes each card look
    like a small ritagli-band) is on .clump-photo itself — the element
    the entrance animation actually transforms — the frame is there
