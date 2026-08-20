@@ -1130,13 +1130,13 @@ body.page-galleria main {
    hover-reveal badge, all unchanged. Two things differ from the
    earlier overlapping-diagonal version: (1) the resting position —
    side by side now, at the same y — and (2) each photo now carries
-   its own padded, translucent frame — same look as .ritagli-band, at
-   double its 22px padding (44px) — present the whole time the
-   animation runs, since it's on .clump-photo itself, the element the
-   animation actually transforms. Only the frame's frosted-glass blur
-   waits for landing (.settled) rather than running the whole flight —
-   see the performance note further down, right above where that
-   split happens, for why.
+   its own padded, translucent, blurred frame — same look as
+   .ritagli-band, at double its 22px padding (44px) — present the
+   whole time the animation runs, since it's on .clump-photo itself,
+   the element the animation actually transforms. The blur's radius
+   is reduced during the flight itself and only reaches its full
+   value on landing (.settled) — see the performance note further
+   down, right above where that split happens, for why.
    The horizontal rhythm at rest: ritagli-band's own left edge, then
    card 1 (44px padding, photo, 44px padding), a gap, card 2 (same),
    ritagli-band's own right edge — three equal 32px gaps in total
@@ -1180,9 +1180,13 @@ body.page-quercia .clump-photo {
   /* slower than discorso's 0.9s base — reported too fast with only
      two photos to watch (discorso's six read fine at the original
      speed, busier scene, less time to notice any one photo's pace).
-     Overriding just the duration longhand, not the whole `animation`
-     shorthand, keeps the base rule's easing curve and forwards fill. */
-  animation-duration: 1.6s;
+     Shortened again from an earlier 1.6s once blur was reintroduced
+     during the flight itself (see the comment further down) — less
+     time spent paying the resample cost, even at the reduced radius
+     used in flight. Overriding just the duration longhand, not the
+     whole `animation` shorthand, keeps the base rule's easing curve
+     and forwards fill. */
+  animation-duration: 1.1s;
 }
 
 body.page-quercia .clump-photo img {
@@ -1217,23 +1221,21 @@ body.page-quercia .clump-photo:last-child {
    gaps math this comes from (281×185 photo + 29.33px padding on every
    side = 340×239 card).
 
-   background vs. backdrop-filter, split on purpose: background is on
-   .clump-photo itself, present from the very first frame of the
-   fly-in — a solid translucent panel costs the browser nothing extra
-   while the element is being transform-animated. backdrop-filter is
-   NOT here; it moves to .clump-photo.settled below. Confirmed live:
-   with blur running on the same element as the clumpIn transform,
-   the browser has to resample the live backdrop at every frame of
-   the 1.6s flight (quercia's own animation-duration, longer than
-   discorso's 0.9s makes it worse) — expensive, and the actual cause
-   of the reported lag. discorso's own .clump-photo never carries a
-   backdrop-filter at all, which is why it stays smooth. Deferring the
-   blur to .settled — added by JS on animationend, once the transform
-   is no longer changing — keeps the frosted-glass look at rest with
-   none of the per-frame cost while airborne. The panel's own colour
-   doesn't change between the two states, only whether it's blurred,
-   so landing reads as the glass "focusing" rather than a frame
-   popping in from nothing. */
+   background vs. backdrop-filter radius, split on purpose: blur runs
+   for the whole flight now, not just at rest, but at a reduced 4px
+   radius rather than the 10px used once settled. Confirmed live: with
+   the full 10px blur running on the same element as the clumpIn
+   transform for the whole flight, the browser has to resample the
+   live backdrop at every frame — expensive, and the actual cause of
+   an earlier reported lag (worse still at the original 1.6s duration,
+   since shortened to 1.1s above). discorso's own .clump-photo never
+   carries a backdrop-filter at all, which is why it stays smooth by
+   comparison. A smaller radius is cheaper to resample per frame than
+   a larger one, so 4px in flight keeps the frosted-glass look present
+   throughout (rather than popping in only at rest) while cutting most
+   of that per-frame cost; the jump to 10px on .settled — added by JS
+   on animationend, once the transform is no longer changing — costs
+   nothing extra at that point, since nothing is moving anymore. */
 @media (min-width: 641px) {
   body.page-quercia .clump-photo {
     width: 340px;
@@ -1244,6 +1246,8 @@ body.page-quercia .clump-photo:last-child {
     /* same value as .ritagli-band, not the same rule — "identical in
        appearance," as asked, not necessarily identical code */
     background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     border-radius: 14px;
   }
   body.page-quercia .clump-photo.settled {
