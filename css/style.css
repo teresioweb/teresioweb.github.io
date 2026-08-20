@@ -2214,10 +2214,6 @@ body.page-curriculum .doc-viewer-text-inner {
   text-align: center;
 }
 
-.doc-viewer-text-inner .align-right {
-  text-align: right;
-}
-
 /* single light, translucent band wrapping a block of text (the "Nei
    ritagli" quotes, or the Quercia intro paragraph) */
 .ritagli-band {
