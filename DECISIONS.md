@@ -444,6 +444,12 @@ exact thing the zoom exists to make legible. Hidden by default; only ever
 shown inside the hover-capable block below — on touch it never renders, which
 is deliberate (see that block's comment).
 
+**Note (see §D).** On Quercia the badge *is* meant to render on touch, and for
+a long time it didn't. The cause was not this rule but the two stacked-layout
+blocks, which set `.clump-photo { position: static }` and so removed the photo
+as a containing block: both badges escaped up to `.clump-stage` and piled up on
+top of each other in the middle of it. Those are `position: relative` now.
+
 ## §34 — `.clump-photo.settled`
 
 > Hover zoom gated twice on purpose: on .settled, because an animation's forwards fill outranks a :hover transform, and on a real mouse, because touch has no true hover.
@@ -672,6 +678,10 @@ reaching the actual screen edges — the common case on iPhone-mini-and-up-width
 landscape phones, where this query alone applies) depends on width, not on
 being in landscape as such, so it's left to whichever of those two width-based
 rules applies.
+
+**Superseded — see §D.** The footer is no longer `position: fixed` in this
+query, which removes the height pressure this whole entry was reasoning
+about. The border-radius question it leaves open is settled there too.
 
 ## §48 — `.text-window`
 
@@ -1209,3 +1219,79 @@ correct no longer overlaps anything at any width.
 
 `top` moved from `32.8px` to `2.05rem` — the same number, now scaling in
 the same direction as the bar's own type (see §B).
+
+## §D — The landscape footer, and the badge sizes
+
+Three small type sizes were doing damage out of proportion to their size.
+
+**The footer at 10px in landscape.** On a landscape phone the viewport is
+around 390px tall, and a fixed nav plus a fixed footer were taking roughly a
+quarter of it and never giving it back — on the one orientation with the least
+height to spare. The previous answer was to shrink the footer until it fit,
+which solved the geometry by making the text unreadable: 10px is not small
+type, it is texture that happens to be shaped like words.
+
+The footer is `position: static` in this query now. It costs nothing: it is a
+credit line and a licence badge, not navigation, and nothing on the site
+depends on it being reachable at all times. With the height pressure gone the
+type goes back to the portrait size (10.5px) rather than keeping a second,
+smaller mobile value — one fewer number to hold in sync, and the two mobile
+orientations now agree.
+
+Two consequences had to be handled:
+
+- `main`'s bottom padding exists only to clear a *fixed* footer. In flow it
+  would be a large empty gap, so it drops to 48px here — including the two
+  page-specific overrides, listed explicitly because each outranks a bare
+  `main` on specificity. 48px and not 0: Foto's background SVG renders its
+  lines solid white when the photo grid runs right up against the footer
+  (§30), and that is a quirk of proximity, not of `position: fixed`.
+- The safe-area inset stays. A static footer at the end of the document still
+  sits over the home indicator once the page is scrolled to the bottom, which
+  is exactly the case the inset was added for. `border-radius: 0` is now set
+  explicitly rather than left to whichever width-based rule happens to apply —
+  the open question in §47 — because a footer in flow at the end of the page
+  has no floating edge to round.
+
+**The two badges at 11px.** `.clump-badge` and `.img-badge` are both up to
+12px. Below 12px a label stops being read and starts being recognised by
+shape, and `.clump-badge` in particular carries a real instruction ("clicca
+per il testo pdf completo") rather than a one-word category. `.img-badge`'s
+700 weight and 0.3px tracking were already compensating for a size that was
+simply too small; they stay, but they are no longer load-bearing.
+
+**Where the clump badge had gone.** Not a sizing problem at all — see the note
+added to §33.
+
+## §E — backdrop-filter without backdrop-filter
+
+Every translucent surface on the site leans on the blur to stay legible,
+because what sits behind it is not a flat colour: it is the page itself
+scrolling under the bar, and a decorative watermark SVG under the bands.
+Without the blur that content reads through sharply and competes with the text
+on top — the nav's black labels over whatever paragraph is passing beneath
+them, `.ritagli-band`'s light text over the watermark's lines.
+
+Two separate gaps were open:
+
+- **Safari before 18 supports only `-webkit-backdrop-filter`.** Five surfaces
+  declared the unprefixed property alone (`.site-nav`, `.nav-links`, `footer`,
+  `.doc-viewer-bar`, `.lang-link-desktop`) and so had no blur at all on iOS 17
+  and earlier — a large share of real iPhones. All of them carry both
+  spellings now; the Quercia clump frames already did.
+- **Browsers with neither** get an `@supports not (...)` block. The condition
+  tests both spellings, so Safari 17 doesn't fall into it.
+
+The fallback values are chosen to land on roughly the apparent colour the
+blurred surface already produces, so nothing shifts for anyone who has the
+filter. The light chrome (`rgba(220,220,220,0.68)` over the dark page) blends
+to about `#9B9B9B`; raising the alpha to 0.92 keeps it in the same family
+while cutting the show-through, and lifts black text from 7.56:1 to 13.08:1.
+
+`.ritagli-band` is the exception, and the obvious fix would have broken it: it
+is white at 0.25 over a dark page, i.e. a *dark* panel carrying light text, so
+raising the white alpha would have washed the text out rather than protected
+it. It gets a solid `#4C4C4C` instead — the exact colour its own blend already
+produces, which preserves both #ddd body text at 6.32:1 and the band's own
+`--link: #A8D5F2` at 5.51:1, the figure that rule's inline comment has always
+claimed.
