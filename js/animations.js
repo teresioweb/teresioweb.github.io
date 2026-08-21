@@ -200,7 +200,18 @@ function initLightbox() {
     const alt = el.dataset.alt || (img && img.alt) || "";
     const caption = el.dataset.caption || alt || "";
     overlayImg.src = src;
-    overlayImg.alt = alt;
+    // alt="" on purpose, even though a perfectly good alt exists on the
+    // thumbnail. The caption element below is an aria-live region and its
+    // text is either the thumbnail's own alt (see `caption` above, which
+    // falls back to it) or a longer version of the same sentence — so
+    // giving the enlarged <img> an alt as well made a screen reader read
+    // essentially the same description twice on every open and every
+    // prev/next step. Emptying it here doesn't lose anything: the
+    // description still reaches the user through the caption, which is
+    // also the only one of the two that updates announcements as you step
+    // through the gallery. The thumbnail keeps its alt, which is what
+    // matters for the page itself and for the trigger button's name.
+    overlayImg.alt = "";
     if (overlayCounter) {
       // "3 / 6" — only when there's more than one photo to step through
       // (mirrors prevBtn/nextBtn's own currentHasMultiple gate above);

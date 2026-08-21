@@ -33,18 +33,42 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Person",
-  "name": "Teresio Gassino",
-  "birthDate": "1924-11-17",
-  "deathDate": "1998",
-  "jobTitle": "Mechanical designer",
-  "worksFor": {
-    "@type": "Organization",
-    "name": "Olivetti"
-  },
-  "knowsAbout": "Mechanical design",
-  "sameAs": [
-    "https://it.wikipedia.org/wiki/Teresio_Gassino"
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://teresioweb.github.io/#teresio",
+      "name": "Teresio Gassino",
+      "birthDate": "1924-11-17",
+      "birthPlace": {
+        "@type": "Place",
+        "name": "Arè di Caluso, Italy"
+      },
+      "deathDate": "1998",
+      "deathPlace": {
+        "@type": "Place",
+        "name": "San Gimignano, Italy"
+      },
+      "jobTitle": "Mechanical designer",
+      "worksFor": {
+        "@type": "Organization",
+        "name": "Olivetti"
+      },
+      "knowsAbout": "Mechanical design",
+      "sameAs": [
+        "https://it.wikipedia.org/wiki/Teresio_Gassino",
+        "https://www.wikidata.org/wiki/Q103831208"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://teresioweb.github.io/en/#website",
+      "url": "https://teresioweb.github.io/en/",
+      "name": "Teresio Gassino",
+      "inLanguage": "en",
+      "about": {
+        "@id": "https://teresioweb.github.io/#teresio"
+      }
+    }
   ]
 }
 </script>

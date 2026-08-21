@@ -1287,6 +1287,17 @@ footer .cc-logo {
      added for. */
   footer {
     position: static;
+    /* full-bleed here, unlike everywhere else. The 760px cap and the
+       auto margins exist to keep the fixed bar aligned with main's
+       reading column while it floats over the page; once the footer is
+       back in normal flow at the end of the document there is nothing
+       to align it to, and the cap just leaves two unexplained strips of
+       page background either side of it on a viewport that is, by
+       definition of this query, wide. Edge to edge reads as the end of
+       the document, which is what it now is. border-radius goes with
+       it: a band that touches both edges has no floating corner left to
+       round. */
+    max-width: none;
     padding: 8px 14px calc(5px + (env(safe-area-inset-bottom) * 0.8));
     font-size: 0.65625rem;
     gap: 6px;

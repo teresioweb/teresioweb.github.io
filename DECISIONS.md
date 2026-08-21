@@ -1295,3 +1295,61 @@ it. It gets a solid `#4C4C4C` instead — the exact colour its own blend already
 produces, which preserves both #ddd body text at 6.32:1 and the band's own
 `--link: #A8D5F2` at 5.51:1, the figure that rule's inline comment has always
 claimed.
+
+## §F — The graph, the fonts, and the lightbox alt
+
+**Structured data.** Four pages had no JSON-LD at all and, less obviously,
+the two that did had no way of being connected: `index.html` described a
+`Person` and `home.html` described an `Article` `about` a `Person`, but both
+were anonymous nodes, so nothing said they were the same man — and the Italian
+and English versions made four unrelated people rather than one.
+
+Every page now emits an `@graph` built around a handful of shared `@id`s:
+
+- `#teresio` — the `Person`, defined in full only on the two landing pages
+  and referenced by `{"@id": …}` everywhere else. `sameAs` now carries both
+  the Italian Wikipedia article and Wikidata `Q103831208`; the Wikidata URI
+  is the one search engines actually use for entity reconciliation, and for a
+  figure this obscure it is worth more than the article. `birthPlace` and
+  `deathPlace` added while there.
+- `#logos27` — a `Product`, `sameAs` Wikidata `Q17637386`, which records
+  Gassino and Sottsass as its designers. Referenced from `logos.html` and
+  `mentions`ed from the essay.
+- `#quercia`, and one `#website` node per language.
+
+The Italian and English pages use the *same* `#teresio` id on purpose. It is
+one human being; two ids would recreate the problem this was meant to solve.
+Everything else is per-language, since those really are distinct documents.
+
+`discorso.html` was not on the list of pages to fix but got the same
+treatment: leaving one island would have defeated the point.
+
+**Fonts.** Subset conservatively via `fonts/subset.sh`, which is in the repo
+so this is reproducible rather than a one-off. The range keeps all of Latin-1,
+Latin Extended-A, Greek, typographic punctuation, arrows, primes and common
+maths symbols; the only codepoints dropped are eight combining diacritics and
+two modifier apostrophes, none of which can be needed here because every
+accented character in those ranges exists precomposed. 321 KB → 270 KB across
+the ten files, 163 KB → 139 KB for the four faces a page actually loads.
+
+Measured and rejected: subsetting to the 109 characters the site really uses
+cuts about 60% instead of 16%, but it makes every future content edit a
+font-regeneration step, and the failure mode is silent — type a character
+nobody anticipated and it renders in a system fallback that nobody notices.
+Also measured and rejected: `--no-hinting --desubroutinize` saves 228 bytes
+across all ten files, which is not worth any rendering risk on Windows.
+
+Worth knowing: ↗ (U+2197) and ⤢ (U+2922) are used on the site and are in
+neither Merriweather family. They already fell back to a system font before
+this change and still do — the subset didn't cause that and can't fix it.
+
+**Lightbox alt.** `overlayImg.alt` is set to `""` deliberately. The caption
+element beneath is an `aria-live` region whose text is either the thumbnail's
+own `alt` or a longer version of the same sentence, so giving the enlarged
+image an `alt` as well had a screen reader read essentially the same
+description twice — on every open and again on every prev/next step. Nothing
+is lost: the description still arrives via the caption, which is also the only
+one of the two that announces updates as you step through the gallery. The
+thumbnail keeps its `alt`, which is what names the trigger button and what
+matters for the page itself.
+
