@@ -2,7 +2,7 @@
 <html lang="en" class="no-js">
 <head>
 <meta charset="UTF-8">
-<script>document.documentElement.classList.replace('no-js','js'); if ('scrollRestoration' in history) { var __nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0]; history.scrollRestoration = (__nav && __nav.type === 'back_forward') ? 'auto' : 'manual'; addEventListener('pagehide', function () { history.scrollRestoration = 'auto'; }); } addEventListener('load', function () { if (!window.__animsReady) document.documentElement.classList.replace('js', 'no-js'); });</script>
+<script>document.documentElement.classList.replace('no-js','js'); if ('scrollRestoration' in history) history.scrollRestoration = 'auto'; addEventListener('load', function () { if (!window.__animsReady) document.documentElement.classList.replace('js', 'no-js'); requestAnimationFrame(function () { document.documentElement.classList.add('scroll-smooth'); }); });</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Teresio Gassino — Logos 27</title>
 <meta name="description" content="The story of the Logos 27, the Olivetti mechanical calculator designed by Natale Capellaro with Teresio Gassino.">

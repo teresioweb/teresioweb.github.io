@@ -68,7 +68,7 @@ No image uses `loading="lazy"`.
 ## 3. When something breaks
 - **If `js/animations.js` fails, the content still shows.** The reveal animations start at `opacity: 0`, gated behind a `.js` class the inline `<head>` script adds. `animations.js` sets `window.__animsReady = true` as the **last** statement of its `DOMContentLoaded` handler; the inline script checks that flag on `load` and swaps `.js` back to `.no-js` if it is missing. Degraded outcome: no animations, everything on screen. **If you add an `init*()` call, add it above that flag.**
 - **If a document scan fails to load**, the viewer stops pretending to load it — see "Document viewer".
-- **Back navigation restores your reading position.** `history.scrollRestoration` is `manual` on a fresh navigation, `auto` when the navigation type is `back_forward`, and reset to `auto` on `pagehide` so the history entry is not left flagged `manual` when you leave the page. (`DECISIONS.md` §G)
+- **Back navigation restores your reading position.** `history.scrollRestoration` is left at `auto`, and `scroll-behavior: smooth` is held off `html` until one frame after `load` — while it is in force, a browser restores scroll as an animated scroll, which mobile engines cancel partway. In-page anchor jumps are still smooth. (`DECISIONS.md` §G)
 
 ## 4. Accessibility & SEO
 - Every page has a self-referencing `<link rel="canonical">` alongside its `hreflang` alternates. The two homepages canonicalize to `https://teresioweb.github.io/` and `.../en/`, not the `/index.html` form.

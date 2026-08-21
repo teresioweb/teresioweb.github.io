@@ -88,13 +88,23 @@ html {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* smooth in-page jumps (footnote <-> ornament round-trip on home.html);
-   the prefers-reduced-motion block below already forces this back to
-   auto with !important, so it stays a no-op for anyone who has that
-   setting on */
 html {
-  scroll-behavior: smooth;
   scrollbar-gutter: stable;
+}
+
+/* Smooth in-page jumps (footnote <-> ornament round-trip on home.html,
+   highlighted word -> ritaglio on discorso.html). Gated behind a class
+   that the inline <head> script adds one frame after 'load', instead of
+   sitting on html from the start: with scroll-behavior:smooth in force
+   at parse time, a browser restoring your scroll position on back
+   navigation performs that restore as an ANIMATED scroll, which mobile
+   engines routinely cancel partway — the page settles at the top and
+   you lose your place. By the time this class lands, restoration has
+   already happened, instantly, and every later anchor click is smooth
+   as before. The prefers-reduced-motion block below still overrides it
+   with !important.  → DECISIONS.md §G */
+html.scroll-smooth {
+  scroll-behavior: smooth;
 }
 
 /* keyboard-focus outline, kept off for mouse/touch via :focus-visible —

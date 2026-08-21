@@ -1355,49 +1355,57 @@ matters for the page itself.
 
 ## §G — Scroll restoration on back navigation
 
-`history.scrollRestoration` is a property of the **current history entry**, not
-of the document. That is the whole of the problem this entry records.
+Removing `target="_blank"` from the in-essay links made back navigation matter:
+following a reference out of the middle of the Home essay and pressing Back has
+to put you back where you were reading. Getting there took three attempts, and
+the first two are recorded because both looked correct and neither was.
 
-Removing `target="_blank"` from the in-essay links (see §"Internal links" in the
-README) made back navigation matter: following a reference out of the middle of
-the Home essay and pressing Back has to put you back where you were reading.
-The first attempt read the navigation type and set `auto` on a `back_forward`
-entry, `manual` otherwise. It works on desktop and does nothing on a phone.
+**Attempt 1 — read the navigation type.** `history.scrollRestoration` was set to
+`auto` when `performance.getEntriesByType('navigation')[0].type` was
+`back_forward` and `manual` otherwise. Worked on desktop, did nothing on a
+phone.
 
-The reason is the entry-scoped lifetime. On a fresh load the script sets
-`manual`, which flags **that entry**. When you navigate away, the flag stays on
-it. Coming back, the browser consults the flag it recorded for the entry being
-restored and declines to restore the scroll — before, or regardless of,
-whatever the re-parsed document then sets. Desktop engines mostly re-read the
-property early enough for the `back_forward` branch to take effect; mobile ones
-mostly don't, and iOS Safari in particular has a bfcache path where the inline
-script never runs at all.
+**Attempt 2 — reset the flag on the way out.** `scrollRestoration` is a property
+of the **history entry**, not of the document: setting `manual` on load flags
+that entry, the flag survives navigating away, and on return the browser
+consults it and declines to restore — potentially before the re-parsed document
+gets to set anything. So a `pagehide` handler put the entry back to `auto`
+before leaving. Sound reasoning, still no effect on a phone.
 
-The fix is to stop leaving the entry flagged:
+**What it actually was: `scroll-behavior: smooth` on `html`.** With smooth
+scrolling in force at parse time, a browser restoring your position performs
+that restore as an *animated* scroll rather than an instant jump. Mobile engines
+routinely cancel that animation partway — an early layout pass, a font landing,
+a stray touch — and the page settles at the top. Nothing was wrong with the
+`scrollRestoration` value in attempts 1 or 2; the restore was being requested
+and then thrown away.
 
-    addEventListener('pagehide', function () {
-      history.scrollRestoration = 'auto';
-    });
+Two changes, together:
 
-`manual` is now only ever in force during the initial load of a fresh
-navigation, which is the only moment it was wanted. The moment the page is left
-the entry reverts to `auto`, so the browser restores the position on return —
-whether it re-parses the document or resumes it from bfcache. `pagehide` is the
-right event here because, unlike `unload` and `beforeunload`, it does not
-disqualify the page from bfcache.
+- `scroll-behavior: smooth` moved off `html` and onto `html.scroll-smooth`,
+  with the class added by the inline `<head>` script one animation frame after
+  `load`. By then restoration has already happened, instantly. Every later
+  anchor click — the footnote round-trip on home.html, the highlighted-word
+  jumps on discorso.html — is smooth exactly as before. The
+  `prefers-reduced-motion` block still overrides it with `!important`.
+- The `manual` branch is gone entirely: `history.scrollRestoration = 'auto'`,
+  unconditionally. Nothing on the site depended on `manual`. It was there so a
+  reload wouldn't drop the reader into the middle of an essay whose
+  scroll-reveal animations had already been consumed above them — a cosmetic
+  concern, and a much smaller one than losing your place. Setting `auto`
+  explicitly rather than deleting the line keeps the intent visible and
+  re-flags any history entry left over from a previously deployed version.
 
-**If this still doesn't work on a given phone**, the next step is to delete the
-`manual` branch entirely and let every browser do its default thing:
-
-    if ('scrollRestoration' in history) history.scrollRestoration = 'auto';
-
-Nothing on the site depends on `manual`. It exists so that a reload, or a
-mid-page entry, doesn't drop the reader into the middle of an essay whose
-scroll-reveal animations have already been consumed above them — a cosmetic
-concern, and a much smaller one than losing your place.
+**If it is still wrong on some device**, the discriminator is what you see in
+the first moment after pressing Back. If the correct position appears and then
+the page slides or jumps to the top, something is still animating or cancelling
+the restore. If the correct position never appears at all, restoration isn't
+being attempted, and the next suspects are content height changing after the
+restore — `font-display: swap` reflowing a long essay when the webfont lands, or
+an image without `width`/`height` (none currently) — rather than anything about
+`scrollRestoration`.
 
 Restoring `target="_blank"` on internal links for touch devices only was
 considered as a fallback and is worse on its own terms: it needs JavaScript to
 rewrite `target` from a `matchMedia` query, and it hands mobile readers — the
 ones least able to manage a tab stack — a pile of tabs of the same site.
-
