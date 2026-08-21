@@ -1353,3 +1353,51 @@ one of the two that announces updates as you step through the gallery. The
 thumbnail keeps its `alt`, which is what names the trigger button and what
 matters for the page itself.
 
+## §G — Scroll restoration on back navigation
+
+`history.scrollRestoration` is a property of the **current history entry**, not
+of the document. That is the whole of the problem this entry records.
+
+Removing `target="_blank"` from the in-essay links (see §"Internal links" in the
+README) made back navigation matter: following a reference out of the middle of
+the Home essay and pressing Back has to put you back where you were reading.
+The first attempt read the navigation type and set `auto` on a `back_forward`
+entry, `manual` otherwise. It works on desktop and does nothing on a phone.
+
+The reason is the entry-scoped lifetime. On a fresh load the script sets
+`manual`, which flags **that entry**. When you navigate away, the flag stays on
+it. Coming back, the browser consults the flag it recorded for the entry being
+restored and declines to restore the scroll — before, or regardless of,
+whatever the re-parsed document then sets. Desktop engines mostly re-read the
+property early enough for the `back_forward` branch to take effect; mobile ones
+mostly don't, and iOS Safari in particular has a bfcache path where the inline
+script never runs at all.
+
+The fix is to stop leaving the entry flagged:
+
+    addEventListener('pagehide', function () {
+      history.scrollRestoration = 'auto';
+    });
+
+`manual` is now only ever in force during the initial load of a fresh
+navigation, which is the only moment it was wanted. The moment the page is left
+the entry reverts to `auto`, so the browser restores the position on return —
+whether it re-parses the document or resumes it from bfcache. `pagehide` is the
+right event here because, unlike `unload` and `beforeunload`, it does not
+disqualify the page from bfcache.
+
+**If this still doesn't work on a given phone**, the next step is to delete the
+`manual` branch entirely and let every browser do its default thing:
+
+    if ('scrollRestoration' in history) history.scrollRestoration = 'auto';
+
+Nothing on the site depends on `manual`. It exists so that a reload, or a
+mid-page entry, doesn't drop the reader into the middle of an essay whose
+scroll-reveal animations have already been consumed above them — a cosmetic
+concern, and a much smaller one than losing your place.
+
+Restoring `target="_blank"` on internal links for touch devices only was
+considered as a fallback and is worse on its own terms: it needs JavaScript to
+rewrite `target` from a `matchMedia` query, and it hands mobile readers — the
+ones least able to manage a tab stack — a pile of tabs of the same site.
+
