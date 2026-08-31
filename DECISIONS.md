@@ -3192,6 +3192,19 @@ Housekeeping notes:
   Option left on the table if it ever bothers anyone: add the application
   number to the Italian row the way other cross-references are given —
   `… Testina magnetica e dispositivo che la contiene (AR95A007)`.
+- The same row now names its applicant: **per / for Proget di Gassino Massimo
+  & C. S.N.C.** The list has two words with fixed technical meanings, honoured
+  in all sixteen occurrences before this one and in both languages: *con* /
+  *with* introduces a co-inventor, always a person (con G. Lanza, con N.
+  Giolitti…); *per* / *for* introduces the applicant, always a legal person
+  (per Jacqueline S.p.A., per Tesalon Anstalt, per Ages S.p.A.). Proget is the
+  applicant, so *per*. *con* would have been the only entry in the list
+  putting a company in the co-inventor slot — not just inconsistent but
+  untrue. Note that *per* asserts nothing about the nature of the
+  relationship: Tesalon and Ages were outside commissioners, Proget was the
+  son's firm used as the legal vehicle for the filing, and the list does not
+  and should not try to distinguish the two. If that distinction is ever worth
+  making, it belongs in prose, not here.
 - These are the first two glosses ever to appear on the *Italian* page: the
   original-title-plus-gloss-in-quotes pattern was until now an English-page
   device only (Centro Formazione Meccanici, Cavaliere, the three Olivetti
