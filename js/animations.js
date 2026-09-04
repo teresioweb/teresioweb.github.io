@@ -7,13 +7,25 @@
 // dialog. Toggling the filter off and back on forces WebKit to tear
 // down and rebuild that specific compositing layer instead of trying
 // to reuse the stale one. Called from both dialogs' close handlers.
+//
+// BOTH forms are written, exactly as the stylesheet declares both. The
+// unprefixed `backdrop-filter` only became a real CSSOM property in
+// WebKit with Safari 18 — on iOS 16 and 17, which is precisely where
+// this bug lives, assigning nav.style.backdropFilter creates an inert
+// expando on the JS object and never touches the CSS, so the layer was
+// never rebuilt on the only browsers the function was written for.
+// Elsewhere (Chromium, Safari 18+) the prefixed line is pure
+// redundancy and costs nothing.
 function nudgeNavBackdropFilter() {
   const nav = document.querySelector(".site-nav");
   if (!nav) return;
   const prev = nav.style.backdropFilter;
+  const prevWebkit = nav.style.webkitBackdropFilter;
   nav.style.backdropFilter = "none";
+  nav.style.webkitBackdropFilter = "none";
   void nav.offsetHeight; // forces the browser to apply the change above before the one below
   nav.style.backdropFilter = prev;
+  nav.style.webkitBackdropFilter = prevWebkit;
 }
 
 // One-shot reveal-on-scroll: adds .visible to each element matching

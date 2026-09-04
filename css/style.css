@@ -915,8 +915,14 @@ body.page-discorso {
 
 .card h2 { margin: 0 0 8px; font-size: 1.1875rem; color: #1a1a1a; }
 .card p { margin: 0; color: #333; font-style: italic; font-size: 0.9375rem; }
+/* The cards are set in italic because three of the four QUOTE; .plain marks
+   the parts that describe instead, and it is the only mechanism for that
+   distinction. Card 4 used to get the same effect from
+   `.card:nth-child(4) p`, which said "the fourth one" where it meant "this
+   one is not a quotation" — reorder or insert a card and the roman lands
+   silently on the wrong one. Card 4's text now carries .plain like the
+   tail of card 1 does, and the positional rule is gone. */
 .card p .plain { font-style: normal; }
-.card:nth-child(4) p { font-style: normal; }
 
 @media (max-width: 35em) {
   .card { flex-direction: column; align-items: flex-start; }
@@ -2250,6 +2256,31 @@ body.page-curriculum .doc-viewer-text-inner {
   color: #ddd;
 }
 
+/* Discorso's four credits are a <ul> rather than four <p> (→ §I). These
+   two rules restate what those paragraphs used to get from the base
+   `p` rule and from nothing else — the reset already zeroes ul's own
+   margin and padding, so only the marker needs suppressing, and the
+   18px is the same 18px `p { margin-bottom }` was giving them.
+   Spacing is unchanged in both directions: between items it is still
+   18px, and below the last one the li's 18px collapses through the
+   ul's bottom edge (no padding, no border, auto height) and then with
+   the note's 22px margin-top, landing on the same 22px the adjacent
+   paragraphs used to collapse to. Confirmed against the previous
+   markup in a browser at 1280 and 390: every item's top, left and
+   height identical to the hundredth of a pixel, band height
+   identical, gaps 18/18/18 and 22 to the note, and the four .hl
+   highlight boxes unchanged in width — the .visually-hidden spans
+   added inside two of those links are out of flow and do not widen
+   them. */
+.ritagli-band ul {
+  list-style: none;
+}
+
+.ritagli-band li {
+  margin-bottom: 18px;
+  color: #ddd;
+}
+
 .ritagli-band p:last-child {
   margin-bottom: 0;
 }
@@ -2279,14 +2310,20 @@ body.page-curriculum .doc-viewer-text-inner {
    inline-block lets padding actually enlarge the tappable area
    instead of just adding whitespace around the glyph the way it
    would on a still-inline element. */
-.ritagli-band p a.footnote-link {
+/* Banchelli's credit is now an <li>, not a <p> (→ §I); the selector is
+   cut back to the band rather than re-listing both, since a
+   .footnote-link anywhere in this band wants the same target size. */
+.ritagli-band a.footnote-link {
   display: inline-block;
   padding: 2px 4px;
 }
 
 /* The rights note is not one of the quoted sources, so it does not take
-   the marker.  → DECISIONS.md §I */
-body.page-discorso .ritagli-band p:not(.ritagli-nota)::before {
+   the marker — and now it does not have to be excluded by name either:
+   the four sources are <li> and the note is the band's only <p>, so the
+   structure carries the distinction the `:not()` used to carry by hand.
+     → DECISIONS.md §I */
+body.page-discorso .ritagli-band li::before {
   content: ">";
   display: inline;
   margin-right: 8px;
@@ -2855,9 +2892,18 @@ body.page-discorso .ritagli-band p:not(.ritagli-nota)::before {
 }
 
 /* Names the slice the card is showing. The caption above gives the whole
-   span (1958-1995); this says which part of it these eight are, which is
-   the only place a reader can learn that, since the printed years are
-   grant years and the selection is by filing date.  → DECISIONS.md §O */
+   span (1955-1995); this says which part of it these eight are, and it
+   is the only place a reader can learn it.
+   The reason is not the one §O gave. §O said the printed years were
+   grant years while the selection went by filing date, so the two could
+   not be reconciled on the page — §AF then put priority years on the
+   page, removing that mismatch, and the line was still needed. It is
+   needed because the cut is EDITORIAL: the eight run to the mechanical
+   bit (3,363,837) and stop, leaving out 3,390,929, a soundproof cover
+   rather than calculating mechanism. Those two share a priority year
+   and a grant year; only the full dates part them. So no column on this
+   page, present or future, can express the rule, and this line is
+   permanent rather than a stopgap.  → DECISIONS.md §O (retirement note) */
 /* This line should look exactly like "il bit meccanico" a few rows below
    it: §18's 900 cut, in .text-window's own #4A4A4A citation grey. The
    weight comes free by inheritance; the colour does not, because
@@ -2902,6 +2948,39 @@ body.page-discorso .ritagli-band p:not(.ritagli-nota)::before {
 .doc-list-expand-btn:hover,
 .doc-list-expand-btn:focus-visible {
   text-decoration-thickness: 2px;
+}
+
+/* Same move as the print block below, for the same reason, and it belongs
+   here for a stronger one. #text-brevetti-completi is the ONLY copy of 33
+   of the 41 patents — the card carries eight — and both ways into it are
+   <button>s, so with JavaScript off those 33 links are not merely hidden,
+   they are unreachable: measured at 0 of 41 visible. The README promises
+   "no animations, everything on screen" without JS, and this was the one
+   place that promise was not kept. So the container is unhidden and reads
+   as an appendix, exactly as it does on paper.
+
+   Not a copy of the print rule despite the shared idea: on screen this
+   element is a direct child of <body>, outside <main>, so it has to
+   restate main's own 760px / 24px measure to line up with the page above
+   it, and it has to carry main's 6.125rem bottom padding or the FIXED
+   footer sits on top of the last patents. Print needs neither. [hidden]
+   is a UA display:none and an author rule outranks the UA sheet, so no
+   !important is needed here — unlike in print, where one guards against
+   the on-screen rules that block re-declares.  → DECISIONS.md §O, §AF */
+.no-js .doc-list-full[hidden] {
+  display: block;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 20px 24px 6.125rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Both are controls for a dialog that cannot open: the badge over the
+   drawing and the "Espandi la lista" link under the card. The list they
+   would have opened is now printing below them. */
+.no-js .doc-list-expand,
+.no-js .patent-rotator .img-badge {
+  display: none;
 }
 
 /* The complete list in the dialog is 41 entries in four groups: it needs
@@ -3066,8 +3145,11 @@ body.page-discorso .ritagli-band p:not(.ritagli-nota)::before {
   body {
     background: #fff !important;
     background-image: none !important; /* drops the watermark SVGs: 157 KB
-                                          of sgimignano.svg alone, and they
-                                          read as smudge on paper */
+                                          gzipped for sgimignano.svg alone
+                                          (377 KB on disk — the two figures
+                                          elsewhere in the docs are the same
+                                          file, measured differently), and
+                                          they read as smudge on paper */
     color: #111 !important;
   }
 

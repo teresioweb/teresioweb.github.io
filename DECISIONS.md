@@ -1948,6 +1948,64 @@ anni della Logos 27" — and why the caption also had to stop saying "Ufficio
 brevetti degli Stati Uniti", which had been false since the French and Italian
 patents were added.
 
+> **OBSOLETE — superseded by §AF.** Kept because the retire rule says to mark,
+> not delete, and because the first sentence above is still the operative fact.
+> Everything after it is not. §AF replaced grant years with priority years on
+> the page, which removes the *grant vs filing* asymmetry this paragraph was
+> built on: printed year and selection basis are now the same kind of date.
+> What is measurably true of the page today:
+>
+> - visible years on the card run **1963–1966**, not 1965–1969;
+> - the pair falling on opposite sides is **two 1966 patents**, not two 1968
+>   ones — same two documents, 3,363,837 in and 3,390,929 out, now sharing a
+>   printed year instead of differing by one;
+> - the caption no longer states the rule at all. It reads "depositati dal 1955
+>   al 1995" and names the priority year as the year shown; the slice is named
+>   by `.doc-list-intro` instead, and only as "Brevetti degli anni Logos" —
+>   which names the period, not the cut.
+>
+> **And "depositati fra il 1964 e il 1968" is retired outright, because the cut
+> was never chronological.** Confirmed by V. The selection runs *to the
+> mechanical bit* — 3,363,837, the entry the card's own text singles out in bold
+> — and stops there. The one patent excluded from that window, 3,390,929, is
+> "Soundproof cover for an office machine": a cover, not calculating mechanism,
+> and of little interest beside the rest. That is the whole rule, and it is
+> editorial.
+>
+> The dates could not have told you this, and the cross-check is worth keeping
+> because it forecloses the search rather than merely failing at it. The two
+> boundary documents are inseparable on **every** basis the site holds:
+>
+> | | 3,363,837 (in) | 3,390,929 (out) |
+> |---|---|---|
+> | priority year, shown on the page | 1966 | 1966 |
+> | grant year, still in JSON-LD `datePublished` | 1968 | 1968 |
+> | priority date, from V's source table | **9 Feb 1966** | **7 Apr 1966** |
+>
+> Only the full dates separate them, so a build that wants a mechanical
+> threshold can use any cut-off between those two days. **Write that down as
+> the implementation, never as the reason.** Turning the boundary back into a
+> justification is precisely how "1964–1968" came to be here: a range
+> back-derived from a choice, then read by everyone after as the choice itself.
+> It survived one display change (grant → priority years, §AF) as a plain
+> falsehood before anyone noticed.
+>
+> **What still stands from the paragraph above:** the first sentence — selection
+> is by patent number in the build, not by the year on screen — and the
+> conclusion drawn from it, that no reader can infer the cut from the page.
+> If anything that conclusion is now firmer than §O could argue it. §O thought
+> the obstacle was a mismatch between two kinds of date, which a display change
+> could in principle have removed — and §AF did remove it, without helping. An
+> editorial judgement about which patent is interesting is not inferable from
+> any column at all. `.doc-list-intro` naming the slice is therefore permanent,
+> not a workaround waiting on better data.
+>
+> **Incidental, but useful.** §AF left `datePublished` on grant years by design,
+> which means the page still carries both columns — priority in the HTML, grant
+> in the JSON-LD. That is what made it checkable that §O's original "1965–1969,
+> two 1968 patents" was accurate when written rather than careless. Treat the
+> mismatch as a second axis, not as debt to be paid off.
+
 ### The transcript is a [hidden] div, not a <template>
 
 Every other transcript on this site is a `<template>`, and that is right for
@@ -1969,6 +2027,96 @@ selection followed by a labelled complete list reads correctly. Result: 5 pages,
 
 `cloneSource()` exists only because of this split. `<template>` exposes
 `.content`; a plain element does not, so the helper branches on it.
+
+### Without JavaScript: unhidden here too, and the dead trigger is accepted
+
+The print block was for a long time the only path on which the `[hidden]`
+container was revealed, and that left a hole this section had not noticed. Both
+ways into the dialog are `<button>`s — the one wrapping the drawing, labelled by
+its "⤢ Lista" badge, and the "Espandi la lista" one at the foot of the box,
+styled as a plain link but a `<button>` all the same — so with JavaScript off
+those 33 entries were not merely hidden, they were **unreachable**. With JS
+disabled before the fix the page offered **8 of the 41**: the card's own list is
+not gated behind `.js` and rendered normally, so it stayed readable — the 33
+that exist nowhere but the `[hidden]` container did not. Counted in a browser
+with scripting off, before and after: **8 → all 41**, and with scripting on the
+page is byte-for-byte the behaviour it had before (badge shown, expand shown,
+container `display: none`). The appendix renders 760px wide, aligned with
+`main`. That is the one place
+the README's no-JS contract ("no animations, everything on screen") was not
+being kept.
+
+So `.no-js .doc-list-full[hidden]` now unhides the same container as an
+appendix, and `.no-js` hides both expand controls, exactly as print does. It is
+NOT a copy of the print rule: on screen the container is a direct child of
+`<body>`, outside `<main>`, so it has to restate main's own 760px / 24px
+measure to line up with the page above it, and it has to carry main's
+`6.125rem` bottom padding or the **fixed** footer sits on top of the last
+patents. Print needs neither, and needs `!important` where this does not —
+`[hidden]` is a UA `display: none`, which any author rule outranks, but the
+print block is also overriding the on-screen rules it re-declares.
+
+**When the appendix appears differs by path, and on one of them it is late.**
+There are three ways to reach `.no-js`, not two. With JavaScript disabled
+outright, and when `animations.js` never arrives or fails to parse, the class
+is on `<html>` from the first byte and the appendix is simply part of the page
+— it is written into the initial layout and nothing shifts. But when
+`animations.js` parses and then **throws part-way**, `.js` is on the element
+until the inline `<head>` script checks `__animsReady` on `load` and swaps it
+back: the appendix, and the disappearance of both expand controls, land
+*after* load. That is a layout shift on an already-painted page. Accepted, and
+small — the container sits below `</main>`, off-screen for anyone who has not
+scrolled, so the CLS cost is near zero and it happens only on a failure branch.
+Written down because it is invisible in testing: disabling JavaScript in
+devtools exercises the first path and never this one. **To see it, make
+`animations.js` throw rather than removing it.**
+
+**Accepted residue: the rotator `<button>` stays focusable and does nothing.**
+The drawing sits *inside* the trigger, not beside it, so with JS off there is a
+`<button>` in the tab order that takes focus, takes Enter and Space, and fires a
+click nobody listens for. This is not fixable from the stylesheet, and the note
+matters mostly to stop the next person trying:
+
+- `display: none` / `visibility: hidden` / `content-visibility: hidden` on the
+  button take the patent drawing with them — it is content, not chrome.
+- `pointer-events: none` stops the mouse and **not** the keyboard, which is
+  worse than doing nothing: same control, two behaviours by input device.
+- Removing something from the tab order needs `tabindex="-1"`, `disabled` or
+  `inert` — all three are **attributes**, and CSS cannot set attributes. Same
+  wall as `[hidden]` above, where the sheet can only override the `display`.
+
+That leaves markup or script, and both were weighed and declined:
+
+- **Emit a `<span>` and let `initPatentRotator()` promote it** (`role="button"`,
+  `tabindex="0"`, handler) — clean without JS, but it contradicts the README's
+  "triggers are real `<button>`/`<a>` elements" and walks straight into §T:
+  `.side-row > a, .side-row > img, .side-row > button` carries `overflow:
+  hidden`, `position: relative`, `border-radius` and the hover overlay, i.e.
+  the frame the entering image slides out from behind. An inert defect traded
+  for a likely visual regression.
+- **Disable it from the inline `<head>` script** — covers the wrong half. Of the
+  two no-JS paths, only the *failsafe* one (`animations.js` 404s or throws, the
+  inline script swaps `.js` back to `.no-js` on `load`) can run any script at
+  all; with JavaScript disabled outright nothing runs, inline included. Two
+  different behaviours in two situations the reader cannot tell apart. And
+  `disabled` on a button wrapping an image risks the UA's dimmed rendering on
+  the patent drawing itself.
+
+**Why accepting it is not a shrug: A2 changed what pressing it costs.** Before,
+this button was the only route to 33 patents, so a press that did nothing lost
+the reader the content. Now the complete list is printed below the card on the
+same page — the press leads nowhere because there is nowhere left to go. Nor is
+it a violation: 4.1.2 asks for name, role and value, and the control has a name
+and a role; no criterion requires that a control do something. One wasted Tab
+stop, in a mode that also has no animations.
+
+**One knock-on to know about.** `.no-js` hiding `.img-badge` also removes it from
+the accessibility tree, and the badge was part of the button's accessible name,
+which is computed from its contents. So without JS the trigger announces as
+"Disegno di brevetto di calcolatore meccanico, pulsante" rather than
+"… ⤢ Lista, pulsante". Correct, in that the badge promised a dialog that cannot
+open — but if the badge is ever given an `aria-label` or a `.visually-hidden`
+sibling, re-check what the button is called on this path.
 
 ### The focus trap bug in §C stopped being latent
 
@@ -1997,7 +2145,7 @@ control genuinely has no destination, unlike the site's other
 Rechnerlexikon URL is not lost: it is the first link in the `.fonte` line
 directly below, where it always also was.
 
-"Espandi lista" sits **below** the box rather than at the end of the list inside
+"Espandi la lista" sits **below** the box rather than at the end of the list inside
 it. Inside, the control that reveals the rest of a list you can only see three
 rows of would itself have needed scrolling to find. It is 44px tall, which is
 also the standard the burger still fails.
@@ -2011,7 +2159,13 @@ and get a real `src` on an idle callback after `load`. §K's rule is that image
 scheduling here IS animation timing — but that rule is about the frame that
 animates, and only frame 1 does. Frames 2 and 3 sit behind it at `opacity: 0` and
 are never revealed on arrival, so deferring them costs no choreography and keeps
-134 KB off the critical path.
+them off the critical path. **Re-measured: 78,908 B + 83,078 B = 161,986 B, 158
+KiB.** This line said 134 KB, which was the pair's weight before the two scans
+were replaced (brev4, brev5). WebP does not compress further in transit, so
+there is no reading of 134 that is still true. The same figure appears in the
+`prefers-reduced-motion` note further down, where those bytes are not merely
+deferred but never requested at all — **if one is ever re-measured, re-measure
+both.**
 
 **It does not run below 60px of scroll range.** Mapping a 20px range onto three
 frames turns a trackpad nudge into a full image change. Under the threshold the
@@ -2022,6 +2176,23 @@ be flattened by the global reduce block, but an image that changes underneath yo
 as you scroll is motion whether or not it fades, and three interchangeable scans
 are decoration. Verified: frame index stays `[0,0,0,0,0,0]` across the full
 scroll under `reduce`, against `[0,0,1,1,2,2]` without.
+
+**Free consequence, worth writing down before someone refactors it away.** That
+`reduce` return sits at the TOP of `initPatentRotator()`, above the point where
+`loadFrames` is defined and scheduled — so under `reduce` the deferred swap
+never runs, frames 2 and 3 keep their inert 1x1 gif as `src`, and the two real
+scans are **never requested at all**. Measured on this build: `brevetto-2.webp`
+78,908 B + `brevetto-3.webp` 83,078 B = **161,986 B, 158 KiB not downloaded**
+by a reader on `reduce`. **Verified in a browser, not inferred:** with
+`prefers-reduced-motion: reduce` the only image request the card makes is
+`brevetto.webp`, frames 2 and 3 report `naturalWidth` 1 throughout, and the
+current-frame index stays `[0,0,0,0,0,0]` across the full scroll — against
+`[0,0,1,1,2,2]` and all three files requested without the preference. This is a side effect of where the guard is placed,
+not of anything that announces itself: move the `reduce` check below the
+`loadFrames` scheduling, or hoist the loader out of the function, and the
+saving disappears silently with no visible or behavioural change to notice it
+by. **If you refactor the rotator, re-check that the guard still precedes the
+loader.**
 
 That interchangeability is also why frames 2 and 3 carry `alt=""`. Only frame 1
 describes the drawing, so the trigger's accessible name stays fixed no matter
@@ -2036,6 +2207,23 @@ all three opaque, stacking the drawings on top of each other. `.patent-frame` at
 alone on purpose — the `translateX` slide still applies to all three, which is
 correct, since the card moves as one block. Only which frame is opaque is taken
 back.
+
+> **Re-measured in a browser, and §P moved these numbers without saying so.**
+> Headless Chromium, fonts loaded, `.text-window` clientHeight 130px in every
+> case. The post-cut figures above — 3.5 screenfuls on mobile, 2.7 on desktop —
+> reproduce **exactly** once `.doc-list-intro` and the in-box `.doc-list-expand`
+> are removed from the box: 2.72 on desktop, 3.5 at 390px. Both were put inside
+> `.text-window` by §P, which is later, and §P did not restate the measurement it
+> had just changed. **As the page stands: 3.12 screenfuls on desktop (405px of
+> content), 3.92 at 390px, 3.59 at 414px.** Desktop is flat at 3.12 from 768px
+> up, because `main` caps at 760px. The two additions cost 52px between them
+> (intro 20.8px, expand 25px, plus margins).
+>
+> The decision is untouched — 3.12 against the pre-cut 20.8 is the same result —
+> but note what went wrong: **§O recorded rendered numbers without recording the
+> viewport or the layout they were taken in**, which is why reproducing them took
+> a bisect rather than a re-run. Any rendered figure written here should carry
+> its conditions.
 
 ### Still open
 
@@ -2057,6 +2245,23 @@ jurisdictions were added. The 1964-1968 selection is named where the selection
 actually is: a centred bold line inside the box, "Intorno agli anni della Logos".
 §O's problem stands and this is its answer — the printed years are grant years,
 the selection is by filing date, and no reader can infer that from the page.
+
+> **OBSOLETE on both quotations — superseded by §AF.** The shape of the decision
+> stands (caption gives the span, box names the slice); the two strings quoted
+> in it do not, and neither does the closing justification.
+>
+> | quoted here | on the page |
+> |---|---|
+> | "depositati dal 1958 al 1995" | "depositati dal 1955 al 1995" (§AF §1 — priority dates open the range three years earlier) |
+> | "Intorno agli anni della Logos" | "Brevetti degli anni Logos" / "Patents of the Logos years" |
+>
+> The last sentence — grant years vs filing date — is dead outright: the list
+> prints priority years now. And "the 1964-1968 selection" names a rule that
+> never existed: the cut is editorial, running to the mechanical bit and
+> dropping the soundproof cover. **What §P got right and should be kept is the
+> division of labour** — caption gives the span, box names the slice — which
+> holds all the better now that the slice provably cannot be stated as a range.
+> See the retirement note in §O for the rule and the cross-check.
 
 **The dialog's first line now states the numbering convention.** Patent families
 spanning several countries are listed once under the US document, with the other
@@ -2133,6 +2338,15 @@ jurisdictions' codes in brackets — the convention the dialog's first line now
 states. Two things were cleaned up in the source data on the way in: `CH468255`
 appeared twice under 3,404,765, and 3,005,585 appeared as two separate rows
 (`CH340647` and `SE195739`), now merged into one. Sixteen families, 22 codes.
+
+> **The two counts are stale — §AG moved them and did not say so.** Swapping the
+> two French documents for their German family members kept the French numbers
+> as cross-references, `(FR2039399)` on DE 7014884 and `(FR2055456)` on
+> DE 2036218. Both rows had carried no bracketed code before, so each swap added
+> one entry and one code. **Re-counted from the rendered list: 18 of the 41
+> entries carry codes, 24 codes in all**, IT and EN identical. The convention
+> itself is unchanged, and so is the sentence below — two of the card's eight
+> have codes, and the box still stays clean.
 
 The codes are added **only inside `.doc-list-full`**, which is both the dialog and
 the printed appendix. The card's eight-entry box stays clean: two of those eight
