@@ -479,15 +479,36 @@ offset) inline, so the same keyframe works for all of them. The stage bleeds
 slightly past main's padding (negative margin) to give the photos more room to
 actually grow larger.
 
-## §32 — `#clump-row-1, #clump-row-2, #clump-row-3`
+## §32 — `#clump-capellaro, #clump-piol, #clump-sartor, #clump-banchelli`
 
 > Scroll targets for the highlighted words in the ritagli-band, offset so the fixed nav doesn't land on top of the photo.
 
-The three in-page scroll targets the ritagli-band's highlighted words jump to
-(#clump-row-1/2/3, see discorso.html) — offset so the fixed .site-nav doesn't
-land directly on top of the photo. 100px clears the nav's own rendered height
-(≈58px desktop, ≈50px mobile) with some breathing room to spare, so one value
-covers both rather than needing a breakpoint-specific one.
+The in-page scroll targets the ritagli-band's highlighted words jump to (see
+discorso.html) — offset so the fixed .site-nav doesn't land directly on top of
+the photo. 100px clears the nav's own rendered height (≈58px desktop, ≈50px
+mobile) with some breathing room to spare, so one value covers both rather than
+needing a breakpoint-specific one.
+
+**One id per cited source, not per row.** These were `#clump-row-1/2/3`, sitting
+on the leftmost photo of each row of the clump, and four words pointed at three
+of them. On the desktop clump that reads as correct and measures as correct: the
+two photos of a row share a `--ty`, so scrolling to either lands the pair at the
+same place — measured identically at top=100 for all four words. Below `50em`
+the clump is not a clump, it is a vertical stack in DOM order (capellaro, piol,
+piol2, sartor, banchelli1, banchelli2), and a row id then puts a *different*
+source at the top of the viewport than the one the reader just clicked.
+Measured at 390×844 before the change: the yellow word (Piol) put capellaro at
+the top with piol at top=469, and the peach word (Sartor) put piol2 at top=100
+with sartor at 165. Both were still on screen, so nothing was broken — but the
+colour-to-source pairing is the entire mechanism of this page, and on a phone it
+was landing on the wrong colour.
+
+Each cited source now carries its own id and each word points at its own photo.
+piol2 loses the id it had: it is Piol's second page, reachable by scrolling from
+Piol's first, and nothing links to it. Desktop behaviour is unchanged by
+construction — same `--ty`, same landing — and the stacked layout now puts the
+clicked source at the top. Side effect worth having: the four-links-three-targets
+case that §W had to work around no longer exists.
 
 ## §33 — `.clump-badge`
 
@@ -2634,10 +2655,15 @@ groups are affected in practice:
 - **The footnote links on Home**, `#nota` and the English `#nota-1` / `#nota-2`.
 - **The skip link**, `#main`, on all 14 pages.
 
-Discorso is the worst case, because **four links share three targets**:
-"documento" and the first "parole" both point at `#clump-row-1`. Using either one
-kills both. Measured with real clicks: 1400 → 138, then 1400 → 1400, then
+Discorso was the worst case, because **four links shared three targets**:
+"documento" and the first "parole" both pointed at `#clump-row-1`. Using either
+one killed both. Measured with real clicks: 1400 → 138, then 1400 → 1400, then
 1400 → 1400, and "parole" dead on arrival afterwards.
+
+*(Obsolete as of §32's per-source ids: the four words now have four distinct
+targets, so the shared-target amplification is gone. The handler below is not —
+it is what makes any of these links work on a second click, shared target or
+not. Kept here because it is the measurement that motivated the fix.)*
 
 `initFragmentLinks()` intervenes **only** when `location.hash` already equals the
 link's href — the single case the browser gets wrong. Every navigation that works
@@ -2655,7 +2681,7 @@ focus, because that is what a real fragment navigation does: it is how the skip
 link reaches `<main tabindex="-1">`.
 
 After: all four coloured words land on 138 / 138 / 614 / 1117 on three
-consecutive clicks each, alternating between the two links that share
+consecutive clicks each, alternating between the two links that shared
 `#clump-row-1` works indefinitely, the footnotes are stable across three clicks,
 and the skip link moves focus to `<main>` every time. §H's four restoration
 scenarios are unchanged, including the `#nota` round trip at 1500 → 4193 → 1500.
@@ -3431,3 +3457,93 @@ Housekeeping notes:
 - The office label is lowercase ("ufficio brevetti tedesco") to match the
   five Italian and the previous two French rows, and the year keeps the
   comma after it as every other one of the 41 rows does.
+
+## §AH — `html { scroll-padding }`, and the focus ring behind a fixed bar
+
+> Keeps a focused link out from under the two fixed bars.
+
+The nav and the footer are `position: fixed`. Neither takes part in layout, so
+neither exists as far as Chromium's "should I scroll this newly focused element
+into view?" test is concerned: that test compares the element's layout box
+against the scrollport, and a link sitting under a bar is inside the scrollport.
+No scroll is started, the focus ring is drawn behind the bar, and a reader
+navigating by Tab loses their place. The link still activates on Enter — this is
+never a dead control, only an invisible one.
+
+Measured with a full Tab sweep of every page, forwards and then backwards from
+the footer, at 750ms per step so the smooth scroll finishes before the reading:
+**seven links entirely covered.**
+
+| page | link | covered by |
+|---|---|---|
+| home | `Logos 27`, `Virgolettati qui e oltre` | footer, 22px |
+| home | `Natale Capellaro`, `prodigio` (Shift+Tab only) | nav, 22px |
+| discorso | `ricordi` | footer, 25px |
+| discorso | footnote `1`, footnote `2` | footer, 34px |
+
+WCAG 2.2 SC 2.4.11 *Focus Not Obscured (Minimum)*, Level AA, is failed by
+"entirely hidden" and nothing less, so those seven are failures and the
+partly-covered ones measured alongside them (`link` on Logos at 62%) are not.
+They would fail 2.4.12 *Enhanced*, which is AAA and not a target here.
+
+### Why `scroll-padding` and not `scroll-margin`
+
+The obvious fix is `:focus-visible { scroll-margin-top; scroll-margin-bottom }`.
+It was tried first and it is the wrong tool: `scroll-margin` only changes *where
+a scroll lands*, and the whole bug is that no scroll is started. It helps
+exactly in the cases where the browser had already decided to scroll — measured,
+it took Discorso from 4 covered links to 1 and Home from 5 to 3, and left every
+Shift+Tab case untouched.
+
+`scroll-padding` shrinks the scrollport itself, which means it also feeds the
+"is it already in view" test. Same sweep, same conditions: **7 → 0**, on all
+seven pages, in both tab directions, at a 16px and a 24px default font, and on
+desktop, portrait phone and landscape phone.
+
+### The numbers
+
+`rem`, not `px`, for the same reason as the type scale (§B): both bars grow with
+the reader's font size, and a px value would stop clearing them precisely where
+clearing them matters most. Measured heights:
+
+| default font | nav | footer (fixed) |
+|---|---|---|
+| 16px | 66px | 41px |
+| 20px | 65px | 41–47px |
+| 24px | 73px | 95–104px |
+
+The footer's jump at 24px is the credit line wrapping to two lines. So
+`scroll-padding-top: 5.5rem` is 88px against a 66px nav and 132px against a 73px
+one; `scroll-padding-bottom: 5rem` is 80px against 41px and 120px against 104px.
+4.75rem was the first draft and cleared that 104px footer by only 10px — 5rem is
+the same idea with room to be wrong in.
+
+### What had to move with it
+
+Both `scroll-margin-top` values on the site were `100px`, chosen in §32 to clear
+the nav on their own. `scroll-padding-top` now contributes 88 of that 100, and
+the two add, so both were changed to **12px** to keep every anchor jump landing
+on the pixel it landed on before. Verified against the unmodified site: the
+`nota(*)` round trip on Home is `y=3157, top=445` before and after, and the four
+coloured words on Discorso land at `[100, 100, 100, 105]` — the second of those
+was 160 before, improved by §32's per-source ids rather than by this rule.
+**Change the padding and you change both margins.**
+
+The skip link changes behaviour slightly and for the better: `<main>` used to
+land at `top: 0`, i.e. tucked under the nav, and now lands at `top: 66`, exactly
+below it. Focus still moves to `<main>` either way.
+
+`scroll-padding-bottom` is reset to `0` in the landscape-phone block, where the
+footer is not fixed (§47): with nothing floating over the bottom of the page, the
+reserve would only over-scroll every focused link by 80px on the one viewport
+with the least height to spare. The top reserve stays — the nav is still fixed
+there.
+
+### Not fixed by this, and why that is correct
+
+Nothing here touches `initScrollMemory()`. Scroll restoration uses
+`window.scrollTo(0, y)` with an explicit position, which ignores
+`scroll-padding` entirely, so the four restoration scenarios of §H are
+untouched. The three scrollable panels (`.text-window`, `.doc-viewer-scroll`,
+`.doc-viewer-text`) have their own scrollports and are unaffected: nothing is
+fixed over them.

@@ -744,15 +744,17 @@ function initDocViewer() {
 
 
 // In-page fragment links go dead after their first use. Clicking
-// href="#clump-row-1" navigates to that fragment and scrolls; clicking it
-// again asks the browser to navigate somewhere the document already is,
+// href="#clump-capellaro" navigates to that fragment and scrolls; clicking
+// it again asks the browser to navigate somewhere the document already is,
 // so it does nothing at all. Measured on Discorso with real clicks:
 // 1400 -> 138, then 1400 -> 1400, then 1400 -> 1400.
 //
-// On this site that is worse than it sounds, because the four coloured
-// words share three targets: "documento" and the first "parole" both
-// point at #clump-row-1, so using either one kills both. The same applies
-// to the footnote links on Home and to every skip link.
+// This used to be worse: the four coloured words shared three targets, so
+// "documento" and the first "parole" both pointed at #clump-row-1 and using
+// either one killed both. Each word now has its own per-source target
+// (§32), which removes the shared-target case but not the repeat-click one
+// this handler exists for — nor does it help the footnote links on Home or
+// any skip link, which are still one link to one target.
 //
 // The handler intervenes ONLY when location.hash already equals the
 // link's href — the one case the browser gets wrong. Every working

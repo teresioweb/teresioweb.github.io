@@ -92,6 +92,41 @@ html {
   scrollbar-gutter: stable;
 }
 
+/* Keeps a focused link out from under the two fixed bars.  → DECISIONS.md §AH
+
+   Chromium only scrolls a newly focused element into view if it is outside
+   the scrollport, and it decides that on the layout box alone: the nav and
+   the footer float over the page, so a link that sits under either one
+   still counts as "in view" and no scroll happens. Tab lands on it, the
+   ring is drawn behind a bar, and the reader loses their place. Measured
+   before this rule: 7 links entirely covered — "Logos 27" and "Virgolettati
+   qui e oltre" under the footer on Home, "Natale Capellaro" and "prodigio"
+   under the nav on Shift+Tab, and "ricordi" plus footnotes 1 and 2 under
+   the footer on Discorso. WCAG 2.2 SC 2.4.11 (AA) is failed by "entirely
+   hidden", so those seven are failures and a partly covered one is not.
+
+   scroll-padding and NOT scroll-margin on :focus-visible: scroll-margin
+   only changes where a scroll lands, and the bug is that no scroll is
+   started at all. scroll-padding shrinks the scrollport itself, so it
+   feeds the "is it already in view" test too — the whole point. Measured
+   with the same sweep: scroll-margin took Discorso from 4 to 1, this takes
+   every page to 0, in both tab directions.
+
+   rem and not px, like the type scale (§B): the bars grow with the
+   reader's font size — nav 66→73px and footer 41→104px between a 16px and
+   a 24px default, the footer's credit line wrapping to two lines — so a px
+   value would stop clearing them exactly where clearing them matters most.
+   5.5rem is 88px against a 66px nav; 5rem is 80px against a 41px footer,
+   and 120px against that 104px one.
+
+   Both scroll-margin-top values on the site are 12px rather than 100px
+   because of this rule: 100 - 88 = 12 keeps every anchor jump landing on
+   the same pixel it did before. Change the padding, change both. */
+html {
+  scroll-padding-top: 5.5rem;
+  scroll-padding-bottom: 5rem;
+}
+
 /* Smooth in-page jumps (footnote <-> ornament round-trip on home.html,
    highlighted word -> ritaglio on discorso.html). Gated behind a class,
    instead of sitting on html from the start: with scroll-behavior:smooth
@@ -1000,11 +1035,15 @@ body.page-galleria main {
 }
 
 /* Scroll targets for the highlighted words in the ritagli-band, offset so
-   the fixed nav doesn't land on top of the photo.  → DECISIONS.md §32 */
-#clump-row-1,
-#clump-row-2,
-#clump-row-3 {
-  scroll-margin-top: 100px;
+   the fixed nav doesn't land on top of the photo. One id per cited source,
+   not per row: on the desktop clump the two photos of a row share a --ty
+   and land identically either way, but below 50em the clump is a vertical
+   stack and a row id puts the wrong photo at the top.  → DECISIONS.md §32 */
+#clump-capellaro,
+#clump-piol,
+#clump-sartor,
+#clump-banchelli {
+  scroll-margin-top: 12px;
 }
 
 .clump-anchor {
@@ -1396,6 +1435,14 @@ footer .cc-logo {
 
   .desktop-dot {
     display: inline;
+  }
+
+  /* Nothing floats over the bottom of the page here, so the reserve
+     §AH keeps for the fixed footer would only over-scroll every
+     focused link by 80px on the one viewport with the least height
+     to spare. The top reserve stays: the nav is still fixed. */
+  html {
+    scroll-padding-bottom: 0;
   }
 
   /* The footer stops being fixed here, and that is the whole point of
@@ -2599,9 +2646,11 @@ body.page-discorso .ritagli-band li::before {
 }
 
 /* offset for anchor jumps to footnotes, so the fixed nav doesn't end
-   up covering the line the reader was just sent to */
+   up covering the line the reader was just sent to. 12px, not 100:
+   html's scroll-padding-top already contributes 88 of the 100 this
+   used to carry on its own (§AH). */
 .footnote-target {
-  scroll-margin-top: 100px;
+  scroll-margin-top: 12px;
 }
 
 /* drop cap on the essay's first letter ("Teresio") */
