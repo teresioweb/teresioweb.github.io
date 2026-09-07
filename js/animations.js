@@ -116,6 +116,37 @@ function initNavHide() {
   }, { passive: true });
 }
 
+// Publishes the nav bar's measured height as --nav-h, which body's
+// padding-top reads through max().
+//
+// Everything else about the bar is expressed in rem and needs no help:
+// the bar and the reserve grow together as long as the brand stays on
+// one line. Below the nav breakpoint the brand is allowed to wrap, and
+// on that second line the two stop tracking — the bar gains a whole
+// line of type while a rem reserve gains nothing, and the top of main
+// ends up under it. There is no CSS test for "did this text wrap", so
+// the height has to be measured.
+//
+// ResizeObserver and not a resize listener: the wrap is triggered by the
+// reader's default font size as much as by the window, and a font change
+// fires no resize event. Reading offsetHeight in the callback is a read
+// after layout, not a forced reflow.
+//
+// Without JS the custom property is never set and the max() falls back to
+// the 4.125rem this always was — correct for the one-line bar, which is
+// every bar at a default font size, and short by about a line in the
+// no-JS-and-large-font corner. Nothing is hidden there, only tucked.
+function initNavHeight() {
+  const nav = document.querySelector(".site-nav");
+  if (!nav || typeof ResizeObserver === "undefined") return;
+
+  const publish = () =>
+    document.documentElement.style.setProperty("--nav-h", nav.offsetHeight + "px");
+
+  new ResizeObserver(publish).observe(nav);
+  publish();
+}
+
 // Mobile burger: toggles the dropdown, closes on link tap or outside tap.
 // The button itself morphs into an X while the dropdown is open.
 function initMobileMenu() {
@@ -1268,6 +1299,7 @@ document.addEventListener("DOMContentLoaded", () => {
   observeReveal(".essay-anim");
   initGalleryReveal();
   initNavHide();
+  initNavHeight();
   initMobileMenu();
   initLightbox();
   initDocViewer();

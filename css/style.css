@@ -88,6 +88,26 @@ html {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* ...and puts something back in its place. Turning the system highlight
+   off is a look decision; leaving nothing behind it is a feedback bug.
+   Until this rule there was not one :active state in the file, so on a
+   phone a tap on a link, a badge or a photo produced no acknowledgement
+   at all until the next page painted — and on a slow connection that is
+   a long silence to fill with a second tap.
+   Scoped to (hover: none) because a mouse already has :hover for this,
+   and every :hover the site defines is scoped away from touch. opacity,
+   because it is the one property that reads on the two things being
+   tapped here: text and photographs. transition:none so the dimming
+   lands on the press and lifts on the release, which is what makes it
+   feel like a button rather than a fade.  → DECISIONS.md §AK.4 */
+@media (hover: none) {
+  a:active,
+  button:active {
+    opacity: 0.55;
+    transition: none;
+  }
+}
+
 html {
   scrollbar-gutter: stable;
 }
@@ -208,8 +228,18 @@ body {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   /* Reserves room for the fixed nav, in rem so the gap grows together
-     with the bar's own type.  → DECISIONS.md §7 */
-  padding-top: 4.125rem;
+     with the bar's own type. The rem alone only holds while the brand
+     stays on one line; once §AJ lets it wrap, the bar grows by a whole
+     line while this grows by nothing, and the top of main slides under
+     it. initNavHeight() publishes the bar's measured height as --nav-h
+     and max() takes whichever is larger. No gap is added on top of the
+     measurement: the desktop bar already measures 65.6 against this
+     66, so the clearance the design actually has is 0.4px, and adding
+     a nominal 8 to "keep the gap" moved main down on every desktop
+     page at a default font. The fallback is the same 4.125rem, so the
+     no-JS path and every one-line bar land exactly where they always
+     did.  → DECISIONS.md §7, §AJ.2 */
+  padding-top: max(4.125rem, var(--nav-h, 4.125rem));
 }
 
 /* Site nav: fixed bar, hides on scroll down and returns on scroll up.
@@ -234,6 +264,28 @@ body {
 
 .site-nav.nav-hidden {
   transform: translateY(-100%);
+}
+
+/* §AH kept a focused link from being drawn BEHIND the fixed bar. This is
+   the same failure in the other direction, reintroduced by the bar's own
+   hide-on-scroll: scroll down, click a paragraph so focus falls back to
+   <body>, then Tab. The next seven stops are the brand, the five nav
+   links and the language pill — all inside a bar that is currently
+   translated off the top, all drawing their focus ring above the
+   viewport edge. Nothing rescues them: a fixed element is never scrolled
+   into view, and body's overflow-x:hidden blocks reaching it by hand.
+   Bringing the bar back on :focus-within is the whole fix — the transform
+   is already transitioned, so it slides down exactly as it does on a
+   scroll up. The second rule is needed because the pill is position:fixed
+   in its own right and carries its own .nav-hidden, with an opacity:0
+   that the first rule cannot reach.  → DECISIONS.md §AK.1 */
+.site-nav.nav-hidden:focus-within {
+  transform: none;
+}
+
+.site-nav:focus-within .lang-link-desktop.nav-hidden {
+  transform: translateY(-50%);
+  opacity: 1;
 }
 
 .nav-inner {
@@ -266,6 +318,12 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  /* A flex item's automatic minimum size is its content, and this one's
+     content cannot shrink (nowrap) — so at a large default font the
+     brand refused to give ground and the burger beside it absorbed the
+     whole shortfall instead. This lets the brand yield; the wrap that
+     then happens is granted below the breakpoint.  → DECISIONS.md §AJ.1 */
+  min-width: 0;
 }
 
 .brand-text {
@@ -334,6 +392,13 @@ body {
   z-index: 1;
   width: 26px;
   height: 24px;
+  /* The 26px above is a flex-basis, not a floor: with the default
+     flex-shrink:1 the bar handed this button the entire shortfall
+     whenever the brand outgrew the row, and 26px measured 0 from a 24px
+     default font upward — a target that cannot be tapped, on the one
+     device where tapping is the only input. Never shrink.
+       → DECISIONS.md §AJ.1 */
+  flex: 0 0 auto;
   background: none;
   border: none;
   padding: 0;
@@ -406,6 +471,17 @@ body {
     padding: 12px 0;
   }
 
+  /* Below the breakpoint the row is brand + burger and nothing else, so
+     the brand is free to take a second line rather than push the burger
+     off the right edge. Above it the bar has room and the wordmark stays
+     on one line, which is why this is scoped and not global. Both
+     selectors are needed: nowrap is set on .brand, and .brand-text is
+     the element that actually holds the words.  → DECISIONS.md §AJ.1 */
+  .brand,
+  .brand-text {
+    white-space: normal;
+  }
+
   .menu-toggle {
     display: block;
   }
@@ -421,6 +497,15 @@ body {
     right: 0;
     flex-direction: column;
     align-items: center;
+    /* The desktop rule above sets justify-content:flex-end to push the
+       links to the right end of the bar. Here the axis is vertical and
+       the box is capped, so flex-end pushed the overflow off the TOP:
+       above a 24px default font the list outgrew its cap and "Un
+       ricordo" was drawn behind the bar and clipped away by the
+       overflow:hidden below. Start, so anything that does not fit falls
+       off the bottom where the reader can at least see it go.
+         → DECISIONS.md §AJ.3 */
+    justify-content: flex-start;
     gap: 4px;
     padding: 0 24px;
     background: rgba(220, 220, 220, 0.9);
@@ -439,7 +524,13 @@ body {
   }
 
   .nav-links.open {
-    max-height: 400px;
+    /* 25rem is 400px at a 16px default — the value this always had —
+       but in rem, so the cap grows with the six labels it has to
+       clear instead of staying put while they get taller. It is a
+       transition end point, not a layout size: the list is shorter
+       than this at every font size, and only max-height can be
+       animated from 0.  → DECISIONS.md §AJ.3 */
+    max-height: 25rem;
     opacity: 1;
     padding: 22px 24px 26px;
     pointer-events: auto;
@@ -1421,8 +1512,18 @@ footer .cc-logo {
    Fonte's own typeface — this content is citation, not prose.  →
    DECISIONS.md §48 */
 .text-window {
-  height: 130px;
+  /* 8.125rem is 130px at a 16px default, so nothing moves there — but
+     the box now grows with what it holds. At 130px flat, a reader on a
+     200% default font got a window whose content had trebled inside a
+     frame that had not moved: not one patent line fitted between its
+     edges. The "⤢ Lista" badge was still a way out, which is the only
+     reason this was not a 1.4.4 failure outright.  → DECISIONS.md §48, §AK.2 */
+  height: 8.125rem;
   overflow-y: auto;
+  /* 500-odd px of list inside 130 on a phone: without this, the flick
+     that reaches the end of the list keeps going into the page scroll
+     and carries the reader past the whole card.  → DECISIONS.md §AK.2 */
+  overscroll-behavior: contain;
   margin: 10px 0;
   padding: 10px 12px;
   border-radius: 10px;
@@ -1771,11 +1872,22 @@ footer .cc-logo {
    loading gear, §AB) and comes later in the DOM: without this it paints
    over these three, and on a portrait phone the photo is wide enough to
    swallow prev/next entirely.  → DECISIONS.md §AD */
+/* 26px wide, like .menu-toggle (§S) and .doc-viewer-close before it — the
+   third control of that family and the only one that had been left to
+   shrink-to-fit. The multiplication sign measures 19.9px, under SC 2.5.8's
+   24px floor; it survived only on the spacing exception, prev/next being
+   far away. This is the close button of a modal on a phone.
+   The glyph is untouched: min-width grows the BOX, and right drops from 26
+   to 23 to absorb the 3px the wider box would otherwise have shifted the
+   sign by. Box centre before, 19.9 wide at right:26, is viewport-35.95;
+   after, 26 wide at right:23, viewport-36. The extra target is 6px of
+   empty button, all of it on the inboard side.  → DECISIONS.md §AK.5 */
 .lightbox-close {
   position: absolute;
   z-index: 1;
   top: 22px;
-  right: 26px;
+  right: 23px;
+  min-width: 26px;
   background: none;
   border: none;
   color: #fff;
@@ -1954,11 +2066,17 @@ footer .cc-logo {
 
 .doc-viewer-scroll img {
   display: block;
-  /* Caps a document at the viewport width, with nowhere for extra width
-     to go but off both edges. --doc-width can still ask for less, never
-     more.  → DECISIONS.md §62 */
+  /* Caps a document at the width of the box that holds it. --doc-width
+     can still ask for less, never more.
+     Percent, not vw — the same distinction §AD settled for the lightbox
+     and this rule then got wrong 200 lines later. vw counts the
+     scrollbar the dialog reserves with scrollbar-gutter, so 100vw is
+     15px wider than the scrollport it sits in, and the diploma scan
+     (1600px native) landed at 1280 inside a 1265 box: a horizontal
+     scrollbar on a document that would otherwise have fitted exactly.
+       → DECISIONS.md §62, §AD, §AK.3 */
   width: var(--doc-width, auto);
-  max-width: 100vw;
+  max-width: 100%;
   height: auto;
   margin: auto; /* centers a document narrower than the cap in both axes; one AT the cap just fills it edge to edge */
   /* fades in once loaded (see initDocViewer()'s open()) instead of

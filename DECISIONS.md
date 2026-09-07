@@ -77,6 +77,8 @@ split and are each about a decision rather than a rule.
 | §AG | The two French entries replaced by their German family members |
 | §AH | `html { scroll-padding }`, and the focus ring behind a fixed bar |
 | §AI | Four notes the stylesheet was carrying with nowhere to put them |
+| §AJ | The bar at a large default font size |
+| §AK | Five fixes from the same pass |
 
 ---
 
@@ -3677,3 +3679,237 @@ them the alpha is harmless by then — nothing but Canvas is behind them once
 the watermarks are dropped — because a translucency whose whole purpose is
 letting a page show through has nothing left to show, and leaving it in would
 invite the next reader to wonder whether it was doing something.
+
+---
+
+## §AJ — The bar at a large default font size
+
+Every threshold on this site is in `em` or `rem` precisely so that a reader
+who enlarges their default text moves the whole ladder with it (§2, §B, §AA).
+That machinery worked. What had never been checked was the layout on the far
+side of the thresholds it moves.
+
+Measured with CDP `Page.setFontSizes`, which shifts the `em` media queries
+too — a reader raising their browser's default font, not `html { font-size }`
+injected after the fact.
+
+### §AJ.1 — The burger was flex-shrunk out of existence
+
+At a 390px viewport, `/home.html`, width and left edge of `.menu-toggle`:
+
+| default | brand | burger | outcome |
+| --- | --- | --- | --- |
+| 16px | 225px | w=26, l=344 | fine |
+| 20px | 280px | w=26, l=344 | fine |
+| 22px | 307px | **w=15.4**, l=355 | under the 24px target floor |
+| 24px | 333px | **w=0**, l=381 | outside the viewport |
+| 28px | 384px | **w=0**, l=432 | outside the viewport |
+| 32px | 441px | **w=0**, l=489 | outside the viewport |
+
+`.brand { white-space: nowrap }` inside `.nav-inner { flex-wrap: nowrap }`:
+the brand can neither shrink nor wrap, so it consumed the row and the button
+beside it absorbed the entire shortfall. `width: 26px` on a flex item is a
+*basis*, not a floor, and with the default `flex-shrink: 1` it went to zero.
+`.site-nav { overflow: visible }` then let the button draw past the right
+edge, and `body { overflow-x: hidden }` stopped anyone scrolling to it.
+
+**What is and is not lost.** From a 24px default the button cannot be tapped.
+It can still be reached: Tab lands on it at the second stop at every size
+tested, and Enter opens the menu with all six links on screen. So this is not
+"no way to reach the navigation" — it is *no way by touch*, on the one class
+of device where touch is the only input a reader has. That is the whole
+severity and it is enough.
+
+Three declarations, and only the third is scoped:
+
+- `.menu-toggle { flex: 0 0 auto }` — never shrink.
+- `.brand { min-width: 0 }` — a flex item's automatic minimum size is its
+  content, and nowrap content cannot shrink; this lets the brand yield
+  instead.
+- `@media (max-width: 67.5em) { .brand, .brand-text { white-space: normal } }`
+  — with the burger unshrinkable and the brand able to yield, something has
+  to give: below the breakpoint the row is brand plus burger and nothing
+  else, so the wordmark takes a second line. Above it the bar has room and
+  stays on one. Both selectors are needed: `nowrap` is on `.brand`,
+  `.brand-text` holds the words.
+
+Result: burger 26×24, l=344, tappable at 16, 20, 22, 24, 28 and 32px, on
+390, 768 and 1280. No link clipped at any size. Geometry at a 16px default
+compared box by box — nav, brand, links, burger, pill, main, footer, across
+3 widths × 4 pages × menu open and closed, 168 boxes: **zero differences**.
+
+### §AJ.2 — Once the brand wraps, a rem reserve stops tracking the bar
+
+`body { padding-top }` was `4.125rem`, in rem so that it grew with the bar's
+own type (§7). That holds exactly as long as the bar is one line tall. The
+moment §AJ.1 lets the brand wrap, the bar gains a whole line of type and the
+reserve gains nothing, and the top of `main` slides underneath it — 20px at
+a 22px default, and still 17px at 32px. Fixing the tap target had traded one
+defect for a smaller one.
+
+There is no CSS test for "did this text wrap", so the height has to be
+measured. `initNavHeight()` publishes `.site-nav`'s `offsetHeight` as
+`--nav-h` from a `ResizeObserver`, and the reserve becomes:
+
+```css
+padding-top: max(4.125rem, var(--nav-h, 4.125rem));
+```
+
+`ResizeObserver` and not a `resize` listener, because a change of default
+font size fires no resize event and is half of what triggers the wrap. No
+loop: `--nav-h` moves `body`'s padding, which cannot change the height of a
+fixed bar.
+
+**No gap is added on top of the measurement**, and the first attempt here was
+wrong for adding one. `calc(var(--nav-h) + 0.5rem)` looked harmless — the
+mobile bar measures 57.6 against a 66px reserve, so 8px of clearance seemed
+to be the design. The desktop bar measures **65.6 against the same 66**: the
+clearance the design actually has is 0.4px, and the nominal 8 moved `main`
+down on every desktop page at a default font. Caught by the box-by-box
+comparison above, which went from 0 differences to 1. The number that was
+already right is the bar's own height.
+
+Without JavaScript the property is never set and `max()` falls back to the
+`4.125rem` this always was: correct for every one-line bar, which is every
+bar at a default font size, and short by about a line in the
+no-JS-**and**-large-font corner. Verified with `animations.js` served as 404:
+`.no-js` reapplied, nothing at `opacity: 0`, burger 26px and tappable at both
+16 and 32px. Nothing is hidden there, only tucked.
+
+### §AJ.3 — The dropdown clipped its first item off the top
+
+Independent of the two above, and present before them.
+
+The desktop rule sets `.nav-links { justify-content: flex-end }` to push the
+links to the right end of the bar. Below the breakpoint the same element
+becomes `flex-direction: column` with `max-height: 400px` and
+`overflow: hidden` — and `flex-end` was never reset. So when the list
+outgrew its cap, the overflow was pushed off the **top**: at a 32px default,
+"Un ricordo" was drawn above the box edge, behind the bar, and clipped away.
+Five items in a six-item menu, with nothing to indicate the sixth existed. It
+happened at 390, 768 and 1280 alike — this is a font-size bug, not a width
+one.
+
+`justify-content: flex-start`, so anything that does not fit falls off the
+bottom where the reader can see it go. And `max-height: 25rem` in place of
+`400px` — the same 400 at a 16px default, but growing with the labels it has
+to clear instead of standing still while they get taller. It is a transition
+end point, not a layout size; the list is shorter than it at every size
+tested, and `max-height` is the only property here that can be animated
+from 0.
+
+These two boxes were the last fixed-pixel sizes on the site holding text. A
+sweep of the whole stylesheet found **no `font-size` in px at all**, and only
+`.text-window`'s height (§AK.2) and this cap; everything else in px is a
+photo stage or an icon.
+
+---
+
+## §AK — Five fixes from the same pass
+
+### §AK.1 — Seven focus stops behind the auto-hidden bar
+
+§AH stopped a focused link being drawn *behind* the fixed bar. This is the
+same failure in the other direction, reintroduced by the bar's own
+hide-on-scroll, and it takes a specific route to reach: scroll down so the
+nav hides itself, click a paragraph — focus falls back to `<body>` — then
+press Tab.
+
+The next seven stops are the brand, the five nav links and the language
+pill. Measured at top −50, −46 ×5 and −91, the last also at `opacity: 0`:
+seven consecutive focus rings drawn above the top edge of the window.
+Nothing rescues them. A `position: fixed` element is never scrolled into
+view, `.nav-hidden` is a transform rather than a scroll offset, and `body`'s
+`overflow-x: hidden` blocks reaching it by hand. Shift+Tab from the content
+does not show it — that path scrolls upward and brings the bar back on its
+own — which is why it survived.
+
+Two rules, no JavaScript:
+
+```css
+.site-nav.nav-hidden:focus-within { transform: none; }
+.site-nav:focus-within .lang-link-desktop.nav-hidden {
+  transform: translateY(-50%); opacity: 1;
+}
+```
+
+The transform is already transitioned, so the bar slides down exactly as it
+does on a scroll up. The second rule is needed because the pill is
+`position: fixed` in its own right (§AE) and carries its own `.nav-hidden`
+with an `opacity: 0` the first rule cannot reach; `translateY(-50%)` is its
+resting transform, not a new value. Seven invisible stops before, **zero
+after**, on `home.html`, `discorso.html` and `en/home.html`.
+
+### §AK.2 — `.text-window` was the one text box measured in pixels
+
+`height: 130px`, chosen for a seven-item list (§48). The box does not move
+when the reader's type does, and the content inside it triples:
+
+| default | box | content | patent lines fully visible |
+| --- | --- | --- | --- |
+| 100% | 130px | 509px | 2 of 8 |
+| 150% | 130px | 963px | 1 of 8 |
+| 200% | 130px | 1731px | **0 of 8** |
+
+At 200% not one line fits between the box's edges: every row is cut top and
+bottom. Not a 1.4.4 failure outright, because the "⤢ Lista" badge is still a
+way out — but it is exactly what §B exists to prevent.
+
+`height: 8.125rem` is 130px at a 16px default, so nothing moves there, and
+260px at 200% with a line fitting whole. Added `overscroll-behavior: contain`
+in the same rule: with 509px of list inside 130 on a phone, the flick that
+reached the end of the list carried on into the page scroll and took the
+reader past the entire card.
+
+### §AK.3 — `100vw` counted the scrollbar again
+
+`.doc-viewer-scroll img { max-width: 100vw }`. §AD settled this exact
+distinction for the lightbox — *percent, not vw; vw counts the scrollbar* —
+and this rule, 200 lines further on, was decided the other way.
+
+Not a latent trap. `.doc-viewer-scroll` reserves 15px with
+`scrollbar-gutter: stable`, so at a 1280 window the box is 1265 and the cap
+is 1280. The diploma scan (`diploma-cfm-full.webp`, 1600px native) landed at
+exactly 1280 inside it: `scrollWidth` 1280, `clientWidth` 1265, a horizontal
+scrollbar on a document that would otherwise have fitted edge to edge.
+`max-width: 100%` — 1265 after, no horizontal overflow. The landscape
+`.doc-fit-height` branch sets `max-width: none` and is untouched: panning a
+document wider than the screen is what that mode is for.
+
+### §AK.4 — A tap highlight was turned off and nothing put back
+
+`* { -webkit-tap-highlight-color: transparent }` (§3) suppresses the
+highlight mobile browsers draw over a tapped link. Turning it off is a look
+decision; leaving nothing behind it is a feedback bug. There was not one
+`:active` state anywhere in the file — grep returned zero — so on a phone a
+tap on a link, a badge or a photograph produced no acknowledgement at all
+until the next page painted. On a slow connection that is a long silence to
+fill, and a second tap is the natural thing to do with it.
+
+```css
+@media (hover: none) {
+  a:active, button:active { opacity: 0.55; transition: none; }
+}
+```
+
+Scoped to `(hover: none)` because a pointer already has `:hover` for this,
+and every `:hover` on this site is scoped away from touch for the same
+reason. Verified inert under a mouse and firing under touch emulation:
+1 → 0.55 on press, 1 on release. `opacity` because it is the one property
+that reads on both of the things being tapped here, text and photographs.
+`transition: none` because tap feedback that fades is a fade, not feedback.
+
+### §AK.5 — `.lightbox-close` was left to shrink-to-fit
+
+`.menu-toggle` is 26×24 and §S explains why. `.doc-viewer-close` is 26×30.
+`.lightbox-close` was **19.86×34** at 1280×900, 390×844 and 844×390 alike:
+the multiplication sign's own advance width, under SC 2.5.8's 24px floor,
+surviving only on the spacing exception because prev/next sit far away. It
+is the close button of a modal on a phone.
+
+The glyph is not touched. `min-width: 26px` grows the box, and `right` drops
+from 26 to 23 to absorb the 3px the wider box would otherwise have shifted
+the sign by: centre before, 19.86 wide at `right: 26`, is viewport−35.93;
+after, 26 wide at `right: 23`, viewport−36. Measured 50.93 → 51 from the
+right edge at 1280 and 35.93 → 36 at 390, with `font-size` unchanged at
+34px. The 6px gained is empty button, all of it on the inboard side.
