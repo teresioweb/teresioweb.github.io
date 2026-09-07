@@ -32,6 +32,7 @@
 <meta name="twitter:title" content="Teresio Gassino | Progettista meccanico Olivetti">
 <meta name="twitter:description" content="Teresio Gassino progettista meccanico di macchine da calcolo Olivetti, geniale alter ego di Capellaro">
 <meta name="twitter:image" content="https://teresioweb.github.io/images/card-tecnigrafo.webp">
+<meta name="twitter:image:alt" content="Teresio Gassino al tecnigrafo, Olivetti">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -42,20 +43,23 @@
       "name": "Teresio Gassino",
       "birthDate": "1924-11-17",
       "birthPlace": {
-        "@type": "Place",
-        "name": "Arè di Caluso, Italia"
+        "@id": "https://teresioweb.github.io/#are"
       },
       "deathDate": "1998",
       "deathPlace": {
-        "@type": "Place",
-        "name": "San Gimignano, Italia"
+        "@id": "https://teresioweb.github.io/#sangimignano"
       },
-      "jobTitle": "Progettista meccanico",
+      "jobTitle": {
+        "@language": "it",
+        "@value": "Progettista meccanico"
+      },
       "worksFor": {
-        "@type": "Organization",
-        "name": "Olivetti"
+        "@id": "https://teresioweb.github.io/#olivetti"
       },
-      "knowsAbout": "Progettazione meccanica",
+      "knowsAbout": {
+        "@language": "it",
+        "@value": "Progettazione meccanica"
+      },
       "sameAs": [
         "https://it.wikipedia.org/wiki/Teresio_Gassino",
         "https://www.wikidata.org/wiki/Q103831208"
@@ -70,6 +74,27 @@
       "about": {
         "@id": "https://teresioweb.github.io/#teresio"
       }
+    },
+    {
+      "@type": "Place",
+      "@id": "https://teresioweb.github.io/#are",
+      "name": {
+        "@language": "it",
+        "@value": "Arè di Caluso, Italia"
+      }
+    },
+    {
+      "@type": "Place",
+      "@id": "https://teresioweb.github.io/#sangimignano",
+      "name": {
+        "@language": "it",
+        "@value": "San Gimignano, Italia"
+      }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://teresioweb.github.io/#olivetti",
+      "name": "Olivetti"
     }
   ]
 }
@@ -78,7 +103,6 @@
 <body class="page-index">
 <a href="#main" class="skip-link">Vai al contenuto</a>
 <header class="site-nav">
-  <a href="/en/" class="lang-link-desktop" hreflang="en" lang="en" aria-label="English version">EN</a>
   <div class="nav-inner">
     <a href="./" class="brand active" aria-current="page"><span class="brand-text">Teresio Gassino</span> <img src="sfondi/firma.svg" alt="" class="brand-signature"></a>
     <button type="button" class="menu-toggle" aria-controls="nav-links" aria-label="Apri il menu" aria-expanded="false" data-label-open="Apri il menu" data-label-close="Chiudi il menu">
@@ -93,6 +117,7 @@
     <a href="/en/" class="lang-link" hreflang="en" lang="en" aria-label="English version"><img src="/sfondi/flag-gb.svg" alt="" class="lang-flag-icon"><span>EN</span></a>
   </nav>
   </div>
+  <a href="/en/" class="lang-link-desktop" hreflang="en" lang="en" aria-label="English version">EN</a>
 </header>
 
 <main id="main" tabindex="-1">

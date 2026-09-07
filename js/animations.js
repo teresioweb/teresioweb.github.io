@@ -503,12 +503,20 @@ function initClumpPhotos() {
 // prev/next, no carousel index, because every .doc-viewer-trigger on
 // a page is its own standalone document, never a sequence.
 //
-// Triggers stay real <a href="…"> elements pointing at the raw image
-// file, not <button>s like the photo lightbox uses — click is
-// intercepted with preventDefault() when JS runs, but without JS the
-// link still works exactly as it did before this feature existed
-// (opens the full-resolution file in a new tab). Progressive
-// enhancement, not a replacement.
+// Most triggers are real <a href="…"> elements pointing at the raw
+// image file — click is intercepted with preventDefault() when JS
+// runs, but without JS the link still works exactly as it did before
+// this feature existed (opens the full-resolution file in a new tab).
+// Progressive enhancement, not a replacement.
+//
+// Two on Curriculum are NOT anchors, and this comment claimed for a
+// while that none were. The patent card's drawing and the "Espandi la
+// lista" control are <button>s, because what they open is the complete
+// list in this same dialog and there is no raw file behind them to
+// degrade to. That difference is not free: §T records how swapping the
+// card's <a> for a <button> silently dropped four declarations that
+// `.side-row > a` had been supplying, and §O records the Tab stop the
+// button leaves behind on the no-JS path.
 //
 // The transcript toggle only appears when a trigger actually has a
 // data-text-target pointing at a <template> on the page (see

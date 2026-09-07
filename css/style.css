@@ -92,59 +92,25 @@ html {
   scrollbar-gutter: stable;
 }
 
-/* Keeps a focused link out from under the two fixed bars.  → DECISIONS.md §AH
-
-   Chromium only scrolls a newly focused element into view if it is outside
-   the scrollport, and it decides that on the layout box alone: the nav and
-   the footer float over the page, so a link that sits under either one
-   still counts as "in view" and no scroll happens. Tab lands on it, the
-   ring is drawn behind a bar, and the reader loses their place. Measured
-   before this rule: 7 links entirely covered — "Logos 27" and "Virgolettati
-   qui e oltre" under the footer on Home, "Natale Capellaro" and "prodigio"
-   under the nav on Shift+Tab, and "ricordi" plus footnotes 1 and 2 under
-   the footer on Discorso. WCAG 2.2 SC 2.4.11 (AA) is failed by "entirely
-   hidden", so those seven are failures and a partly covered one is not.
-
-   scroll-padding and NOT scroll-margin on :focus-visible: scroll-margin
-   only changes where a scroll lands, and the bug is that no scroll is
-   started at all. scroll-padding shrinks the scrollport itself, so it
-   feeds the "is it already in view" test too — the whole point. Measured
-   with the same sweep: scroll-margin took Discorso from 4 to 1, this takes
-   every page to 0, in both tab directions.
-
-   rem and not px, like the type scale (§B): the bars grow with the
-   reader's font size — nav 66→73px and footer 41→104px between a 16px and
-   a 24px default, the footer's credit line wrapping to two lines — so a px
-   value would stop clearing them exactly where clearing them matters most.
-   5.5rem is 88px against a 66px nav; 5rem is 80px against a 41px footer,
-   and 120px against that 104px one.
-
-   Both scroll-margin-top values on the site are 12px rather than 100px
-   because of this rule: 100 - 88 = 12 keeps every anchor jump landing on
-   the same pixel it did before. Change the padding, change both. */
+/* Keeps a focused link out from under the two fixed bars. scroll-padding
+   and not scroll-margin on :focus-visible: the bug is that no scroll is
+   started at all, and only scroll-padding shrinks the scrollport itself,
+   which is what the "already in view" test reads. 7 covered links before,
+   0 after. Both scroll-margin-top values on the site are 12px because this
+   padding already contributes 88 of their old 100; the two add. Change
+   this, change both.  → DECISIONS.md §AH */
 html {
   scroll-padding-top: 5.5rem;
   scroll-padding-bottom: 5rem;
 }
 
-/* Smooth in-page jumps (footnote <-> ornament round-trip on home.html,
-   highlighted word -> ritaglio on discorso.html). Gated behind a class,
-   instead of sitting on html from the start: with scroll-behavior:smooth
-   in force, a scroll restore is performed as an ANIMATED scroll, which
-   mobile engines routinely cancel partway — the page settles at the top
-   and you lose your place.
-
-   The gate used to be "one frame after 'load'", added by the inline
-   <head> script. It is now owned by initScrollMemory() in animations.js,
-   which adds the class only once a restore window has closed and takes
-   it back off at the start of every later one — including the two the
-   'load' gate could never see, a bfcache resume (no parse, no 'load',
-   the class comes back already on) and a same-document Back. The inline
-   script keeps a copy of the old behaviour purely as a failsafe, for
-   when animations.js never runs at all.
-
-   The prefers-reduced-motion block below still overrides it with
-   !important.  → DECISIONS.md §G, §H */
+/* Smooth in-page jumps (footnote round-trip on home.html, highlighted
+   word -> ritaglio on discorso.html). Gated behind a class rather than
+   sitting on html from the start, because a scroll restore performed
+   while smooth is in force is an ANIMATED scroll and mobile engines
+   cancel it partway. initScrollMemory() owns the gate; the inline <head>
+   script keeps the old one as a failsafe. The prefers-reduced-motion
+   block below overrides it with !important.  → DECISIONS.md §G, §H */
 html.scroll-smooth {
   scroll-behavior: smooth;
 }
@@ -166,8 +132,7 @@ button:focus-visible {
    to 20px — which this site's audience does more than most — moves every
    threshold up by a quarter, so the layout changes when their text
    actually needs the room instead of at a pixel width that means nothing
-   to them. Page zoom was already handled by px; the default-size setting
-   was not, and only the nav's 67.5em was getting it right.
+   to them.
 
    Each rung is a component's geometry, not a device:
 
@@ -185,16 +150,9 @@ button:focus-visible {
                       halves meet without a gap; change one, change both)
      67.5em  (1080px) nav collapses to the burger, language pill follows
 
-   They are close together at the bottom because three different
-   components run out of horizontal room within 80px of each other, not
-   because anyone patched the same problem three times. Merging them
-   would mean picking a width that is wrong for at least two of the
-   three.  → DECISIONS.md §J
-
-   Blocks are placed next to the rules they modify rather than gathered
-   per breakpoint. That is why "max-width: 43.75em" appears seven times:
-   locality beats tidiness here, since you change a component by reading
-   one place. */
+   Pick an existing rung before adding a seventh. Why there are six and
+   not three, and why the blocks sit next to the rules they modify rather
+   than gathered per breakpoint: → DECISIONS.md §J */
 
 /* Skip link: the first focusable thing on every page. Off-screen until
    focused, then it drops into view above the nav.  → DECISIONS.md §4 */
@@ -364,20 +322,12 @@ body {
   border-bottom-color: #111;
 }
 
-/* 26x24: a 26x20 GLYPH inside a 24px-tall target box. WCAG 2.2 SC 2.5.8
-   wants 24 CSS px on both axes and measures the target, not the drawing,
-   so 2px of clearance above and below the bars satisfies it without
-   touching what the eye sees.
-     The first attempt scaled the drawing itself to 31x24 and it read as
-   misaligned beside the wordmark. The reason is in the ink, not in the
-   centring — both were centred at 28.83 the whole time. At 26x20 the top
-   rule lands at y=19.0, which is exactly the cap height of "Teresio
-   Gassino"; that shared top edge was doing the alignment work. Grown to
-   24px the drawing starts at 17.0, two pixels above the cap line, and
-   ends 7.7px below the baseline — so the burger straddled the wordmark
-   instead of sitting on the same line as it.
-     Keep the glyph at 26x20. If you ever resize it, keep the top rule on
-   the cap height of the brand text.  → DECISIONS.md §S */
+/* 26x24: a 26x20 GLYPH inside a 24px-tall target box. SC 2.5.8 measures
+   the target, not the drawing, so 2px of clearance above and below the
+   bars satisfies it without changing anything visible. Keep the glyph at
+   26x20 — its top rule lands on the cap height of "Teresio Gassino", and
+   that shared edge, not a shared centre, is what makes the nav read as
+   aligned.  → DECISIONS.md §S */
 .menu-toggle {
   display: none;
   position: relative;
@@ -400,19 +350,12 @@ body {
   transition: top 0.3s ease, transform 0.3s ease, opacity 0.2s ease;
 }
 
-/* Direction-specific easing, and it is not decoration. With one shared
-   `ease` on both properties the bars converged as fast as they rotated:
-   measured frame by frame, at ~90ms into the open the three rules sat
-   within 3.8px of each other while still only 26 degrees off horizontal,
-   which reads as one thick blurred bar rather than an X forming — the
-   "hesitation" that looks like the page is still loading.
-     Opening: rotation leads (fast-out curve, ~39 degrees by 90ms) and
-   convergence lags (slow-in curve, bars still ~16px apart at that point),
-   so the two rules are unmistakably separate while they cross.
-     Closing wants the mirror image, or it produces the same artefact on
-   the way back: the bars separate first, the rotation unwinds after.
-   Hence two declarations — the base rule times the return to closed, the
-   .open rule times the trip to open. */
+/* Direction-specific easing, and it is not decoration: with one shared
+   `ease` the bars converged as fast as they rotated and read as a single
+   blurred bar mid-animation. Opening, rotation leads and convergence
+   lags; closing wants the mirror, hence two declarations — the base rule
+   times the return, the .open rule times the trip out.
+     → DECISIONS.md §V */
 .menu-toggle span {
   transition: top 0.3s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.3s cubic-bezier(0.7, 0, 0.84, 0),
@@ -627,12 +570,10 @@ p {
      DECISIONS.md §20 */
   --link: #699EC6;
 
-  /* The page is dark by design, but nothing told the browser that, so
-     every UA-rendered surface stayed light: the page scrollbar and the
-     three scrollable dark panels (.text-window, .doc-viewer-scroll,
-     .doc-viewer-text) drew a white bar against #101010 on Windows.
-     One declaration covers all four, plus any future form control.
-     The @media print block re-declares this as `light`.
+  /* The page is dark by design, but nothing told the browser so, and every
+     UA-rendered surface stayed light — the page scrollbar and the three
+     scrollable dark panels drew a white bar against #101010. The print
+     block re-declares this as `light`, on :root and not html.
        → DECISIONS.md §L */
   color-scheme: dark;
 }
@@ -950,13 +891,10 @@ body.page-discorso {
 
 .card h2 { margin: 0 0 8px; font-size: 1.1875rem; color: #1a1a1a; }
 .card p { margin: 0; color: #333; font-style: italic; font-size: 0.9375rem; }
-/* The cards are set in italic because three of the four QUOTE; .plain marks
-   the parts that describe instead, and it is the only mechanism for that
-   distinction. Card 4 used to get the same effect from
-   `.card:nth-child(4) p`, which said "the fourth one" where it meant "this
-   one is not a quotation" — reorder or insert a card and the roman lands
-   silently on the wrong one. Card 4's text now carries .plain like the
-   tail of card 1 does, and the positional rule is gone. */
+/* Three of the four cards QUOTE; .plain marks the parts that describe
+   instead, and it is the only mechanism for that distinction. It replaces
+   a `.card:nth-child(4) p` rule that said "the fourth one" where it meant
+   "this one is not a quotation".  → DECISIONS.md §AI.1 */
 .card p .plain { font-style: normal; }
 
 @media (max-width: 35em) {
@@ -1091,13 +1029,10 @@ body.page-galleria main {
   right: 10px;
   padding: 5px 12px;
   border-radius: 16px;
-  /* 0.65, up from 0.55. The badge sits on the blank paper margin of a
-     scan, so the worst case is white underneath: at 0.55 the composited
-     pill measured rgb(115,115,115), which is 4.74:1 against #fff — a
-     pass with 0.24 of margin, on a line that is a real instruction
-     rather than decoration. 0.65 composites to rgb(89,89,89) and 7.01:1,
-     which clears AAA as well. .img-badge already sits at 0.72 (9.23:1)
-     for the same reason.  → §X */
+  /* 0.65, up from 0.55. Worst case is white paper underneath: 0.55
+     composited to 4.74:1, a pass with a quarter point of margin on a line
+     that is a real instruction. 0.65 gives 7.01:1. .img-badge sits at
+     0.72 for the same reason.  → DECISIONS.md §X */
   background: rgba(0, 0, 0, 0.65);
   color: #fff;
   font-family: 'Merriweather Sans', Arial, sans-serif;
@@ -1181,15 +1116,11 @@ body.page-galleria main {
     flex-direction: column;
     gap: 16px;
   }
-  /* relative, not static. The badge inside is position:absolute and is
-     meant to be placed against its own photo; static here removed the
-     photo as a containing block, so both badges escaped up to
-     .clump-stage and stacked on top of each other in the middle of it —
-     which is why the badge appeared to be missing entirely on every
-     narrow layout. relative undoes the base rule's absolute positioning
-     exactly as static did, since a relatively positioned box with no
-     offsets sits where it would have sat anyway, and it keeps the
-     photo as the reference the badge needs. */
+  /* relative, not static. The badge inside is absolutely positioned
+     against its own photo, and static removed the photo as a containing
+     block — both badges escaped up to .clump-stage and stacked on top of
+     each other, which is why the badge looked missing on every narrow
+     layout.  → DECISIONS.md §33 */
   .clump-photo {
     position: relative;
     width: 100%;
@@ -1445,35 +1376,19 @@ footer .cc-logo {
     scroll-padding-bottom: 0;
   }
 
-  /* The footer stops being fixed here, and that is the whole point of
-     this block now. On a landscape phone the viewport is around 390px
-     tall; a fixed nav plus a fixed footer were taking roughly a quarter
-     of it and never giving it back, on the one orientation with the
-     least height to spare. The previous answer was to shrink the footer
-     until it fit — down to 10px type — which solved the geometry by
-     making the text unreadable. Letting it scroll away with the page
-     costs nothing: it is a credit line and a licence badge, not
-     navigation, and nothing on the site depends on it being reachable
-     at all times.
-     Type back up to the portrait size (10.5px) rather than staying at
-     10px: with the height pressure gone there is no reason for two
-     different mobile footer sizes, and one fewer number to keep in
-     sync. The safe-area padding stays — a static footer at the end of
-     the document still sits over the home indicator once the page is
-     scrolled to the bottom, which is exactly the case the inset was
-     added for. */
+  /* The footer stops being fixed here, and that is the whole point of this
+     block. A fixed nav plus a fixed footer were taking a quarter of a
+     390px-tall viewport and never giving it back; the previous answer
+     shrank the type to 10px, which solved the geometry by making the text
+     unreadable. Type returns to the portrait 10.5px. The safe-area
+     padding stays.  → DECISIONS.md §D */
   footer {
     position: static;
-    /* full-bleed here, unlike everywhere else. The 760px cap and the
-       auto margins exist to keep the fixed bar aligned with main's
-       reading column while it floats over the page; once the footer is
-       back in normal flow at the end of the document there is nothing
-       to align it to, and the cap just leaves two unexplained strips of
-       page background either side of it on a viewport that is, by
-       definition of this query, wide. Edge to edge reads as the end of
-       the document, which is what it now is. border-radius goes with
-       it: a band that touches both edges has no floating corner left to
-       round. */
+    /* full-bleed here, unlike everywhere else: the 760px cap exists to align
+       a floating bar with main's reading column, and a footer back in
+       normal flow at the end of the document has nothing to align to.
+       border-radius goes with it — a band touching both edges has no
+       floating corner left to round.  → DECISIONS.md §D */
     max-width: none;
     padding: 8px 14px calc(5px + (env(safe-area-inset-bottom) * 0.8));
     font-size: 0.65625rem;
@@ -1489,14 +1404,12 @@ footer .cc-logo {
     height: 15px;
   }
 
-  /* main's bottom padding exists only to keep content clear of a FIXED
-     footer. With the footer back in flow it would be a large empty gap,
-     so it drops to an ordinary bottom margin — including the two
-     page-specific overrides, which are listed explicitly because each
-     outranks a bare `main` on specificity. 48px rather than 0: Foto's
-     background SVG renders its lines solid white when the photo grid
-     runs right up against the footer (see DECISIONS.md §30), and that
-     is a rendering quirk of proximity, not of position:fixed. */
+  /* main's bottom padding exists only to clear a FIXED footer; in flow it
+     would be a large empty gap. The two page-specific overrides are listed
+     explicitly because each outranks a bare `main`. 48px and not 0: Foto's
+     background SVG renders its lines solid white when the grid runs up
+     against the footer, which is a quirk of proximity rather than of
+     position:fixed.  → DECISIONS.md §D, §30 */
   main,
   body.page-home main,
   body.page-galleria main {
@@ -1529,27 +1442,19 @@ footer .cc-logo {
      a pastel card, so the page-level `dark` gave it a dark scrollbar on a
      light surface. It opts back out for itself.  → DECISIONS.md §L */
   color-scheme: light;
-  /* color-scheme above is what Chromium needs and is enough for it. Firefox
-     needs a second, unrelated fix: on top of color-scheme it runs its own
-     heuristic (ported from WebKit, Bugzilla #865806) that reads the box's
-     *specified* background-color and darkens the scrollbar whenever the raw
-     R+G+B sum is under 384 — ignoring alpha entirely. rgba(0,0,0,0.06) above
-     is (0,0,0) by that reading: a full black, not a 6% wash, so Firefox
-     still drew a dark scrollbar on this light box after color-scheme was
-     already correct in Chromium. scrollbar-color is a second, independent
-     lever both engines support and neither heuristic can override — Safari
-     is the one engine with neither, and stays on color-scheme alone, which
-     is already right for it.  → DECISIONS.md §X */
+  /* color-scheme above is enough for Chromium. Firefox runs a second,
+     independent heuristic that reads the box's *specified*
+     background-color and darkens the scrollbar when R+G+B < 384, ignoring
+     alpha — so rgba(0,0,0,0.06) reads as full black, not a 6% wash.
+     scrollbar-color is the one lever neither heuristic can override.
+     Safari has neither and stays on color-scheme alone.
+       → DECISIONS.md §Y */
   scrollbar-color: rgba(0, 0, 0, 0.35) transparent;
-  /* The same tint that forced #4A4A4A above also applies to the LINKS in
-     here, and that half was missed: .color-band's #205C8B is tuned
-     against the bare card colour, so inside this box it lands on
-     #EDB5B5 (pink) rather than #FCC1C1 and measures 4.01:1 — a real AA
-     failure on the 41 patent links, confirmed by axe-core. #1A4F78 is
-     the same hue two steps darker: 4.88 on tinted pink, 5.43 tinted
-     blue, 5.92 tinted peach, 6.27 tinted yellow. The blue card would
-     have failed too (4.46) the day a .text-window landed on it.
-       → DECISIONS.md §L */
+  /* The tint that forced #4A4A4A above applies to the LINKS in here too,
+     and that half was missed: .color-band's #205C8B is tuned against the
+     bare card colour and measures 4.01:1 inside this box — a real AA
+     failure on all 41 patent links. #1A4F78 clears AA on all four card
+     colours (4.88 pink to 6.27 yellow).  → DECISIONS.md §L */
   --link: #1A4F78;
 }
 
@@ -1739,14 +1644,11 @@ footer .cc-logo {
   inset: 0;
   align-items: center;
   justify-content: center;
-  /* The gutter is what gives way, not the photo. 90vw of content inside a
-     40px gutter overflowed a 390px screen by 21px; capping the content
-     instead shrank the photo, which is the wrong thing to spend. 5vw makes
-     90vw + two gutters exactly 100vw at every width. --lb-chrome is the
-     counter and caption stacked under the photo (65px measured for one
-     line): the photo leaves room for it, and prev/next shift up by half of
-     it so they sit on the photo's middle instead of the column's.
-     → DECISIONS.md §AD */
+  /* The gutter is what gives way, not the photo: capping the content
+     instead shrank the picture, which is the wrong thing to spend.
+     Percent and not vw — vw counts the scrollbar. --lb-chrome is the
+     counter and caption stacked under the photo, and does three jobs from
+     one number.  → DECISIONS.md §AD */
   --lb-pad-y: 16px;
   /* % and not vw: vw counts the scrollbar the padding box does not have,
      which left 7px hanging off a 1024px window. Capped at the original 40px
@@ -1787,12 +1689,11 @@ footer .cc-logo {
   position: relative; /* the positioning context .lightbox-loading::after centres against */
 }
 
-/* Same gear, same reason as .doc-viewer-loading: five of the six gallery
-   photos open a data-src file separate from the thumbnail already on the
-   page (foto-01 is 178 KB against the thumb's 78 KB), so there is a real
-   download between the tap and the picture. The min-height reserves room
-   for the gear, which would otherwise sit in a box collapsed to nothing:
-   the image is at opacity 0 and has no intrinsic size yet.  → DECISIONS.md §AB */
+/* Same gear and same reason as .doc-viewer-loading: five of the six
+   gallery photos open a data-src file separate from the thumbnail already
+   on the page, so there is a real download between the tap and the
+   picture. min-height reserves room for the gear in a box that would
+   otherwise collapse to nothing.  → DECISIONS.md §AB */
 /* The block the gear turns in before the photo arrives. Square on purpose:
    the real dimensions are unknown until 'load', and handing the image the
    thumbnail's width/height instead was tried — inside a column flex
@@ -1824,10 +1725,8 @@ footer .cc-logo {
   max-width: 100%;
   /* calc, never a percentage: a percentage max-height against
      .lightbox-content's auto height is indefinite, which voids the whole
-     declaration and leaves the photo with no cap at all — 205px of vertical
-     overflow in landscape when it was tried that way. 80vh stays the cap
-     wherever there is room for it, which is portrait and every desktop
-     size; only short landscape viewports fall back to the calc. */
+     declaration and leaves the photo uncapped — 205px of overflow when it
+     was tried that way.  → DECISIONS.md §AD */
   max-height: min(80vh, calc(100vh - 2 * var(--lb-pad-y) - var(--lb-chrome)));
   border-radius: 8px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
@@ -2281,13 +2180,10 @@ body.page-curriculum .doc-viewer-text-inner {
 }
 
 /* single light, translucent band wrapping a block of text (the "Nei
-   ritagli" quotes, or the Quercia intro paragraph)
-
-   Second of two blocks for this class, deliberately: the --link override
-   stays up in the link-colour cluster next to :root and .color-band, so
-   the three contexts and their contrast ratios stay readable together.
-   Splitting costs one extra place to look; merging would cost the
-   comparison. Everything visual is here. */
+   ritagli" quotes, or the Quercia intro paragraph). Second of two blocks
+   for this class on purpose: the --link override stays up in the
+   link-colour cluster so the three contexts stay comparable side by side.
+   Everything visual is here.  → DECISIONS.md §AI.2 */
 .ritagli-band {
   background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(10px);
@@ -2303,22 +2199,11 @@ body.page-curriculum .doc-viewer-text-inner {
   color: #ddd;
 }
 
-/* Discorso's four credits are a <ul> rather than four <p> (→ §I). These
-   two rules restate what those paragraphs used to get from the base
-   `p` rule and from nothing else — the reset already zeroes ul's own
-   margin and padding, so only the marker needs suppressing, and the
-   18px is the same 18px `p { margin-bottom }` was giving them.
-   Spacing is unchanged in both directions: between items it is still
-   18px, and below the last one the li's 18px collapses through the
-   ul's bottom edge (no padding, no border, auto height) and then with
-   the note's 22px margin-top, landing on the same 22px the adjacent
-   paragraphs used to collapse to. Confirmed against the previous
-   markup in a browser at 1280 and 390: every item's top, left and
-   height identical to the hundredth of a pixel, band height
-   identical, gaps 18/18/18 and 22 to the note, and the four .hl
-   highlight boxes unchanged in width — the .visually-hidden spans
-   added inside two of those links are out of flow and do not widen
-   them. */
+/* Discorso's four credits are a <ul> rather than four <p>. These two
+   rules restate what those paragraphs used to get from the base `p` rule:
+   the reset already zeroes ul's margin and padding, so only the marker
+   needs suppressing, and 18px is the same 18px they had. Spacing verified
+   unchanged in both directions.  → DECISIONS.md §I */
 .ritagli-band ul {
   list-style: none;
 }
@@ -2332,17 +2217,12 @@ body.page-curriculum .doc-viewer-text-inner {
   margin-bottom: 0;
 }
 
-/* Rights note closing the credits band on discorso.html. Deliberately a
-   step quieter than the credits above it — smaller, dimmer, behind a
-   hairline — because it is a different register: those paragraphs say
-   where each document came from, this one says who owns it. Reading the
-   two in the same voice would make the note look like a fifth source.
-
-   #c8c8c8 rather than something dimmer: the band is 25% white over
-   #101010, so text sits on an effective #4c4c4c, and this is 5.13:1 —
-   past 4.5:1 with room, which matters more here than usual because the
-   type is 0.9375rem and nothing about a rights note earns an exception.
-   #bbb measures 4.47:1 and would fail.  → DECISIONS.md §I */
+/* Rights note closing the credits band on discorso.html. A step quieter
+   than the credits above it, because "who owns this" is a different
+   register from "where this came from" and reading the two in one voice
+   would file the note as a fifth source. #c8c8c8 measures 5.13:1 on the
+   band's effective #4c4c4c; #bbb would fail at 4.47.
+     → DECISIONS.md §I */
 .ritagli-band p.ritagli-nota {
   margin-top: 22px;
   padding-top: 18px;
@@ -2414,15 +2294,11 @@ body.page-discorso .ritagli-band li::before {
   }
 }
 
-/* badge on linked images (Logos / Curriculum) indicating what the
-   link opens: PDF, video, an external page, or a larger image.
-   `button` is in all three of these selectors because the patent card's
-   trigger is a <button> rather than an <a> (§O) and needs the identical
-   treatment — most of all `overflow: hidden`, which is what makes an
-   entering image slide up from behind the card's own frame edge instead
-   of gliding across the pastel on top of it. Leaving the button out was
-   exactly the difference a reader spotted between that card and the other
-   three, and the hover overlay was missing from it too.
+/* badge on linked images (Logos / Curriculum) indicating what the link
+   opens: PDF, video, an external page, or a larger image. `button` is in
+   all three selectors because the patent card's trigger is a <button>
+   rather than an <a> and needs the identical treatment — above all
+   `overflow: hidden`, the frame an entering image slides out from behind.
      → DECISIONS.md §T */
 .side-row > a,
 .side-row > button {
@@ -2800,22 +2676,14 @@ body.page-discorso .ritagli-band li::before {
 }
 
 /* Fallback for browsers with no backdrop-filter in either form. Every
-   translucent surface on the site leans on the blur to stay legible: what
-   sits behind it isn't a flat colour but the page itself scrolling under
-   the bar, and a decorative watermark SVG under the bands. Without the
-   blur that content reads through sharply and competes with the text on
-   top — the nav's black labels over whatever paragraph happens to be
-   passing beneath them, the band's light text over the watermark's lines.
-   The condition tests both spellings, because Safari before 18 supports
-   only the -webkit- one and doesn't need this at all.
-   Values are chosen to land on roughly the apparent colour the blurred
-   surface already produces, so nothing shifts for anyone who does have
-   the filter: the light chrome (rgba(220,220,220,0.68) over the dark
-   page) blends to about #9B9B9B, and raising the alpha to 0.92 stays in
-   the same family while cutting the show-through. .ritagli-band gets a
-   solid colour instead of a higher alpha — it's white at 0.25 over a dark
-   page, so its blend lands near #4C4C4C, and making it *more* white would
-   wash out the light text it carries rather than protect it. */
+   translucent surface here leans on the blur to stay legible, because
+   what sits behind it is the page scrolling under the bar or a watermark
+   SVG, not a flat colour. The condition tests both spellings, so Safari
+   before 18 — which has only the -webkit- one — does not fall into it.
+   Values land on roughly the apparent colour the blurred surface already
+   produces. .ritagli-band gets a solid colour instead of a higher alpha:
+   it is white over a dark page, so more white would wash out the light
+   text it carries rather than protect it.  → DECISIONS.md §E */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .site-nav,
   footer,
@@ -2849,14 +2717,10 @@ body.page-discorso .ritagli-band li::before {
 
 
 /* --- Patent card: rotating drawing + expandable list ---------------------
-
-   The trigger is a <button>, not the <a> that used to wrap this image. It
-   no longer goes anywhere — it opens the complete list in the shared
-   document dialog — and the Rechnerlexikon link it replaced is not lost:
-   the same URL is the first link in the .fonte line directly below.
-   Button rather than a[href]+preventDefault because this one genuinely
-   has no destination, unlike .doc-viewer-trigger's other uses.
-     → DECISIONS.md §O */
+   The trigger is a <button>, not the <a> that used to wrap this image: it
+   no longer goes anywhere, it opens the complete list in the shared
+   dialog. The Rechnerlexikon URL it replaced is the first link in the
+   .fonte line directly below.  → DECISIONS.md §O */
 .patent-rotator {
   /* Only the part a <button> needs and an <a> does not: undoing the UA
      button styling. Everything structural — position, overflow, radius,
@@ -2871,24 +2735,15 @@ body.page-discorso .ritagli-band li::before {
 }
 
 /* The frames are stacked, not swapped by changing one src: a src swap
-   shows the previous drawing until the next one decodes, which on a
-   scroll-driven change reads as a stutter. Stacking costs the extra
-   elements and gains a cross-fade with nothing to wait for — the frame
-   is already decoded when its turn comes. aspect-ratio holds the box at
-   the scans' shared 800x615 so the card never reflows between them.
-     No clipping on this wrapper: the <button> above does it, exactly as
-   the <a> does on the other three cards, so an entering frame is masked
-   at the card's own frame edge rather than at the image's.
+   shows the previous drawing until the next decodes, which on a
+   scroll-driven change reads as a stutter. Stacking costs two elements
+   and gains a cross-fade with nothing to wait for.
+     No clipping on this wrapper — the <button> above does it, exactly as
+   the <a> does on the other three cards.
      4/3 and not the scans' own 800/615, because `.reveal-img.side img`
-   crops EVERY side image to 4/3 regardless of what it actually is — the
-   three neighbouring cards hold 1.41, 1.42 and even 0.73 and all render
-   281x210. 800/615 is 1.3008, slightly taller, so the wrapper stood 5.3px
-   proud of the image inside it: a sliver of pastel under the drawing,
-   visible when the hover overlay painted it, and a badge sitting 10px up
-   from the wrapper instead of 10px up from the picture. object-fit: cover
-   trims 7.5px off the top and bottom of an 800x615 scan to make 4/3 —
-   about 1.2% a side, well inside the drawings' own margins, so the
-   redrawn images with wider borders are not needed. */
+   crops EVERY side image to 4/3 regardless of what it is; 800/615 left
+   the wrapper standing 5.3px proud of the picture.
+     → DECISIONS.md §V, §AI.3 */
 .patent-rotator-frames {
   position: relative;
   display: block;
@@ -2905,20 +2760,14 @@ body.page-discorso .ritagli-band li::before {
 }
 
 /* The frames are three <img> inside a .reveal-img, so the entrance rules
-   own them: `.js .reveal-img.visible img { opacity: 1 }` is (0,3,1) and
-   was flooding all three to fully opaque, stacking the drawings on top of
-   each other. Matching that with a plain `.patent-frame` (0,1,0) is not
-   close; this selector is (0,4,0) and clears it. Only which frame is
-   opaque is taken back — the translateX slide still applies to all three,
+   own them: `.js .reveal-img.visible img` is (0,3,1) and was flooding all
+   three opaque, stacking the drawings. This selector is (0,4,0) and takes
+   back only which frame is opaque; the slide still applies to all three,
    which is right, since they enter as one card.
-   NOTE the absence of a `transition` here. An earlier draft declared
-   `transition: opacity 0.45s ease` for the cross-fade, which is a
-   shorthand and therefore REPLACED the reveal rule's
-   `opacity 0.8s, transform 0.8s` — dropping the transform transition
-   entirely, so the 60px slide ran in zero seconds and the card snapped
-   into place. Inheriting the site's own transition costs a slower
-   cross-fade (0.8s rather than 0.45s) and buys an entrance identical to
-   every other image on the site, which is the trade §K would make. */
+   NOTE the absence of a `transition` here — declaring one is a shorthand
+   and REPLACES the reveal rule's `opacity 0.8s, transform 0.8s`, which is
+   what made this card snap into place instead of sliding.
+     → DECISIONS.md §T */
 .js .reveal-img .patent-rotator .patent-frame,
 .patent-rotator .patent-frame {
   opacity: 0;
@@ -2929,38 +2778,28 @@ body.page-discorso .ritagli-band li::before {
   opacity: 1;
 }
 
-/* Without JS no frame ever gets .is-current — so this keeps frame 1
-   visible on its own, which is exactly the pre-rotation card. Frames 2
-   and 3 carry an inert 1x1 gif as their src and the real file in
-   data-frame-src (an <img> with no src at all is invalid HTML, → §X);
-   they are held at opacity 0 by the rule above until initPatentRotator()
-   swaps the real source in, so the placeholder is never painted. */
+/* Without JS no frame ever gets .is-current, so this keeps frame 1
+   visible on its own — the pre-rotation card. Frames 2 and 3 carry an
+   inert 1x1 gif as their src (an <img> with no src is invalid HTML) and
+   are held at opacity 0 by the rule above, so it is never painted.
+     → DECISIONS.md §X */
 .no-js .patent-frame:first-child,
 .patent-frame:only-child {
   opacity: 1;
 }
 
 /* Names the slice the card is showing. The caption above gives the whole
-   span (1955-1995); this says which part of it these eight are, and it
-   is the only place a reader can learn it.
-   The reason is not the one §O gave. §O said the printed years were
-   grant years while the selection went by filing date, so the two could
-   not be reconciled on the page — §AF then put priority years on the
-   page, removing that mismatch, and the line was still needed. It is
-   needed because the cut is EDITORIAL: the eight run to the mechanical
-   bit (3,363,837) and stop, leaving out 3,390,929, a soundproof cover
-   rather than calculating mechanism. Those two share a priority year
-   and a grant year; only the full dates part them. So no column on this
-   page, present or future, can express the rule, and this line is
-   permanent rather than a stopgap.  → DECISIONS.md §O (retirement note) */
+   span (1955-1995); this says which part of it these eight are, and it is
+   the only place a reader can learn it — the cut is EDITORIAL, running to
+   the mechanical bit and dropping the soundproof cover, and no column on
+   this page can express that. Permanent, not a stopgap.
+     → DECISIONS.md §O (retirement note), §AF */
 /* This line should look exactly like "il bit meccanico" a few rows below
    it: §18's 900 cut, in .text-window's own #4A4A4A citation grey. The
    weight comes free by inheritance; the colour does not, because
    `.reveal-img.side.color-band figcaption p` (0,3,2) sets #222 on every
-   <p> in the card and this is one. Hence the long prefix — (0,5,0) — and
-   `inherit` rather than a repeated literal, so it tracks .text-window if
-   that grey is ever retuned. An earlier draft set #222 and weight 700 here
-   and made this a different thing wearing the same words. */
+   <p> in the card. Hence the (0,5,0) prefix and `inherit` rather than a
+   repeated literal.  → DECISIONS.md §R */
 .doc-list-intro {
   margin: 0 0 8px;
   text-align: center;
@@ -2970,13 +2809,11 @@ body.page-discorso .ritagli-band li::before {
   color: inherit;
 }
 
-/* "Espandi la lista" appears twice, and the two are styled differently on
-   purpose. The badge over the drawing is the primary control and looks like
-   one. This one is the redundant copy, at the end of the list, for a reader
-   who scrolled to the bottom and is looking for more rather than looking at
-   the picture — so it is a plain link, not a second button competing with
-   the badge. It sits INSIDE .text-window, after the <ul>: reachable by
-   scrolling, which is exactly the audience it is for.  → DECISIONS.md §O */
+/* "Espandi la lista" appears twice and the two are styled differently on
+   purpose: the badge over the drawing is primary, this is the deliberately
+   redundant copy for a reader who scrolled to the bottom looking for more.
+   Two controls doing one job should not look alike.
+     → DECISIONS.md §O, §P */
 .doc-list-expand {
   margin: 12px 0 2px;
   text-align: center;
@@ -2999,23 +2836,13 @@ body.page-discorso .ritagli-band li::before {
   text-decoration-thickness: 2px;
 }
 
-/* Same move as the print block below, for the same reason, and it belongs
-   here for a stronger one. #text-brevetti-completi is the ONLY copy of 33
-   of the 41 patents — the card carries eight — and both ways into it are
-   <button>s, so with JavaScript off those 33 links are not merely hidden,
-   they are unreachable: measured at 0 of 41 visible. The README promises
-   "no animations, everything on screen" without JS, and this was the one
-   place that promise was not kept. So the container is unhidden and reads
-   as an appendix, exactly as it does on paper.
-
-   Not a copy of the print rule despite the shared idea: on screen this
-   element is a direct child of <body>, outside <main>, so it has to
-   restate main's own 760px / 24px measure to line up with the page above
-   it, and it has to carry main's 6.125rem bottom padding or the FIXED
-   footer sits on top of the last patents. Print needs neither. [hidden]
-   is a UA display:none and an author rule outranks the UA sheet, so no
-   !important is needed here — unlike in print, where one guards against
-   the on-screen rules that block re-declares.  → DECISIONS.md §O, §AF */
+/* #text-brevetti-completi is the ONLY copy of 33 of the 41 patents, and
+   both ways into it are <button>s — so without JS those 33 links are not
+   hidden, they are unreachable. This unhides the container as an appendix,
+   as print does. Not a copy of the print rule: on screen the element is a
+   direct child of <body>, so it has to restate main's own measure and
+   carry its bottom padding or the FIXED footer sits on the last patents.
+     → DECISIONS.md §O */
 .no-js .doc-list-full[hidden] {
   display: block;
   max-width: 760px;
@@ -3043,15 +2870,11 @@ body.page-discorso .ritagli-band li::before {
   margin: 22px 0 8px;
   font-size: 1rem;
   text-align: center;
-  /* These three were <p><strong> and are now <h3> (→ §X), which changes
-     two inherited values that have to be declared back. The weight: the
-     old <strong> was picking up §18's `body.page-curriculum strong {
-     font-weight: 900 }`, and an <h3> is 700 by default, so the line would
-     have quietly lightened — it is the same 900 cut as .doc-list-intro
-     and "il bit meccanico" beside it, and it stays. The size: an <h3> is
-     1.17em by default, and this list wants a divider between rows, not a
-     bigger row, so the 1rem above is now doing real work rather than
-     restating the <p> it inherited from. */
+  /* These three were <p><strong> and are now <h3>, which drops two
+     inherited values that have to be declared back: the 900 weight they
+     were getting from §18's `body.page-curriculum strong`, and the size,
+     since an <h3> is 1.17em and these want to read as dividers between
+     rows rather than as bigger rows.  → DECISIONS.md §X */
   font-weight: 900;
 }
 
@@ -3061,36 +2884,18 @@ body.page-discorso .ritagli-band li::before {
 
 
 /* --- Forced colours (Windows High Contrast, and its equivalents) --------
-
-   In forced-colors mode the UA replaces `color` and `background-color`
-   with the reader's own system pair. It does NOT replace
-   `background-image` — and on this site almost everything sitting behind
-   text is a background-image, not a background-color:
-
-     - every page's watermark is `linear-gradient(rgba(16,16,16,.75) …),
-       url(../sfondi/disegno-N.svg)`. The tint survives forced colours,
-       so a reader on a black-on-white theme gets system-black text over
-       a surviving dark wash. Measured on the untouched page, that
-       overlay composites to rgb(76,76,76) — 7.40:1 for the site's own
-       #eee, and about 1.6:1 for forced black.
-     - `.gallery-caption` is a gradient of its own, over a photo.
-
-   So the images go, exactly as they go in @media print below and for the
-   same reason. Everything else in here is a border: forced colours flatten
-   the whole page to one background, and elements that read as separate
-   surfaces only because they are a different shade — the nav pill, the
-   language pill, the badges floating on photos, both dialogs — lose that
-   separation and need an explicit edge instead.
-
-   `.hl` is the one place on the site where colour alone carries meaning
-   (each highlighted word is tied to its source paragraph by hue, → §I).
-   Forced colours flatten all four to the same pair. The print sheet
-   already solved this with a colourless fallback; the same underline is
-   reused here rather than invented twice.
-
-   Nothing here sets `forced-color-adjust: none`. Overriding the reader's
-   palette is the one thing this mode exists to prevent, and no part of
-   this site needs it.  → §X */
+   Forced colours replace `color` and `background-color` with the reader's
+   own system pair. They do NOT replace `background-image` — and on this
+   site almost everything behind text is a background-image: every page's
+   watermark, and .gallery-caption's own gradient. The dark wash therefore
+   survives the override while the text does not. So the images go, exactly
+   as they go in @media print below.
+   Everything else here is a border: forced colours flatten the page to one
+   background, and elements that read as separate surfaces only because
+   they are a different shade need an explicit edge instead. `.hl` reuses
+   the print sheet's colourless underline, since Discorso's highlights are
+   the one place hue alone carries meaning.
+   Nothing here sets `forced-color-adjust: none`.  → DECISIONS.md §X */
 @media (forced-colors: active) {
   html,
   body {
@@ -3098,14 +2903,11 @@ body.page-discorso .ritagli-band li::before {
   }
 
   /* Opaque, not just bordered. The UA forces the colour of an rgba()
-     background but keeps its alpha, so `rgba(0,0,0,.65)` on a badge
-     becomes 65% Canvas over an untouched photograph — measured on
-     logos.html with forced colours on, the pill spans rgb(0,0,0) to
-     rgb(255,255,255) underneath forced-colour text, which is every
-     contrast ratio at once and 1:1 in places. On the bar and the two
-     pills the same alpha is harmless (nothing but Canvas is behind them
-     now) and it is set here anyway, because a translucency that exists
-     to let a page show through has nothing left to show. */
+     background but keeps its alpha, so a badge's rgba(0,0,0,.65) becomes
+     65% Canvas over an untouched photograph — measured on logos.html, the
+     pill spans rgb(0) to rgb(255) under forced-colour text, which is every
+     contrast ratio at once. A translucency that exists to let a page show
+     through has nothing left to show.  → DECISIONS.md §AI.4 */
   .site-nav,
   .lang-link-desktop,
   .skip-link,
@@ -3146,30 +2948,15 @@ body.page-discorso .ritagli-band li::before {
 
 
 /* --- Print --------------------------------------------------------------
-
-   Until this block existed, printing this site produced almost nothing.
-   Two separate failures stacked:
-
-   1. Colour. The page is light-on-dark (#eee on #101010), and browsers
-      do not print background colours by default. Every rule tuned for
-      the dark page — #eee, #ccc, #bbb, #999, #888, #fff — printed as
-      near-white text on white paper. Measured on discorso.html: the
-      body text was invisible.
-
-   2. The reveal choreography. Every content image and every essay
-      paragraph starts at opacity:0 behind `.js` and is revealed by the
-      IntersectionObserver. Printing does not scroll, so the observer
-      never sees the sections below the first screen. Measured: home.html
-      printed 122 words of 621 across four sheets, three of them blank
-      apart from the fixed nav and footer stamped onto each one.
-      curriculum.html printed 3 of its 41 patents — the rest were clipped
-      by .text-window's 130px box.
-
-   The block below is therefore not a polish pass; it is the difference
-   between a printable archive and four blank sheets. It inverts the
-   palette, disables every entrance state, unpins the fixed chrome, and
-   lets the two fixed-size scroll boxes (.text-window, .clump-stage) open
-   to their natural height.  → DECISIONS.md §M */
+   Until this block existed, printing this site produced almost nothing,
+   and for two stacked reasons: the palette is light-on-dark and browsers
+   do not print background colours, and every image and essay paragraph
+   starts at opacity:0 behind an IntersectionObserver that printing never
+   triggers. Measured before: home.html printed 122 words of 621, and
+   curriculum.html 3 of its 41 patents.
+   The block inverts the palette, cancels every entrance state, unpins the
+   fixed chrome and opens the two fixed-height scroll boxes. Two traps if
+   you edit it are recorded in the entry.  → DECISIONS.md §M */
 
 @media print {
   @page {
@@ -3250,16 +3037,11 @@ body.page-discorso .ritagli-band li::before {
   }
 
   /* The excerpt-to-paragraph pairing on Discorso is the one place on this
-     site where colour alone carries meaning, so it is also the only place
-     that overrides the reader's ink. `exact` does not mean "keep the
-     colour if backgrounds are on" — it FORCES the background to print
-     whether they asked for it or not, which is why it is scoped to these
-     four inline highlights and nothing else. The pastel cards were in
-     this list in the first draft and came back out: at full column width
-     they flood a whole sheet with ink to say something decorative, and
-     their text is #1a1a1a/#222 — already legible on bare paper. The
-     underline below is the colourless fallback, so the pairing survives
-     even where `exact` is ignored. */
+     site where colour alone carries meaning, so it is the only place that
+     overrides the reader's ink. `exact` FORCES the background to print
+     whether they asked or not, which is why it is scoped to these four
+     inline highlights and nothing else. The underline below is the
+     colourless fallback.  → DECISIONS.md §M, §I */
   .hl {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
@@ -3337,13 +3119,10 @@ body.page-discorso .ritagli-band li::before {
     border: 1px solid #ddd;
   }
 
-  /* The clump is an 800px absolute-positioned stage whose photos would
-     land on top of each other on paper. Rather than invent a print
-     layout, this mirrors the one the site already has: the
-     `max-width: 50em` block turns .clump-anchor into a flex column and
-     gives each photo an explicit aspect-ratio. Note the photos are
-     CHILDREN of .clump-anchor, not siblings — hiding the anchor hides
-     all six, which is exactly what the first draft of this block did. */
+  /* The clump is an 800px absolute stage whose photos would land on top of
+     each other on paper, so this mirrors the layout the site already has
+     below 50em. Note the photos are CHILDREN of .clump-anchor, not
+     siblings — hiding the anchor hides all six.  → DECISIONS.md §M */
   .clump-stage {
     position: static !important;
     height: auto !important;
@@ -3413,15 +3192,9 @@ body.page-discorso .ritagli-band li::before {
   }
 
   /* The eight-entry card list is a reading convenience; the archive is the
-     full 41. On screen the rest lives in a [hidden] container that the
-     dialog clones from — in print that container IS the list, so it is
-     unhidden and prints as an appendix. It sits after </main> and before
-     the footer, which is where an appendix belongs. The card keeps its own
-     eight: they match the caption above them, and a printed selection
-     followed by a labelled complete list reads correctly. [hidden] is a UA
-     display:none, so a CSS display wins over it without touching the
-     attribute, and the element stays out of the accessibility tree on
-     screen. */
+     full 41. In print the [hidden] container IS the list, so it is unhidden
+     as an appendix after </main>. The card keeps its own eight: they match
+     the caption above them.  → DECISIONS.md §O */
   .doc-list-full[hidden] {
     display: block !important;
     margin-top: 28px;
@@ -3472,21 +3245,12 @@ body.page-discorso .ritagli-band li::before {
   /* -- 6. a dialog open at print time ---------------------------------- */
 
   /* If a dialog is open when the reader hits Print, that is what they are
-     reading and that is what they mean to print. Both dialogs are
-     position:fixed with a viewport-height scroll pane, so without this the
-     printer paints the first screenful over every page and drops the rest:
-     1809px of the complete patent list, 555px of Banchelli, 449px of
-     Quercia, 42px of teresio-cavaliere. Only diploma-cfm fitted.
-     `:has()` is the whole gate — with no dialog open nothing here matches
-     and the sheet prints exactly as it did before.
-
-     The footer does not come along, and it cannot: an open modal is in the
-     top layer, where `position: static` computes to `absolute` (verified —
-     the dialog reports absolute and body.scrollHeight drops to the
-     footer's own 35px). The footer is laid out underneath the dialog's
-     opaque background and never paints. So a printed transcript carries no
-     licence line. Printing the page itself, which is the normal case, is
-     untouched and still carries it.  → DECISIONS.md §AB */
+     reading and what they mean to print. Both dialogs are position:fixed
+     with a viewport-height pane, so without this the printer paints the
+     first screenful over every sheet and drops the rest — 1809px of the
+     patent list alone. `:has()` is the whole gate: with none open nothing
+     matches and the sheet is untouched. `position: static` looks removable
+     and is not.  → DECISIONS.md §AB */
   body:has(dialog[open]) > *:not(dialog[open]) {
     display: none !important;
   }

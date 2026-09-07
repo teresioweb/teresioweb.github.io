@@ -32,6 +32,7 @@
 <meta name="twitter:title" content="Teresio Gassino — La Quercia di Racciano">
 <meta name="twitter:description" content="La Quercia di Racciano">
 <meta name="twitter:image" content="https://teresioweb.github.io/images/quercia/quercia-1-clump.webp">
+<meta name="twitter:image:alt" content="The Quercia di Racciano oak tree in full leaf">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -58,10 +59,17 @@
       "@type": "Thing",
       "@id": "https://teresioweb.github.io/#quercia",
       "name": "La Quercia di Racciano",
-      "description": "Centuries-old oak at Racciano, San Gimignano, after which Teresio Gassino named his Vernaccia; brought down in December 2015.",
+      "description": {
+        "@language": "en",
+        "@value": "Centuries-old oak at Racciano, San Gimignano, after which Teresio Gassino named his Vernaccia; brought down in December 2015."
+      },
       "location": {
         "@type": "Place",
-        "name": "Racciano, San Gimignano, Italy"
+        "@id": "https://teresioweb.github.io/#racciano",
+        "name": {
+          "@language": "en",
+          "@value": "Racciano, San Gimignano, Italy"
+        }
       }
     }
   ]
@@ -75,7 +83,6 @@
      Wix site and its Italian counterpart — it's only reachable via the
      "La Quercia di Racciano" link in the essay on the home page. -->
 <header class="site-nav">
-  <a href="/quercia.html" class="lang-link-desktop" hreflang="it" lang="it" aria-label="Versione italiana">IT</a>
   <div class="nav-inner">
     <a href="/en/" class="brand"><span class="brand-text">Teresio Gassino</span> <img src="/sfondi/firma.svg" alt="" class="brand-signature"></a>
     <button type="button" class="menu-toggle" aria-controls="nav-links" aria-label="Open menu" aria-expanded="false" data-label-open="Open menu" data-label-close="Close menu">
@@ -90,6 +97,7 @@
     <a href="/quercia.html" class="lang-link" hreflang="it" lang="it" aria-label="Versione italiana"><img src="/sfondi/flag-it.svg" alt="" class="lang-flag-icon"><span>IT</span></a>
   </nav>
   </div>
+  <a href="/quercia.html" class="lang-link-desktop" hreflang="it" lang="it" aria-label="Versione italiana">IT</a>
 </header>
 
 <main id="main" tabindex="-1">

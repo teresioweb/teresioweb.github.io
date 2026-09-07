@@ -75,6 +75,8 @@ split and are each about a decision rather than a rule.
 | §AE | The burger opened behind the focus, and the pill's real containing block |
 | §AF | Patent list: priority year instead of grant year |
 | §AG | The two French entries replaced by their German family members |
+| §AH | `html { scroll-padding }`, and the focus ring behind a fixed bar |
+| §AI | Four notes the stylesheet was carrying with nowhere to put them |
 
 ---
 
@@ -1390,7 +1392,10 @@ the two that did had no way of being connected: `index.html` described a
 were anonymous nodes, so nothing said they were the same man — and the Italian
 and English versions made four unrelated people rather than one.
 
-Every page now emits an `@graph` built around a handful of shared `@id`s:
+Every page now emits an `@graph` built around a handful of shared `@id`s
+(`home.html` and `en/home.html` were the two exceptions until the
+pre-publish pass — they emitted a bare `Article` node, which worked because
+the `@id` references still resolved, but made this sentence false):
 
 - `#teresio` — the `Person`, defined in full only on the two landing pages
   and referenced by `{"@id": …}` everywhere else. `sameAs` now carries both
@@ -1407,6 +1412,37 @@ The Italian and English pages use the *same* `#teresio` id on purpose. It is
 one human being; two ids would recreate the problem this was meant to solve.
 Everything else is per-language, since those really are distinct documents.
 
+**What that choice costs, which this entry did not say and should have.**
+Sharing an `@id` is only half of "one person". A consumer that merges the two
+documents also merges every property hanging off that id — and the properties
+were plain strings, so the merged graph asserted that Teresio held two job
+titles ("Progettista meccanico" *and* "Mechanical designer"), knew two
+subjects, and was born in two places. Same for `#logos27`'s `category` and
+`#quercia`'s `description`. Valid RDF, and wrong about the world: multiple
+values on a property mean multiple values, not one value said twice.
+
+Two corrections, both mechanical:
+
+- **Every literal on a shared id is language-tagged**, `{"@language": "it",
+  "@value": …}` against `{"@language": "en", …}`. The merge then carries one
+  value per language, which is what was meant all along. Language-neutral
+  literals — `name`, `birthDate`, `sameAs`, `releaseDate` — stay bare, because
+  tagging "Teresio Gassino" as Italian would be a claim about the name rather
+  than about the string.
+- **Nested nodes were given ids of their own.** `birthPlace`, `deathPlace`,
+  `worksFor`, `manufacturer` and Quercia's `location` were blank nodes, and a
+  blank node cannot merge across documents no matter what its parent's id is —
+  so two Places with the same meaning stayed two Places. They are now
+  `#are`, `#sangimignano`, `#olivetti` and `#racciano`, each defined once per
+  language with a tagged `name`. `#olivetti` is the one whose literal is
+  identical in both languages and it still needed the id, which is the clearest
+  statement of the rule: **the id is what merges, the tag is what disambiguates,
+  and they are separate jobs.**
+
+**The rule for anything added later:** if a node is referenced from both
+languages it needs an `@id`; if one of its literals differs between the two it
+needs an `@language`. Neither implies the other.
+
 `discorso.html` was not on the list of pages to fix but got the same
 treatment: leaving one island would have defeated the point.
 
@@ -1416,7 +1452,16 @@ Latin Extended-A, Greek, typographic punctuation, arrows, primes and common
 maths symbols; the only codepoints dropped are eight combining diacritics and
 two modifier apostrophes, none of which can be needed here because every
 accented character in those ranges exists precomposed. 321 KB → 270 KB across
-the ten files, 163 KB → 139 KB for the four faces a page actually loads.
+the ten files.
+
+> **The per-page figure in this entry was wrong, and so was the one in
+> `README.md` that came from it.** "163 KB → 139 KB for the four faces a page
+> actually loads" describes no page on the site. Counted from the actual
+> `.woff2` requests: Foto loads five faces (124 KB), Index / Discorso / Quercia
+> six (164–165 KB), Logos seven (176 KB), and **Home and Curriculum eight, at
+> 217 KB** — more than the stylesheet and the script put together. The four
+> serif cuts alone are 166 KB, which is where the weight is. The subsetting
+> decision below is unaffected; only the number it was reported against.
 
 Measured and rejected: subsetting to the 109 characters the site really uses
 cuts about 60% instead of 16%, but it makes every future content edit a
@@ -3359,9 +3404,14 @@ brackets with the co-inventor, as requested: ("…", con B. Pedrini).
 
 Housekeeping notes:
 
-- `FR2039399A1.pdf` and `FR2055456A5.pdf` are still in /brevetti/ but no
-  longer linked from anywhere. Kept for now — the cross-references in the
-  list still cite those numbers.
+- `FR2039399A1.pdf` and `FR2055456A5.pdf` were left in /brevetti/ unlinked,
+  "kept for now", because the cross-references in the list still cite those
+  numbers. **They have since been deleted**, and this line was stale until the
+  pre-publish pass caught it: `/brevetti/` now holds exactly 41 PDFs for 41
+  entries, and a repo-wide scan finds no unreferenced file anywhere. The two
+  FR numbers remain as bracketed cross-references, which is all they ever
+  needed to be — a cross-reference cites a document, it does not have to ship
+  one.
 - The JSON-LD `hasPart` entries were realigned to the German documents, and
   named by what each one actually is rather than flattened to "Patent":
 
@@ -3547,3 +3597,83 @@ Nothing here touches `initScrollMemory()`. Scroll restoration uses
 untouched. The three scrollable panels (`.text-window`, `.doc-viewer-scroll`,
 `.doc-viewer-text`) have their own scrollports and are unaffected: nothing is
 fixed over them.
+
+
+## §AI — Four notes the stylesheet was carrying with nowhere to put them
+
+The pre-publish pass measured `css/style.css` at **59.0% comment by weight**
+— 66,342 bytes of 112,463 — which is the same figure the preamble of this
+file quotes as the reason this file exists. The split worked and then the
+stylesheet drifted back to where it started.
+
+Thirty-eight comments ran past 420 bytes. Most were **recounting prose that
+already exists here in fuller form**: the seven covered links (§AH), the two
+print failures (§M), the dialog-at-print-time measurements (§AB), the
+`.text-window` link contrast (§L), the Firefox scrollbar heuristic (§Y), the
+patent card's history (§O, §T). Those were cut to a short "what this does"
+line plus their existing pointer; nothing was lost, because the pointer
+already led to the same words.
+
+Result: **112,463 → 97,497 bytes, 59.0% → 52.7% comment**, 34.9 KB → 28.5 KB
+gzipped. Declarations are byte-identical — verified by stripping every comment
+from both files and diffing what was left.
+
+**One comment was deliberately left long.** The breakpoint ladder above
+`.skip-link` is 1.6 KB and stays: §J designates it as the canonical map of the
+six rungs, and `README.md` points readers at it by name. Only its closing
+paragraph went, which was verbatim §J.
+
+Four notes had no home here at all. They are below, so the stylesheet can
+point at them instead of carrying them.
+
+### §AI.1 — `.card p .plain`, and the positional rule it replaced
+
+The four landing cards are set in italic because three of them QUOTE. The
+fourth describes, and used to get roman from `.card:nth-child(4) p` — a
+selector that says "the fourth one" where it means "this one is not a
+quotation". Reorder the cards or insert a fifth and the roman lands silently
+on the wrong text, with nothing on screen to suggest which rule is wrong.
+Card 4's text now carries `.plain`, exactly as the tail of card 1 already
+did, and the positional rule is gone. `.plain` is now the only mechanism for
+that distinction, which is the point: one mechanism, stated where the content
+is, rather than two that agree by coincidence.
+
+### §AI.2 — Why `.ritagli-band` is declared in two places
+
+The class has two blocks in the stylesheet and that is deliberate, not
+drift. Everything visual — background, blur, padding, radius — sits at the
+class's own position. The `--link` override stays up in the link-colour
+cluster beside `:root` and `.color-band`, because the three contexts and
+their measured contrast ratios are only meaningful read together: the whole
+argument of §19 and §L is that one hue is tuned to three lightness points,
+and separating them leaves three numbers with nothing to compare against.
+Splitting costs one extra place to look. Merging would cost the comparison.
+
+### §AI.3 — The patent frames are stacked rather than swapped
+
+The rotator could have been one `<img>` with its `src` changed on scroll.
+It is three stacked `<img>` cross-faded instead, and the reason is decode
+timing: a `src` swap keeps painting the previous drawing until the new file
+decodes, so a scroll-driven change reads as a stutter rather than a fade.
+Stacking costs two extra elements and buys a cross-fade with nothing to wait
+for — by the time a frame's turn comes it is already decoded. It is also what
+makes the deferred load in §O possible, since a frame that is never the
+current one can sit at `opacity: 0` holding a placeholder without anything to
+hide.
+
+### §AI.4 — Forced colours keep the alpha, which makes a badge worse than useless
+
+`@media (forced-colors: active)` replaces the *colour* of a background but
+keeps its *alpha*. So `rgba(0, 0, 0, 0.65)` on `.img-badge` does not become an
+opaque system surface — it becomes 65% Canvas laid over an untouched
+photograph, because forced colours do not touch the image underneath either.
+Measured on `logos.html` with forced colours on: the pill spanned rgb(0,0,0)
+to rgb(255,255,255) beneath forced-colour text, which is every contrast ratio
+at once and 1:1 in places.
+
+The badges are therefore made fully opaque in that block, not merely given a
+border. The nav bar and the two pills get the same treatment even though for
+them the alpha is harmless by then — nothing but Canvas is behind them once
+the watermarks are dropped — because a translucency whose whole purpose is
+letting a page show through has nothing left to show, and leaving it in would
+invite the next reader to wonder whether it was doing something.
