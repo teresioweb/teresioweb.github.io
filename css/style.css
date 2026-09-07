@@ -526,11 +526,21 @@ body {
   .nav-links.open {
     /* 25rem is 400px at a 16px default — the value this always had —
        but in rem, so the cap grows with the six labels it has to
-       clear instead of staying put while they get taller. It is a
-       transition end point, not a layout size: the list is shorter
-       than this at every font size, and only max-height can be
-       animated from 0.  → DECISIONS.md §AJ.3 */
-    max-height: 25rem;
+       clear instead of staying put while they get taller.
+       min() with the viewport, because the rem alone is not a cap at
+       all on a phone held sideways: the dropdown hangs off a fixed
+       bar, so anything past the bottom edge is not scrolled to, it is
+       simply gone. On 844x390 at a 32px default the list ran to 583
+       against a 390 viewport. Bounded here it ends at 358 and scrolls.
+       --nav-h is the same measurement §AJ.2 publishes; the 1rem is
+       breathing room below, in rem like everything else in this bar.
+         → DECISIONS.md §AJ.3 */
+    max-height: min(25rem, calc(100vh - var(--nav-h, 4.125rem) - 1rem));
+    /* Only on .open: closed, the list keeps the overflow:hidden that
+       makes the max-height animation work. A menu the reader cannot
+       scroll is a menu missing its last items.  → DECISIONS.md §AJ.3 */
+    overflow-y: auto;
+    overscroll-behavior: contain;
     opacity: 1;
     padding: 22px 24px 26px;
     pointer-events: auto;

@@ -3791,12 +3791,48 @@ happened at 390, 768 and 1280 alike — this is a font-size bug, not a width
 one.
 
 `justify-content: flex-start`, so anything that does not fit falls off the
-bottom where the reader can see it go. And `max-height: 25rem` in place of
-`400px` — the same 400 at a 16px default, but growing with the labels it has
-to clear instead of standing still while they get taller. It is a transition
-end point, not a layout size; the list is shorter than it at every size
-tested, and `max-height` is the only property here that can be animated
-from 0.
+bottom rather than the top. And `max-height: 25rem` in place of `400px` — the
+same 400 at a 16px default, but growing with the labels it has to clear
+instead of standing still while they get taller.
+
+**That pair alone made landscape worse, and the first version of this fix
+shipped with the regression in it.** Counting menu items a reader can
+actually reach, out of six:
+
+| | portrait 390x844 | landscape 844x390 |
+|---|---|---|
+| before | 6 / **0** / **0** | 6 / 5 / 4 |
+| flex-start + 25rem | 6 / 6 / 6 | 6 / **4** / **3** |
+| with the viewport bound | 6 / 6 / 6 | 6 / 6 / 6 |
+
+(at 16 / 24 / 32px default. The two zeros in portrait are §AJ.1: the burger
+could not be tapped, so the menu never opened at all.)
+
+Sending the overflow downward is right in portrait and not enough sideways.
+The dropdown hangs off a `position: fixed` bar, so it does not scroll with
+the page: an item past the bottom edge is not somewhere the reader can get
+to, it is gone — the same loss as the clipped first item, just relocated. On
+844x390 at a 32px default the list ran to 583 against a 390 viewport.
+
+So the cap is bounded by the viewport as well as by the type:
+
+```css
+max-height: min(25rem, calc(100vh - var(--nav-h, 4.125rem) - 1rem));
+overflow-y: auto;
+overscroll-behavior: contain;
+```
+
+`--nav-h` is the same measurement §AJ.2 already publishes. `overflow-y` is
+on `.open` only: closed, the list keeps the `overflow: hidden` that makes the
+`max-height` animation work, and `visibility: hidden` (§12) still takes it
+out of the tab order. The open transition was sampled frame by frame before
+and after — `[225, 323, 333, 338, 339, 339]`, identical — and no scrollbar
+appears at any default font in portrait, because there the list still fits.
+
+`100vh` and not `100dvh`, matching the rest of the file. On iOS `100vh` is
+the large viewport, so with the address bar showing the bound is a little
+generous — the same caveat the lightbox carries, and the same one-line
+change would fix both together if it is ever taken.
 
 These two boxes were the last fixed-pixel sizes on the site holding text. A
 sweep of the whole stylesheet found **no `font-size` in px at all**, and only
