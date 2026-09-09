@@ -79,6 +79,7 @@ split and are each about a decision rather than a rule.
 | §AI | Four notes the stylesheet was carrying with nowhere to put them |
 | §AJ | The bar at a large default font size |
 | §AK | Five fixes from the same pass |
+| §AL | Two more, at 320px and 200% |
 
 ---
 
@@ -3949,3 +3950,84 @@ the sign by: centre before, 19.86 wide at `right: 26`, is viewport−35.93;
 after, 26 wide at `right: 23`, viewport−36. Measured 50.93 → 51 from the
 right edge at 1280 and 35.93 → 36 at 390, with `font-size` unchanged at
 34px. The 6px gained is empty button, all of it on the inboard side.
+
+---
+
+## §AL — Two more, at 320px and 200%
+
+Found by a second, independent audit checking the corner §AJ's own measurements
+had not covered: a narrow phone width *and* a large default font *at the same
+time*, rather than either alone.
+
+### §AL.1 — `.brand-signature` grew with the font and never gave ground
+
+`.brand-signature { height: 1.625rem; width: auto }` scales the signature
+with the reader's font size on purpose — the same reasoning as the wordmark
+beside it. At a 320px viewport, tracking the image's own right edge against
+the burger's left edge as the default font grows:
+
+| default | signature width | signature right edge | burger left edge |
+| --- | --- | --- | --- |
+| 16px | 84px | 245 | 274 |
+| 24px | 85px | 246 | 274 |
+| 28px | 148px | 292 | 280 — overlapping |
+| 32px | 169px | 330 | 323 — overlapping |
+
+Same cause as §AJ.1, one flex item over: a replaced element's automatic
+minimum size in a flex row is its own rendered size, so `flex-shrink` had
+nothing to act on and the image just kept growing. `min-width: 0` removes
+that floor, the same override `.brand` itself already needed. `object-fit:
+contain` goes with it — without it, forcing the box narrower than the
+image's aspect ratio wants would stretch the drawing to fill the box instead
+of scaling it down, and a signature is exactly the kind of mark that reads
+as wrong the moment it's distorted.
+
+That alone stops the overlap — confirmed at 0 of 14 pages, at the single
+most extreme setting tested (320px, 200%) — but doesn't free enough width on
+its own at the very worst pairing. `.brand` (wordmark + signature, the
+row's only other two-child case besides the mobile dropdown) gets the same
+fallback §AJ.3 already gave that dropdown: `flex-wrap: wrap`, so when the
+two don't fit side by side, the signature drops to its own line rather than
+forcing the row wider.
+
+**What's left.** At exactly 320px and a 32px default, "Teresio Gassino"
+alone — one line, not wrapped, because it still fits at that width without
+needing to — plus the burger, together still run 3px past the physical
+edge (measured 323–349 against a 320px screen, unchanged from before this
+fix: the signature was never the limiting factor at this specific corner,
+the wordmark's own single-line width is). 23 of the burger's 26px stay on
+screen. Likely still operable — a tap registers on whatever portion is
+under the finger — but not exact. Closing the last 3px would mean touching
+`.brand-text` itself (an abbreviation below some width, or a wrap forced
+even where the text would technically still fit), which is a design change
+to the wordmark rather than a fix to the signature, and this pass stops
+short of it.
+
+### §AL.2 — `.clump-badge` had one edge pinned and no limit on the other
+
+`bottom: 10px; right: 10px; white-space: nowrap`. Fine as long as the badge
+text is short — Quercia's is two words and never reaches this. Discorso's
+longest instruction, *"Clicca per il testo pdf completo"*, is not: at a
+large default font on a phone-width photo, the one-line box is wider than
+the photo itself, and since only the right edge is pinned, the excess runs
+off the *left* — confirmed by keyboard focus (`:focus-within`, §43's own
+note on how this badge is meant to be reached) at 390px/32px: box from −13
+to 356 against a photo from 24 to 366. Read on screen, the instruction
+starts "**icca** per il testo..." — the opening "Cl" is gone, on exactly the
+control a reader using the keyboard is being rewarded for finding.
+
+`left: 10px` alongside the existing `right: 10px` is the whole fix: a
+`position: absolute` box with both edges set is sized to span what's
+between them rather than shrink-to-fit its nowrap text, so `white-space`
+has to change too — `normal`, plus `text-align: center` so a wrapped line
+reads as centred rather than ragged. Verified the badge's box stays within
+its photo's edges at every size tested, on both `discorso.html` and
+`en/discorso.html`, in both languages.
+
+Quercia is untouched on purpose. Its own rule, `body.page-quercia
+.clump-badge { left: 50%; right: auto; ... }`, sits later in the file and
+wins on specificity regardless of what the base rule's `left` says — it
+never had this problem and this change gives it nothing new to override.
+Same story on desktop: `@media (hover: hover) { .clump-badge { left: 50%;
+right: auto; ...} }` already overrides both edges for a mouse, and still
+does — confirmed unchanged at 1280px on both pages, both languages.

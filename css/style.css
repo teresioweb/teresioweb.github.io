@@ -343,6 +343,18 @@ body {
   height: 1.625rem;
   width: auto;
   display: block;
+  /* Same override as .brand itself (§AJ.1): a replaced element's automatic
+     minimum size in a flex row is its own rendered size, so without this
+     the image refused to shrink no matter how tight the row got — it
+     grew with the font (height in rem) and pushed everything beside it,
+     including the burger, past the edge of the screen.
+       → DECISIONS.md §AL.1 */
+  min-width: 0;
+  /* Lets flex-shrink make the box narrower than the aspect ratio wants
+     without stretching the drawing to fill it — the box shrinks, the
+     signature scales down inside it, nothing distorts.
+       → DECISIONS.md §AL.1 */
+  object-fit: contain;
 }
 
 .nav-links {
@@ -480,6 +492,18 @@ body {
   .brand,
   .brand-text {
     white-space: normal;
+  }
+
+  /* Letting the wordmark wrap (above) frees height, not width: the
+     signature still sits on the same line beside it, so at a large
+     enough default font the two together can still outgrow the row
+     even after §AJ.1. Wrapping the row itself is the same fallback
+     already used for the row's only other two-child case, the mobile
+     dropdown's items (§AJ.3) — when it doesn't fit, it drops rather
+     than forcing the row wider.  → DECISIONS.md §AL.1 */
+  .brand {
+    flex-wrap: wrap;
+    row-gap: 2px;
   }
 
   .menu-toggle {
@@ -1128,6 +1152,19 @@ body.page-galleria main {
   position: absolute;
   bottom: 10px;
   right: 10px;
+  /* Paired with right:10px above, this is what actually fixes the
+     overflow: an absolutely positioned box with both left and right
+     set is sized by the browser to span exactly what's between them,
+     rather than shrink-to-fit its own (nowrap) text. Discorso's
+     longest instruction, "Clicca per il testo pdf completo", is wider
+     than a phone-width photo at a large default font; before this it
+     kept its one-line width regardless and ran off the near edge —
+     visible only by pressing the exact key this badge exists to
+     reward, :focus-within (§43 note). Quercia is untouched: its own
+     rule two lines down centers the badge with left:50%/right:auto,
+     which overrides these on specificity and never had this problem
+     (its badges are two words).  → DECISIONS.md §AL.2 */
+  left: 10px;
   padding: 5px 12px;
   border-radius: 16px;
   /* 0.65, up from 0.55. Worst case is white paper underneath: 0.55
@@ -1141,7 +1178,12 @@ body.page-galleria main {
      being texture, and this one is a real instruction ("clicca per il
      testo pdf completo") that has to be read, not recognised. */
   font-size: 0.75rem;
-  white-space: nowrap;
+  /* Was nowrap. With both edges now fixed, nowrap wouldn't stop the
+     overflow — it would just make the text render at its unclipped
+     one-line width past the right edge instead of the left. Wrapping
+     inside the constrained box is the point.  → DECISIONS.md §AL.2 */
+  white-space: normal;
+  text-align: center;
   opacity: 0;
   transition: opacity 0.2s ease;
   pointer-events: none;
