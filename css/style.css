@@ -1508,8 +1508,10 @@ footer .cc-logo {
 }
 
 /* Fixed-height scrollable box for a long list inside a card, set in the
-   Fonte's own typeface — this content is citation, not prose.  →
-   DECISIONS.md §48 */
+   Fonte's own typeface — this content is citation, not prose. The height
+   still shows about two rows on a phone; raising it is a design call that
+   has been considered and not taken.
+     → DECISIONS.md §48, §O (still open) */
 .text-window {
   /* 8.125rem is 130px at a 16px default, so nothing moves there — but the
      box now grows with what it holds, instead of leaving a reader at a
@@ -2336,7 +2338,9 @@ body.page-curriculum .doc-viewer-text-inner {
    the marker — and now it does not have to be excluded by name either:
    the four sources are <li> and the note is the band's only <p>, so the
    structure carries the distinction the `:not()` used to carry by hand.
-     → DECISIONS.md §I */
+   The marker sits at #999, which is 3.014:1 on the no-backdrop-filter
+   fallback — above the 3:1 floor for non-text, and checked.
+     → DECISIONS.md §I, §AM (open, measured, and left) */
 body.page-discorso .ritagli-band li::before {
   content: ">";
   display: inline;
@@ -2625,7 +2629,9 @@ body.page-discorso .ritagli-band li::before {
 }
 
 /* Full-bleed hero breaking out of main's 760px column to the full viewport
-   width, clipped by body's own overflow-x.  → DECISIONS.md §77 */
+   width, clipped by body's own overflow-x. The ~7px a side that 100vw
+   costs on a classic scrollbar is measured and kept.
+     → DECISIONS.md §77, §X (left alone on purpose) */
 .hero-photo {
   width: 100vw;
   position: relative;
@@ -2708,7 +2714,9 @@ body.page-discorso .ritagli-band li::before {
 }
 
 /* Closing mark drawn from one of Teresio's own patents, kept at the same
-   faint level as the watermarks on the other pages.  → DECISIONS.md §82 */
+   faint level as the watermarks on the other pages. No width/height and no
+   aspect-ratio: the resulting shift is measured and accepted.
+     → DECISIONS.md §82, §AM (open, measured, and left) */
 .essay-ornament {
   width: 14%;
   max-width: 100px;
@@ -2738,7 +2746,9 @@ body.page-discorso .ritagli-band li::before {
 }
 
 /* Paragraph divider from a Teresio patent, sized at half the reading
-   column's width on any breakpoint.  → DECISIONS.md §83 */
+   column's width on any breakpoint. No width/height and no aspect-ratio:
+   the resulting shift is measured and accepted.
+     → DECISIONS.md §83, §AM (open, measured, and left) */
 .essay-divider {
   width: 50%;
   max-width: 310px;

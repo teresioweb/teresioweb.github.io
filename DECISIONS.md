@@ -68,6 +68,21 @@ split and are each about a decision rather than a rule.
 | §I | What the Creative Commons line actually covers |
 | §J | The breakpoint ladder, and why it stays six rungs |
 | §K | Image loading is animation timing on this site |
+| §L | Two colour declarations the dark page never made |
+| §M | Printing, which did not work at all |
+| §N | The save that was always a little behind |
+| §O | The patent card: eight visible, forty-one kept |
+| §P | Six adjustments to the patent card |
+| §Q | The iOS bug in the rotator, and what it was really about |
+| §R | Patent list corrections |
+| §S | The burger reaches the WCAG floor, twice |
+| §T | The rotator's entrance stopped animating |
+| §U | The last of the small audit items |
+| §V | Four small behaviours, and one deliberately left alone |
+| §W | Every in-page link had the ornament's bug |
+| §X | The pre-publish audit batch |
+| §Y | Firefox darkened a light scrollbar that Chrome had already fixed |
+| §Z | The rotator's second and third frames were replaced |
 | §AA | The nav bar grew with the type; its box did not |
 | §AB | A dialog open at print time, and the gallery's missing spinner |
 | §AC | The invalid figcaption, and why it stays |
@@ -81,6 +96,50 @@ split and are each about a decision rather than a rule.
 | §AK | Five fixes from the same pass |
 | §AL | Two more, at 320px and 200% |
 | §AM | Two small fixes, and a ledger of what was left alone |
+
+---
+
+## What was left alone, by artifact
+
+Twenty-two things that were looked at and deliberately not changed. They are
+written up in seven different places under six different names — *Non-decisions*,
+*Open, measured, and left*, *Left alone on purpose*, *Still open*, *why it stays*,
+*and should not* — so searching for any one of those names finds a seventh of
+them. **This table is the way in. If an audit is about to report something,
+look for its artifact here first.**
+
+The entries hold the reasoning; this only says where to go.
+
+| artifact | where the decision is |
+|---|---|
+| `.hero-photo` — full-bleed figure clipped ~7px a side by the scrollbar | §X, *Left alone on purpose* |
+| `.essay-divider img`, `.essay-ornament img` — no `width`/`height`, no `aspect-ratio` | §AM, *Open, measured, and left* |
+| `.ritagli-band li::before` at `#999` — 3.014:1 on the no-backdrop-filter fallback | §AM, *Open, measured, and left* |
+| `.text-window` — still 130px, 2.1 rows on a phone | §O, *Still open* |
+| `.nav-links a { white-space: nowrap }` — label truncates at 320px / 32px default | §AM, *Open, measured, and left* |
+| `<figcaption>` inside `<div>` — 16 validator errors, all of them this | §AC |
+| Language switching does not keep your place | §V |
+| Path conventions: relative in Italian pages, root-absolute in `en/` | §X, *Left alone on purpose* |
+| `quercia.html` listed in `sitemap.xml` | §AM, *Open, measured, and left* |
+| Quercia's `og:image` is 630×415, under `summary_large_image`'s 1200×630 | §X, *Left alone on purpose* |
+| Quercia unreachable from the nav, and has no `aria-current` | §AM, *Non-decisions* |
+| Index shows four cards for five destinations | §AM, *Non-decisions* |
+| Home carries no watermark | §AM, *Non-decisions* |
+| CLS from fonts on Home, 0.09 on a slow network | §AM, *Non-decisions* |
+| No custom `404.html` | §AM, *Non-decisions* |
+| LinkedIn and Twitter disagree on `og:image` crops | §AM, *Non-decisions* |
+| Image and SVG payload | §AM, *Non-decisions* |
+| 41 patent PDFs with no text layer (0 characters, 403 pages, 33MB) | §AM, *Open, measured, and left* |
+| CSP via `<meta>` for `script-src` | §AM, *Open, measured, and left* |
+| The Proget line on the curriculum | §AM |
+| Entries no code comment points to | §AM, *Open, measured, and left* |
+| `style.css` drifting back toward 59% comment between audits | §AI |
+
+**Eight of these have no address in the code** — the absent `404.html`, the font
+CLS, the `og:image` crops, the missing watermark, the four cards, the payload,
+Quercia's two nav items. Nothing in a stylesheet can point at a thing that is
+not there, so for those this table is the only defence and a second pass over
+any finding is the only gate. The rest carry a pointer at the rule itself.
 
 ---
 
@@ -4134,7 +4193,7 @@ and ignored: each has a number attached and a reason to stay.
 | `quercia.html` in `sitemap.xml` | A sitemap is an invitation to index, which pulls against the easter egg; the tension is accepted rather than resolved |
 | 41 patent PDFs with no text layer | Real (0 characters from all 41, 403 pages, 33MB) but inherited from the patent offices; an OCR pass is a project, not a fix |
 | `.essay-divider img` and `.essay-ornament img` without `aspect-ratio` | Neither `<img>` carries `width`/`height` and neither rule sets a height, so each box is 0 tall until its SVG lands: the divider jumps 51.36 / 27.09 / 21.28px and the ornament 100.81 / 69.44 / 54.58px at 1280 / 390 / 320px. Both are small local SVGs, the ornament sits at the very foot of the page, and the pair stays as it is |
-| §Z is cross-referenced from nowhere | The only one of 122 entries not reachable from code; content is right, pointer is missing |
+| Entries no code comment points to | Seven of 137: §F, §N, §Q, §U, §W, §Z, §AG. (§AI, §AK and §AL are containers whose subentries are pointed at, so they reach.) Content is right in each, the pointer is missing — measured 14 September 2026, when this row still said §Z was the only one of 122 |
 | `.ritagli-band li::before` at `#999` | 3.014:1 on the `@supports not (backdrop-filter)` fallback — a decorative marker, above the 3:1 floor for non-text, and the attribution beside it is 6.32:1 |
 | CSP via `<meta>` for `script-src` | Feasible — the inline head script is byte-identical on all 14 pages, one SHA-256 — but `style-src` would still need `unsafe-inline` for ~40 custom-property attributes, and `frame-ancestors` cannot go in a `<meta>` at all |
 | The nav label truncates at 320px and a 32px default | See below |
