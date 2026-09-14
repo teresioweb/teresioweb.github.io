@@ -3634,6 +3634,33 @@ from both files and diffing what was left.
 six rungs, and `README.md` points readers at it by name. Only its closing
 paragraph went, which was verbatim §J.
 
+**Re-applied, 14 September 2026.** The file had drifted to 107,878 bytes and
+**56.6% comment** — 61,104 of them — two thirds of the way back to the 59.0%
+above. Forty-five comments were recounting entries again, every one of them
+already carrying the pointer that leads to the fuller version: the twenty-two
+past 420 bytes, and twenty-three more between 330 and 430. Same treatment as
+the first pass, a short "what this does" line plus the existing pointer, and
+the same exemption for the breakpoint ladder above `.skip-link` (§J). Two
+comments were left because they are the only home for what they say and no
+entry holds it: `.clump-anchor`'s A4 measurement, and the `position: static`
+note under `@media print`. **Cut only what an entry already holds in fuller
+form** — that is the whole of the method, and the pointer is how you check.
+
+Result: **107,878 → 99,562 bytes, 56.6% → 53.0% comment**, 32.0 KB → 29.0 KB
+gzipped. Declarations are byte-identical: 2,210 lines, zero differences after
+stripping every comment from both files. Rendering is identical too — 42
+full-page screenshots, fourteen pages across three viewport/default-font pairs
+(1280/16, 390/16, 320/32); forty came back pixel-identical and the two that
+did not reproduced the same two bounding boxes under a control run that
+changed no stylesheet at all.
+
+**The drift is the rule here, not the accident.** Twice now the file has walked
+back toward 59% between audits, and both times the bytes came from comments
+restating entries that were a pointer away. Whatever measures it next should
+measure bytes of `/* */` against total bytes, which is the figure both passes
+used; anything that counts blank lines as comment will read about four points
+high.
+
 Four notes had no home here at all. They are below, so the stylesheet can
 point at them instead of carrying them.
 
