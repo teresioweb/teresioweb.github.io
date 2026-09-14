@@ -80,6 +80,7 @@ split and are each about a decision rather than a rule.
 | §AJ | The bar at a large default font size |
 | §AK | Five fixes from the same pass |
 | §AL | Two more, at 320px and 200% |
+| §AM | Two small fixes, and a ledger of what was left alone |
 
 ---
 
@@ -1762,8 +1763,15 @@ complement of `max-width: 50em`, so the pair meets without a gap or an overlap.
 Change one and you must change the other.
 
 Height thresholds were converted too, on the same reasoning: a viewport is
-"too short" relative to how big the text is, not relative to a pixel count. The
-one consequence worth knowing is that a short laptop window with a large
+"too short" relative to how big the text is, not relative to a pixel count.
+There are two of them, and they are not rungs of the ladder above — each
+belongs to one component that runs out of vertical room, so neither appears
+in the six-rung list in the stylesheet:
+
+- `31.25em` (500px) the landscape footer and the badge sizes (§D, §45, §47)
+- `30em`    (480px) the lightbox gutter, given back to the photo
+
+The one consequence worth knowing is that a short laptop window with a large
 default font now matches the landscape-phone footer rule where it previously
 did not. That is the rule doing its job, but it is a behaviour change and not
 purely mechanical.
@@ -4031,3 +4039,103 @@ never had this problem and this change gives it nothing new to override.
 Same story on desktop: `@media (hover: hover) { .clump-badge { left: 50%;
 right: auto; ...} }` already overrides both edges for a mouse, and still
 does — confirmed unchanged at 1280px on both pages, both languages.
+
+
+## §AM — Two small fixes, and a ledger of what was left alone
+
+An audit re-checked every item of the previous one against the code. Two
+things were corrected; everything else below was measured, judged, and left.
+The ledger exists so the next audit finds these already answered.
+
+### The newspaper's name had no break opportunity
+
+`la&nbsp;Sentinella&nbsp;del&nbsp;Canavese` in the masthead `.fonte` on
+`home.html` and `en/home.html` was one unbreakable 26-character run. At a
+320px viewport and a 32px default font it measured to a right edge of 326
+against a 320px screen; at 40px, 401. Clipped rather than scrolled, because
+of `body { overflow-x: hidden }`.
+
+The middle `&nbsp;` is now a plain space, so the title may break as *la
+Sentinella / del Canavese*. That is the only one of the three break points
+that works: breaking after *la* still overflows at 32px (298, past the
+container) and at 40px (367, past the screen), and dropping all three
+`&nbsp;` would also break `31 dicembre 2018` and `cartacea e online`, which
+are deliberate. The date and the closing pair keep theirs.
+
+Adding a break opportunity is additive — a browser uses it only when the line
+does not otherwise fit — so nothing changes at a normal default: measured
+identical to the pixel at 16px, 223.5 (IT) and 278.5 (EN), one line, as
+before. At 32px the em now ends at 242 (IT) and 225.5 (EN), inside its
+container.
+
+### A rule whose elements had moved out from under it
+
+`.text-window .doc-list-heading` was the only dead selector in the stylesheet
+— verified by matching all 209 static selectors against all 14 pages with
+every dialog opened and text mode on. Its own comment named the three patent
+group headings correctly, but since §X those `<h3>` live in
+`div#text-brevetti-completi.doc-list-full`, a direct child of `body`;
+`.text-window` contains none of them. They are styled by
+`.doc-viewer-text-inner .doc-list-heading` and render unchanged with the rule
+gone. Third time §X's lesson has arrived: change what wraps an element and
+every selector that was reaching it has to be re-read.
+
+### Non-decisions
+
+Eight things an earlier audit raised that were settled in conversation and
+never written down, so each audit since has raised them again. Written down
+now, one line apiece.
+
+| | Decision |
+|---|---|
+| CLS from fonts on Home, 0.09 on a slow network | Accepted; `font-display: swap` on all nine faces is the trade we want |
+| Quercia unreachable from the nav | Intentional — it is an easter egg, found through the link in the Home essay |
+| No custom `404.html` | Overkill for a site this size |
+| Quercia has no `aria-current` | Correct: no nav entry corresponds to it, so highlighting one would be a lie |
+| Image and SVG payload | Fine as it stands, and it does not grow on its own |
+| LinkedIn and Twitter disagree on `og:image` crops | Known, and not worth a second image set |
+| Home carries no watermark | By choice: it is the essay, not a document page |
+| Index shows four cards for five destinations | By choice — the fifth is Quercia, see above |
+
+### Open, measured, and left
+
+Seven items verified in place and judged not worth acting on. Not bugs found
+and ignored: each has a number attached and a reason to stay.
+
+| | Why it stays |
+|---|---|
+| `quercia.html` in `sitemap.xml` | A sitemap is an invitation to index, which pulls against the easter egg; the tension is accepted rather than resolved |
+| 41 patent PDFs with no text layer | Real (0 characters from all 41, 403 pages, 33MB) but inherited from the patent offices; an OCR pass is a project, not a fix |
+| `.essay-divider img` and `.essay-ornament img` without `aspect-ratio` | Neither `<img>` carries `width`/`height` and neither rule sets a height, so each box is 0 tall until its SVG lands: the divider jumps 51.36 / 27.09 / 21.28px and the ornament 100.81 / 69.44 / 54.58px at 1280 / 390 / 320px. Both are small local SVGs, the ornament sits at the very foot of the page, and the pair stays as it is |
+| §Z is cross-referenced from nowhere | The only one of 122 entries not reachable from code; content is right, pointer is missing |
+| `.ritagli-band li::before` at `#999` | 3.014:1 on the `@supports not (backdrop-filter)` fallback — a decorative marker, above the 3:1 floor for non-text, and the attribution beside it is 6.32:1 |
+| CSP via `<meta>` for `script-src` | Feasible — the inline head script is byte-identical on all 14 pages, one SHA-256 — but `style-src` would still need `unsafe-inline` for ~40 custom-property attributes, and `frame-ancestors` cannot go in a `<meta>` at all |
+| The nav label truncates at 320px and a 32px default | See below |
+
+Measuring those two shifts: abort the SVG request and you measure a *broken* image, which Chromium gives a line-height-tall box (28.8px at a 16px default) no matter what `aspect-ratio` says. Delay the response instead — a *pending* image is the state that actually shifts, and it collapses to 0.
+
+**The nav label.** `Un discorso di Capellaro` in the burger dropdown is
+346.8px when it is the `.active` page (700 weight) and 332.8px otherwise,
+against a 305px box. It truncates at both ends — read on screen it says
+"n discorso di Capellar". The band is narrow: at a 28px default the link is
+304.8px and fits inside 305, so this happens only at a 32px default and a
+viewport of 360px or less (and at 40px, up to 430px).
+
+`white-space: normal` on `.nav-links a` closes it — verified over 42
+combinations of font size and width, wrapping in exactly the nine cells where
+the label currently truncates and in none of the other 33 when scoped to
+`@media (max-width: 11.25em)`. It is not applied, because the cost is not
+zero: a wrapped link is a column flex item, so its box grows to the full
+column and its `border-bottom` — the underline this bar reserves from the
+start to avoid a hover shift — becomes a 257px rule under two lines instead
+of an underline hugging the text. Swapping a clipped word for a full-width
+line under the current page is a design choice, not a defect being fixed, and
+it would add a seventh threshold to a ladder whose own comment says to use an
+existing rung first.
+
+### The Proget line on the curriculum
+
+The last patent entry on `curriculum.html` and `en/curriculum.html` ends
+"(per Proget di Gassino Massimo &amp; C. S.N.C.)". It was held back once as a
+privacy question. Reviewed and settled: it stays. It is the assignee on a
+published patent application and is already public in that record.

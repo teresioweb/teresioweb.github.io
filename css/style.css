@@ -370,6 +370,11 @@ body {
   text-decoration: none;
   font-size: 0.90625rem;
   letter-spacing: 0.2px;
+  /* One line per label in the horizontal bar, and inherited by the burger
+     dropdown, where the longest label outgrows the column at a 320px
+     viewport and a 32px default font and is clipped at both ends. Left as
+     it is on purpose; what letting it wrap would cost is written down.
+       → DECISIONS.md §AM */
   white-space: nowrap;
   /* the underline is reserved from the start, transparent until it's
      wanted — same trick already used on .brand-text just above, and
@@ -1619,17 +1624,6 @@ footer .cc-logo {
   margin-bottom: 0;
 }
 
-/* sub-heading between groups of a .doc-list inside a .text-window
-   (Curriculum patent list: "Firmati con Natale Capellaro", "Con altri
-   coinventori", "Dopo l&rsquo;Olivetti") — bold and centered, distinct
-   from the plain citation text around it. Those three are <h3> since §X;
-   the first group opens unlabelled on purpose, so there is no fourth. */
-.text-window .doc-list-heading {
-  text-align: center;
-  font-weight: 700;
-  margin: 14px 0 6px;
-}
-
 /* small print / citation lines ("Fonte: ...") throughout the site */
 .fonte {
   font-family: 'Merriweather Sans', Arial, sans-serif;
@@ -1998,7 +1992,9 @@ footer .cc-logo {
 }
 
 /* A phone held sideways has height to spare nowhere: the gutter is the only
-   thing left to give, and every pixel of it comes back as photo. */
+   thing left to give, and every pixel of it comes back as photo. One of the
+   site's two height thresholds — the other is 31.25em — and neither is a
+   rung of the width ladder above .skip-link.  → DECISIONS.md §J */
 @media (max-height: 30em) {
   .lightbox-overlay {
     --lb-pad-y: 8px;
