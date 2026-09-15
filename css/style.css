@@ -2143,8 +2143,12 @@ body.page-curriculum .doc-viewer-text-inner {
 }
 
 /* section subheads inside a combined transcript (BanchelliFull, two
-   posts in one template) — one level up from .doc-viewer-text-comments
-   h3 below, which marks a much smaller "Commenti" label */
+   posts in one template) — the larger of the two h2 treatments. The
+   "Commenti" label is an h2 too, and sits inside this container, so
+   .doc-viewer-text-comments h2 below matches the same element at equal
+   specificity (0,2,0) and wins on source order alone. It must stay
+   below this rule. (Said "h3" until 15 September 2026; nothing in any
+   template is an h3, and that arm below matches nothing.) */
 .doc-viewer-text-inner h2 {
   font-family: 'Merriweather Sans', Arial, sans-serif;
   font-size: 0.9375rem;

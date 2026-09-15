@@ -96,6 +96,7 @@ split and are each about a decision rather than a rule.
 | §AK | Five fixes from the same pass |
 | §AL | Two more, at 320px and 200% |
 | §AM | Two small fixes, and a ledger of what was left alone |
+| §AN | Seven drifts, two phantoms, one bad fix, and a checker |
 
 ---
 
@@ -145,6 +146,18 @@ the missing build step, and the pointers row, which is about this file rather
 than about the site. Nothing in a stylesheet can point at a thing that is
 not there, so for those this table is the only defence and a second pass over
 any finding is the only gate. The rest carry a pointer at the rule itself.
+
+> **The count and the list disagree, and this is not the place to guess which
+> is wrong.** The sentence says eleven; the enumeration after it names ten
+> rows. An audit on 15 September 2026 resolved it by lowering the number to
+> ten, which is the wrong side: at least two further rows have no address in
+> the code either and are simply absent from the enumeration — CSP via
+> `<meta>`, which is a tag that is not there, and the entries-with-no-pointer
+> row, which is about this file. So the true figure is not ten, and *eleven*
+> may well be right with one item dropped from the list when it was written.
+> Reverted the same day, unresolved on purpose. **Fixing the cheaper side of a
+> contradiction is not a fix** — settle it by counting the rows against the
+> criterion, once, and then rewrite both halves together. (§AN)
 
 ---
 
@@ -2459,6 +2472,10 @@ the selection is by filing date, and no reader can infer that from the page.
 spanning several countries are listed once under the US document, with the other
 jurisdictions' codes in brackets. That was being applied silently.
 
+> **"the US document" was never the whole convention.** Corrected in §R below,
+> 15 September 2026, along with the same sentence there. The dialog's own line
+> says "statunitense, italiano o tedesco" and is the accurate one. (§AN)
+
 **"Espandi la lista" moved inside the box, and changed register.** §O put it
 below the box and argued that a control inside a three-rows-visible list would
 need scrolling to be found. That argument was answered rather than overruled: the
@@ -2539,6 +2556,18 @@ appeared twice under 3,404,765, and 3,005,585 appeared as two separate rows
 > entries carry codes, 24 codes in all**, IT and EN identical. The convention
 > itself is unchanged, and so is the sentence below — two of the card's eight
 > have codes, and the box still stays clean.
+
+> **"under the US document" is wrong, and was wrong when this entry was
+> written.** Thirteen of the eighteen families are listed under their US
+> document. Five are not: `DE7014884` and `DE2036218` in *Dopo l'Olivetti*,
+> and the three Italian ones, `IT1060649`, `IT1038503` and `IT1121405`. §AG
+> added the first two; the three Italian entries were already there when this
+> entry claimed sixteen, so three of that sixteen were Italian documents and
+> the sentence never described the list it was describing. The dialog's own
+> opening line has it right — "si è scelto il documento statunitense, italiano
+> o tedesco" — and is what `README.md` and §P now defer to. **The convention
+> is one document per family, not one country.** Corrected 15 September 2026;
+> the counts in the note above are unaffected. (§AN)
 
 The codes are added **only inside `.doc-list-full`**, which is both the dialog and
 the printed appendix. The card's eight-entry box stays clean: two of those eight
@@ -4250,7 +4279,7 @@ audit raised both and found no row to check them against.
 | LinkedIn and Twitter disagree on `og:image` crops | Known, and not worth a second image set |
 | Home carries no watermark | By choice: it is the essay, not a document page |
 | Index shows four cards for five destinations | By choice — the fifth is Quercia, see above |
-| Comments shipped to readers: no minification step | Accepted. `README.md`'s first line is the constraint — no build tools — and the served files are the edited files. §AI keeps the cost in range by pruning the source instead, twice now; the figure to watch is the gzipped one, 29,837 bytes of CSS and 20,809 of JS at gzip level 9, measured 15 September 2026 — not the raw. Bytes, and stated as bytes: see the unit note in §AI's opening section |
+| Comments shipped to readers: no minification step | Accepted. `README.md`'s first line is the constraint — no build tools — and the served files are the edited files. §AI keeps the cost in range by pruning the source instead, twice now; the figure to watch is the gzipped one, 29,966 bytes of CSS and 20,809 of JS at gzip level 9, measured 15 September 2026 — not the raw. **Measured with Python's `gzip.compress(data, 9)`, and say so**: GNU `gzip -9 -n` returns 29,788 and 20,809 for the same two files, so the JS agrees, the CSS is 178 lower, and the disagreement looks exactly like a stale figure until you reach for the other tool (§AN). The gap between the two tools is not a constant — it was 167 bytes before the 15 September comment edits — so it cannot be carried forward; re-measure both. Bytes, and stated as bytes: see the unit note in §AI's opening section |
 | `DECISIONS.md` and `README.md` served publicly | Accepted, and not an oversight: about a quarter of a megabyte of Markdown at `/DECISIONS.md` and `/README.md`, served raw because neither carries YAML front matter for Jekyll to process. No exact figure here on purpose — it moves with every edit to either file. No page links to either (checked: zero `.md` hrefs in the fourteen), and they hold nothing the public repository does not. Do not add a `robots.txt` rule — `Disallow` on an unlinked file advertises it |
 
 ### Open, measured, and left
@@ -4263,8 +4292,8 @@ and ignored: each has a number attached and a reason to stay.
 | `quercia.html` in `sitemap.xml` | A sitemap is an invitation to index, which pulls against the easter egg; the tension is accepted rather than resolved |
 | 41 patent PDFs with no text layer | Real (0 characters from all 41, 403 pages, 33MB) but inherited from the patent offices; an OCR pass is a project, not a fix |
 | `.essay-divider img` and `.essay-ornament img` without `aspect-ratio` | Neither `<img>` carries `width`/`height` and neither rule sets a height, so each box is 0 tall until its SVG lands: the divider jumps 51.36 / 27.09 / 21.28px and the ornament 100.81 / 69.44 / 54.58px at 1280 / 390 / 320px. Both are small local SVGs, the ornament sits at the very foot of the page, and the pair stays as it is |
-| Pointers with no entry | The reverse failure of the row below, and the one this file had no check for. §K closed on "see the audit note on the decorative SVGs" and no such note existed; found and repointed 15 September 2026. Swept the same day: every `§` reference in `style.css`, `animations.js`, `README.md` and this file resolves to one of the 137 headings. The sweep also caught the prose form — "see the …" and "the note on …" — and found one other, "the retirement note in §O", which resolves. A prose pointer phrased some third way would not have been caught. Worth re-running whenever an entry is retired, since a retired entry is how the next one gets made |
-| Entries no code comment points to | Seven of 137: §F, §N, §Q, §U, §W, §Z, §AG. (§AI, §AK and §AL are containers whose subentries are pointed at, so they reach.) Content is right in each, the pointer is missing — measured 14 September 2026, when this row still said §Z was the only one of 122 |
+| Pointers with no entry | The reverse failure of the row below, and the one this file had no check for. §K closed on "see the audit note on the decorative SVGs" and no such note existed; found and repointed 15 September 2026. Swept the same day: every `§` reference in `style.css`, `animations.js`, `README.md` and this file resolves to one of the 138 headings. The sweep also caught the prose form — "see the …" and "the note on …" — and found one other, "the retirement note in §O", which resolves. A prose pointer phrased some third way would not have been caught. Worth re-running whenever an entry is retired, since a retired entry is how the next one gets made |
+| Entries no code comment points to | Eight of the 124 entries: §F, §N, §Q, §U, §W, §Z, §AG, §AN. (§AI, §AK and §AL are containers whose subentries are pointed at, so they reach. §AN is pointed at from `README.md`, which is not what this row counts.) Content is right in each, the pointer is missing — measured 14 September 2026, when this row still said §Z was the only one of 122. **Entries here, not headings.** The file has 138 headings, the extra fourteen being the subentries §AI.1 to §AL.2, and this row read "seven of 137" until 15 September 2026 — which made its own denominator jump 122 → 137 while a single entry was added, and hid that the basis had changed rather than the file. The row above counts headings, correctly, because a `§` reference can point at a subentry; this one counts entries, because only a whole entry can go unpointed. **Say which you are counting whenever both numbers are in range** |
 | `.ritagli-band li::before` at `#999` | 3.014:1 on the `@supports not (backdrop-filter)` fallback — a decorative marker, above the 3:1 floor for non-text, and the attribution beside it is 6.32:1 |
 | CSP via `<meta>` for `script-src` | Feasible — the inline head script is byte-identical on all 14 pages, one SHA-256 — but `style-src` would still need `unsafe-inline` for ~40 custom-property attributes, and `frame-ancestors` cannot go in a `<meta>` at all |
 | The nav label truncates at 320px and a 32px default | See below |
@@ -4296,3 +4325,211 @@ The last patent entry on `curriculum.html` and `en/curriculum.html` ends
 "(per Proget di Gassino Massimo &amp; C. S.N.C.)". It was held back once as a
 privacy question. Reviewed and settled: it stays. It is the assignee on a
 published patent application and is already public in that record.
+
+---
+
+## §AN — Seven drifts, two phantoms, one bad fix, and a checker
+
+A running check measured `README.md` and this file against the code rather
+than against each other. Seven things had drifted, the seventh found only once
+a browser was available. Two more were reported and
+were not real. A seventh was real, was "fixed" wrongly, and was reverted the
+same day. The three failures are the more useful half of the entry: all three
+are reproducible, and a later audit will reach them again.
+
+### The two that were not drift
+
+**`gzip -9` is not the gzip in §AM.** The minification row records 29,837
+bytes of CSS and 20,809 of JS at gzip level 9. Checked against the shipped
+files, `gzip -9 -n -c` returns 29,670 and 20,809 — the JS matches, the CSS is
+167 short, which reads exactly like a stylesheet edited after the measurement.
+It was not. The figures are Python's `gzip.compress(data, 9)`, which for these
+two inputs differs from GNU gzip by +167 and 0, and reproduces both numbers to
+the byte. Two implementations at the same nominal level disagree by more than
+a small edit would, and the JS agreeing by coincidence is what makes the CSS
+gap look like drift. **§AM's row now says which gzip.** The general form: a
+compressed size is a measurement of a tool as much as of a file, so name the
+tool beside the number, the way the unit note in §AI names the unit.
+
+**§AI's 100,232 bytes is dated, not stale.** The byte-versus-character
+paragraph measures the file *before that day's edits* and says so in its first
+sentence; the current file is 100,080 bytes, 99,433 characters, 53.26% by byte
+and 52.96% by character. The 152-byte gap is the edits the paragraph excludes.
+A dated historical figure with its qualifier attached is not a figure that
+needs refreshing, and re-stating it against today's file would destroy the
+comparison it exists to make. **Check for the qualifier before reporting a
+number as stale.**
+
+### The six that were
+
+**`README.md` claimed the US document for all eighteen patent families.**
+Thirteen of the eighteen are listed under their US document; the five in
+*Dopo l'Olivetti* are listed under the German or Italian one — `DE7014884`,
+`DE2036218`, `IT1060649`, `IT1038503`, `IT1121405`. The list's own opening
+paragraph on `curriculum.html` had it right all along ("statunitense, italiano
+o tedesco"); the README had not followed §AG, which is where the two German
+documents replaced their French family members. Corrected to name all three
+jurisdictions and the split.
+
+**… and so did §P and §R, one of them from before there was a German document
+in the list.** The same sentence appears twice more, and a grep for it after
+fixing the README is what found them. §R's version is the older failure: it
+claimed "sixteen families … listed once under the US document" at a time when
+three of those sixteen were Italian documents, so it did not describe the list
+even on the day it was written. §AG then added the two German ones and did not
+reach back. Both now carry a correction note. **A convention stated in three
+places drifts in three places** — the dialog's own opening line is the copy
+that was right throughout, because it is the one a reader can check against
+what is under it.
+
+**The `@language` rule was stated absolutely and is not absolute.** The README
+said every literal hanging off a shared `@id` carries an `@language` tag.
+Seven do not, correctly: the `name` of `#teresio`, `#olivetti`, `#logos27` and
+`#quercia`, the two dates on `#teresio`, and `#logos27`'s `releaseDate`. A
+proper noun and a date are one value in both graphs; tagging them would assert
+a language the value does not have. The rule was always about literals that
+*differ* between the two pages — that is what the job-title example beside it
+illustrates — and it is now scoped that way. **A rule written stronger than
+the code is falsified by the first person who checks it**, and then the whole
+line stops being trusted, including the part that was right.
+
+**Section 1 of the README stated no unit.** The Font section fixes KB as KiB
+for itself, flags §Z for using decimal, and closes with "state the unit when
+adding a figure". Three lines below, section 1 gives the rotator frames as
+65KB / 79KB / 83KB, which is decimal — 65,406, 78,908 and 83,078 bytes; in
+KiB they would be 64, 77 and 81. The instruction and the next figure under it
+disagreed, which is the same failure §AI recorded for bytes against
+characters. Section 1 now declares decimal and prints the byte counts, and the
+Font section's pointer names section 1 alongside §Z.
+
+**"Seven of 137" counted headings where it meant entries.** The unpointed-
+entries row in §AM listed seven entries against a denominator of 137, which is
+the heading count of the day — 123 entries plus the fourteen subentries
+§AI.1 to §AL.2, and 124 and 138 with this entry added.
+Its own closing clause says the row once read "§Z was the only one of 122",
+the entry count of the day before. So the denominator moved 122 → 137 while
+exactly one entry was added, and nothing in the row said the basis had
+changed. Now "eight of the 124 entries", with the two counts distinguished:
+the sweep row above counts headings because a `§` reference can point at a
+subentry, this one counts entries because only a whole entry can go unpointed.
+
+**"Eleven of these have no address in the code" enumerated ten.** The list
+after the claim has always held ten items. Eleven comes out only by counting
+Quercia's row as the two findings inside it while counting the two repository
+files as the single row they share — two bases in one sentence. Changed to
+ten rows, with the basis named.
+
+### The one that was fixed the wrong way
+
+The "eleven of these have no address in the code" sentence above the artifact
+table names ten rows. Both numbers cannot be right, and the pass changed the
+sentence to ten — the cheaper edit, one word against a list. Wrong side: CSP
+via `<meta>` and the entries-with-no-pointer row also have no address in the
+code and are not in the enumeration, so ten is false and eleven is plausibly
+true with an item dropped from the list. Reverted, and left contradictory with
+a note saying so.
+
+This is the failure worth naming, because it is not a measurement error. Every
+other item here was settled by running something. This one had two candidate
+resolutions and no measurement was run to choose between them; the shorter
+edit won. **A contradiction between a count and a list is resolved by
+recounting against the criterion, not by amending whichever half is fewer
+keystrokes.** If the recount is not worth doing in the pass that found it,
+the honest output is a note, not a number.
+
+### The browser claims, finally measured
+
+Four claims had never been checked against a running browser, because
+Playwright's CDN is unreachable from the sandbox these audits run in. A
+Chromium binary published on the npm registry (`@sparticuz/chromium`) is
+reachable, and Playwright drives it through `executablePath`. Recorded here so
+the next pass does not spend the attempt again.
+
+**The faces-per-page table is right.** Counted from the `.woff2` responses
+after a full scroll, on all fourteen pages: Foto 5 faces / 127,056 bytes /
+124.1 KiB; Index, Discorso and Quercia 6 / 163.6–165.1 KiB; Logos 27 7 /
+176.3 KiB; Home and Curriculum 8 / 217.3–217.4 KiB. Every row of the table
+holds, including the 164–165 range, which Quercia enters at 163.6 and rounds
+into.
+
+**One byte figure beside it did not.** The Font section said the five faces
+Foto requests are "127,000 bytes" and called the section exact. They are
+127,056. The KiB derived from it, 124, was right the whole time, which is why
+nothing downstream was wrong and why nobody caught it: a rounded figure
+presented as exact survives every check that uses the rounding. Corrected, and
+`check.py` now asserts the byte count rather than the KiB.
+
+**Zero console errors and zero page errors** across all fourteen pages, after a
+full scroll, with every dialog opened.
+
+**"209 static selectors" cannot be reproduced, and is not therefore wrong.**
+§AM's dead-selector sweep counted 209; counting every selector in the live
+stylesheet that carries no dynamic pseudo-class gives 262. The two numbers
+disagree because "static" is not defined beside the figure, exactly as the
+gzip level was not. **This is the gzip lesson a second time, so it is not being
+called an error** — the fix is to state the definition or drop the number, not
+to replace it with one taken under a different rule. The sweep's *conclusion*
+was separately re-tested and holds: matching every selector against all
+fourteen pages with every dialog opened and text mode on finds no rule that
+matches nothing. Three selectors match nothing on their own — `.side-row > img`,
+`.patent-frame:only-child` and `.doc-viewer-text-comments h3` — and all three
+are one arm of a rule whose other arms match, which is not a dead rule. The
+middle one is documented as a deliberate no-JS guard.
+
+### The checker
+
+`check.py` at the repository root turns 152 of the figures in these two
+documents into assertions: inventory counts, every internal reference,
+image dimensions against `width`/`height`, the patent list's four group sizes
+and its 18 families and 24 codes and 13-to-5 US split, the breakpoint ladder,
+the scroll-padding reserve and both 12px margins, the burger's box and bars,
+six contrast ratios computed from the hex values, both gzip sizes *with the
+gzip named*, the entry and heading counts, `§` reference integrity in all four
+files, canonical and `hreflang` on fourteen pages, IT/EN structural parity, and
+the JSON-LD rule about which literals may go untagged.
+
+It was mutation-tested before being committed, because a checker that passes is
+indistinguishable from a checker that does nothing. Eight deliberate
+regressions — reverting `scroll-margin-top` to 100px, retuning `.text-window`'s
+link back to the colour that fails AA, deleting a patent from the full list,
+falsifying one `width` attribute, appending one byte to the stylesheet,
+pointing the README at an entry that does not exist, renaming an entry so its
+pointers break, and breaking one canonical — produced 1 to 4 failures each and
+none produced zero.
+
+**Its first catch was this pass's own edit.** Correcting a wrong element name
+in a `style.css` comment — `.doc-viewer-text-comments h3` described as marking
+the "Commenti" label, which is an `h2` in both templates and always was —
+changed the stylesheet, and therefore the gzipped size in §AM's minification
+row. A one-word comment fix, a figure two files away. The checker failed on it
+before the edit was a minute old; by hand, nobody would have connected the two,
+and the next audit would have reported §AM as drifted. The figure is now 29,966,
+and the tool gap widened from 167 bytes to 178, which is the other half of the
+lesson: **the difference between two gzip implementations is not a constant and
+cannot be carried forward.** Re-measure both, never derive one from the other.
+
+**What it is for.** Not tidiness. These audits run without memory of each
+other, so each one re-derives the same figures from scratch, guesses at the
+method, and reports the difference as drift. That is where this pass's two
+phantoms came from, and it is a large share of what the last several passes
+produced. An assertion is a method written down. The figure either holds or it
+names itself, and there is no judgement left in the middle for a fresh reader
+to get wrong.
+
+### What this pass is really about
+
+Four of the six are the same shape: a number or a rule that was right when
+it was written, and a change elsewhere that moved what it described. The
+README's US document claim was overtaken by §AG. "Seven of 137" was overtaken
+by the subentries. Two were never true at all — the `@language` line, and §R's
+version of the US claim — which is the kind this file cannot catch by
+re-measuring, only by reading a rule against the thing it claims to describe.
+
+And the two phantoms are the argument for this section existing. A finding
+that survives one check and dies on the second costs an edit that would have
+made the documentation worse: refreshing §AI's dated figure would have thrown
+away the byte/character comparison, and "correcting" §AM's CSS number would
+have replaced a reproducible figure with one from a different tool. **A second
+pass over any finding is the only gate** — the table at the top of this file
+already says so for the things left alone; it holds for the things reported
+as wrong too.
