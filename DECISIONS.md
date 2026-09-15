@@ -4452,12 +4452,24 @@ after a full scroll, on all fourteen pages: Foto 5 faces / 127,056 bytes /
 holds, including the 164–165 range, which Quercia enters at 163.6 and rounds
 into.
 
+**A full scroll is not the whole cost on Quercia**, and the table has always
+said only what a scroll requests. Opening its document viewer in text mode
+pulls `merriweather-700-normal` too: 7 faces, 204.7 KiB, 41 KiB above its row.
+The cause is a single `<strong>` in the transcript — one inline tag, one whole
+serif cut. Discorso and Logos 27, the other two pages with a viewer, do not
+move under the same test, so this is not a general gap in the table but one
+page's. The row stays as measured and the README now says to read it as the
+resting cost rather than the ceiling. **The measurement was right and the
+question it answered was the narrow one**, which is the same failure as the
+selector count below: a method can be stated, reproducible, and still not be
+the method the figure's reader needs.
+
 **One byte figure beside it did not.** The Font section said the five faces
 Foto requests are "127,000 bytes" and called the section exact. They are
 127,056. The KiB derived from it, 124, was right the whole time, which is why
 nothing downstream was wrong and why nobody caught it: a rounded figure
-presented as exact survives every check that uses the rounding. Corrected, and
-`check.py` now asserts the byte count rather than the KiB.
+presented as exact survives every check that uses the rounding. Corrected to the
+byte count, which is the figure that can be wrong; the KiB follows from it.
 
 **Zero console errors and zero page errors** across all fourteen pages, after a
 full scroll, with every dialog opened.
@@ -4476,45 +4488,39 @@ matches nothing. Three selectors match nothing on their own — `.side-row > img
 are one arm of a rule whose other arms match, which is not a dead rule. The
 middle one is documented as a deliberate no-JS guard.
 
-### The checker
+### Why the figures in these two files now name their method
 
-`check.py` at the repository root turns 152 of the figures in these two
-documents into assertions: inventory counts, every internal reference,
-image dimensions against `width`/`height`, the patent list's four group sizes
-and its 18 families and 24 codes and 13-to-5 US split, the breakpoint ladder,
-the scroll-padding reserve and both 12px margins, the burger's box and bars,
-six contrast ratios computed from the hex values, both gzip sizes *with the
-gzip named*, the entry and heading counts, `§` reference integrity in all four
-files, canonical and `hreflang` on fourteen pages, IT/EN structural parity, and
-the JSON-LD rule about which literals may go untagged.
+A checker was written during this pass — a script asserting every figure here
+that can be derived from the repository — and deliberately not kept. It existed
+to stop stateless reviewers from re-deriving numbers by hand, which is not a
+problem the site has; it is a problem a particular kind of reviewer has, and a
+script in a repository that ships nothing but static files is a thing to
+maintain, mislead with, and eventually let rot. **The durable half of it was
+never the script.** It was the discovery that most reported drift in these
+documents is a reader guessing at a method the figure never stated, and the fix
+for that is prose: every figure that could be taken two ways now says which way
+beside it. Python's `gzip.compress` in §AM's minification row. Decimal KB in
+`README.md` section 1 and KiB in its Font section, each declared in its own
+sentence. Entries against headings in §AM's unpointed row. A full scroll, and
+now also the viewer, for the face counts above. **A figure without its method is
+a future false positive** — that is the whole lesson, and it survives without
+the tooling.
 
-It was mutation-tested before being committed, because a checker that passes is
-indistinguishable from a checker that does nothing. Eight deliberate
-regressions — reverting `scroll-margin-top` to 100px, retuning `.text-window`'s
-link back to the colour that fails AA, deleting a patent from the full list,
-falsifying one `width` attribute, appending one byte to the stylesheet,
-pointing the README at an entry that does not exist, renaming an entry so its
-pointers break, and breaking one canonical — produced 1 to 4 failures each and
-none produced zero.
+Two things the script found before it was dropped are worth keeping, because
+neither is obvious by reading:
 
-**Its first catch was this pass's own edit.** Correcting a wrong element name
-in a `style.css` comment — `.doc-viewer-text-comments h3` described as marking
-the "Commenti" label, which is an `h2` in both templates and always was —
-changed the stylesheet, and therefore the gzipped size in §AM's minification
-row. A one-word comment fix, a figure two files away. The checker failed on it
-before the edit was a minute old; by hand, nobody would have connected the two,
-and the next audit would have reported §AM as drifted. The figure is now 29,966,
-and the tool gap widened from 167 bytes to 178, which is the other half of the
-lesson: **the difference between two gzip implementations is not a constant and
-cannot be carried forward.** Re-measure both, never derive one from the other.
+**A comment edit moved a figure two files away.** Correcting a wrong element
+name in a `style.css` comment — `.doc-viewer-text-comments h3` described as
+marking the "Commenti" label, which is an `h2` in both templates and always was
+— changed the stylesheet, and therefore the gzipped size in §AM's minification
+row. A one-word comment fix, a number in another file. Nobody connects those two
+by hand, and the next pass would have reported §AM as drifted. **Any edit to
+`style.css` or `animations.js`, including to a comment, invalidates §AM's
+gzip figures.** Re-measure them in the same commit.
 
-**What it is for.** Not tidiness. These audits run without memory of each
-other, so each one re-derives the same figures from scratch, guesses at the
-method, and reports the difference as drift. That is where this pass's two
-phantoms came from, and it is a large share of what the last several passes
-produced. An assertion is a method written down. The figure either holds or it
-names itself, and there is no judgement left in the middle for a fresh reader
-to get wrong.
+**The gap between two gzip implementations is not a constant.** It was 167 bytes
+before that comment edit and 178 after. Never derive one tool's figure from the
+other's; measure both, or state one and let the other be looked up.
 
 ### What this pass is really about
 
