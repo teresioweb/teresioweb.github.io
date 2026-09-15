@@ -51,6 +51,8 @@ How many faces a page loads depends on what it sets, and it is more than the fou
 
 On Home and Curriculum the fonts outweigh the CSS and the JS together; the four serif cuts alone are 166 KB. Only `merriweather-400-normal` and `merriweather-sans-400-normal` are preloaded, which is deliberate — preloading more would put the whole 217 KB on the critical path. All ten files are subset by **`fonts/subset.sh`**; re-run it against the Fontsource originals whenever those are replaced. The range covers Latin-1, Latin Extended-A, Greek, typographic punctuation, arrows and common maths symbols. Two characters used on the site fall back to a system font because neither Merriweather contains them: ↗ (U+2197) and ⤢ (U+2922).
 
+Face counts re-measured from the `.woff2` requests on 15 September 2026 and unchanged. **KB in this section means KiB, 1024 bytes**, and it is exact: the five faces Foto requests are 127,000 bytes, the 124 above; the four serif cuts are 170,212, the 166 above. `DECISIONS.md` §Z uses the other convention for the rotator frames — `brevetto.webp` is 65,406 bytes and it calls that 65KB. Both are fine; neither says which it is, and that is the drift worth preventing. State the unit when adding a figure.
+
 ## 1. Images
 All content photos are WebP, sized at roughly 2× their CSS display width. Two Curriculum scans (the CFM diploma and the Cavaliere honour) exist twice: an on-page thumbnail at 800px and a `-full` version up to 1600px on the long edge, opened in the document viewer. `curriculum-fronte.webp` exists only at 1200px. `brevetto.webp`, `brevetto-2.webp` and `brevetto-3.webp` are the patent card's three rotation frames: all 800×615, so the card never reflows between them. Frame 1 is 65KB and frames 2 and 3 are 79KB and 83KB — a difference the card never shows, since the geometry is what holds it steady: the `width`/`height` attributes reserve the box before any file arrives, and frames 2 and 3 are absolutely positioned inside it. `images/creative.png` and every SVG in `sfondi/` are untouched.
 
@@ -134,6 +136,7 @@ Things that look like omissions on a quick pass and are not:
 - **The gallery lightbox and the document viewer both show the same loading gear**, from two different code paths: the viewer sets it in `initDocViewer()`, the lightbox in `initLightbox()`'s `showIndex`. The lightbox one carries an extra `complete && naturalWidth` guard, because prev/next can re-show an image the browser already has and a `src` that doesn't change fires no `load`. (`DECISIONS.md` §AB)
 - **Merriweather 300 is declared and unused.** Sans 300 is used; the serif light face is never requested by any page.
 - **`figcaption` sits inside `.side-row`, not as a direct child of `figure`.** Invalid HTML — 16 Nu validator errors across Logos, Curriculum and their English pages — and left that way deliberately. Three attempts to correct it failed. **Don't start a fourth without reading `DECISIONS.md` §AC first.**
+- **Nothing is minified, and `DECISIONS.md` and `README.md` are served as files.** Both follow from the no-build-tools line at the top of this file. Decisions in `DECISIONS.md` §AM, *Non-decisions*.
 - **The nav bar's max-width is in rem, unlike every other box on the site.** It holds text that scales, so it scales too. (`DECISIONS.md` §AA)
 - **Foto's grid is not a `<ul>`** and has no per-photo headings.
 

@@ -718,14 +718,11 @@ figcaption {
   transform: translateX(0);
 }
 
-/* Side-by-side figure: image and description next to each other. The
-   figcaption sits inside .side-row rather than as a direct child of
-   <figure>, which the W3C validator flags as a content-model error.  →
-   DECISIONS.md §22 */
-/* Image column + text column, side by side. The <figcaption> is inside
-   this flex row, not a direct child of <figure> — which is invalid HTML
-   and is left that way on purpose. Do not "fix" it: three attempts have
-   failed.  → DECISIONS.md §AC */
+/* Image column + text column, side by side: the image column takes 42% and
+   the caption the rest. The <figcaption> is inside this flex row, not a
+   direct child of <figure> — invalid HTML, left that way on purpose. Do
+   not "fix" it: three attempts have failed.  → DECISIONS.md §22 (the
+   rule), §AC (why the figcaption stays) */
 .side-row {
   display: flex;
   gap: 28px;

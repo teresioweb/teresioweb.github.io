@@ -101,7 +101,7 @@ split and are each about a decision rather than a rule.
 
 ## What was left alone, by artifact
 
-Twenty-two things that were looked at and deliberately not changed. They are
+Twenty-five things that were looked at and deliberately not changed. They are
 written up in seven different places under six different names — *Non-decisions*,
 *Open, measured, and left*, *Left alone on purpose*, *Still open*, *why it stays*,
 *and should not* — so searching for any one of those names finds a seventh of
@@ -133,11 +133,16 @@ The entries hold the reasoning; this only says where to go.
 | CSP via `<meta>` for `script-src` | §AM, *Open, measured, and left* |
 | The Proget line on the curriculum | §AM |
 | Entries no code comment points to | §AM, *Open, measured, and left* |
+| Pointers with no entry — the reverse of the row above | §AM, *Open, measured, and left* |
 | `style.css` drifting back toward 59% comment between audits | §AI |
+| Comments shipped to readers: no minification step | §AM, *Non-decisions* |
+| `DECISIONS.md` and `README.md` served publicly from the site root | §AM, *Non-decisions* |
 
-**Eight of these have no address in the code** — the absent `404.html`, the font
-CLS, the `og:image` crops, the missing watermark, the four cards, the payload,
-Quercia's two nav items. Nothing in a stylesheet can point at a thing that is
+**Eleven of these have no address in the code** — the absent `404.html`, the
+font CLS, the `og:image` crops, the missing watermark, the four cards, the
+payload, Quercia's two nav items, the two repository files served as pages,
+the missing build step, and the pointers row, which is about this file rather
+than about the site. Nothing in a stylesheet can point at a thing that is
 not there, so for those this table is the only defence and a second pass over
 any finding is the only gate. The rest carry a pointer at the rule itself.
 
@@ -431,18 +436,36 @@ lets source order decide again, same as before the .no-js/.js split existed.
 
 ## §22 — `.side-row`
 
-> Side-by-side figure: image and description next to each other. The figcaption sits inside .side-row rather than as a direct child of <figure>, which the W3C validator flags as a content-model error.
+> Image column + text column, side by side: the image column takes 42% and the caption the rest. The <figcaption> is inside this flex row, not a direct child of <figure> — invalid HTML, left that way on purpose. Do not "fix" it: three attempts have failed.
 
-Side-by-side figure: image + description next to each other --- figcaption
-sits inside .side-row here, not as <figure>'s direct first/last child — a W3C
-validator flags this as a content-model error. Left as-is deliberately: making
-figcaption a true direct child means switching this layout from flex to CSS
-Grid, which changes how row height gets computed for the text-driven image
-stretch used on the Logos 27 page, and needs its own compensating fix per card
-(cropping, column width) to match. Tried once, reverted — the validator
-warning has no real accessibility cost (screen readers still associate the
-caption correctly regardless of DOM position within the figure), so it wasn't
-worth the risk to a hand-tuned layout.
+Side-by-side figure: image + description next to each other. `.side-row` is
+the flex row; `.side-row > a`, `> img` and `> button` take `width: 42%` with
+`flex-shrink: 0`, and the caption takes the rest. `.fonte-row` below it
+repeats the same two-column geometry with an invisible spacer (§23). At
+`max-width: 40em` the row turns to `flex-direction: column` and the 42%
+becomes 100%.
+
+**The `<figcaption>`'s position is §AC's decision, not this entry's**, and so
+is the account of what has been tried. This entry used to carry its own
+version of both, and its version of the cost disagreed with §AC's: this one
+said the error has no real accessibility cost because screen readers
+associate the caption correctly regardless of its position inside the figure;
+§AC says the nesting leaves those `figure` elements with no accessible name.
+Two entries, opposite claims, and the stylesheet pointing at both.
+
+Measured 15 September 2026, Chromium 141 via the CDP accessibility tree: a
+`figure` on Curriculum has an empty accessible name — and so does a `figure`
+on Home, which §AC itself records as having the conforming shape. In a
+control page a valid `figure > img + figcaption` is unnamed too, and the name
+sources Chromium reports for `figure` are `aria-labelledby`, `aria-label` and
+`title` only. In that engine the caption does not name the figure in either
+shape, so the difference §AC attributes to the nesting is not observable
+there. **This does not settle it**: HTML-AAM does list `figcaption` as a name
+source for `figure`, and Firefox and WebKit were not available to test here.
+
+What is settled is that the claim belongs in one place. It is removed from
+this entry on 15 September 2026 and left with §AC, whose cost paragraph is
+what the measurement above bears on.
 
 ## §23 — `.fonte-row`
 
@@ -996,16 +1019,29 @@ when there isn't, so the whole image always stays inside the scrollable range.
 
 ## §62 — `.doc-viewer-scroll img (width cap)`
 
-> Caps a document at the viewport width, with nowhere for extra width to go but off both edges. --doc-width can still ask for less, never more.
+> Caps a document at the width of the box that holds it; --doc-width can still ask for less, never more. Percent, not vw — the same distinction §AD settled for the lightbox, which this rule then got wrong 200 lines later. vw counts the scrollbar the dialog reserves with scrollbar-gutter.
 
-Capped so a document can't run wider than the viewport — nowhere for the extra
-width to go but off both edges, which combined with justify-content:center
-above was the actual cause of the reported horizontal-scroll bug. Holds on
-mobile too now: a portrait-shaped scan (banchellilogos, banchellidiscorso,
-teresio-cavaliere) reads fine capped by width, same as everywhere else. --doc-
-width can still request a SMALLER width than the cap, for a document whose
-natural size tested too small to read — it only ever shrinks the image, never
-grows it past the cap.
+Capped so a document can't run wider than the box that holds it — nowhere for
+the extra width to go but off both edges, which combined with
+justify-content:center above was the actual cause of the reported
+horizontal-scroll bug. Holds on mobile too: a portrait-shaped scan
+(banchellilogos, banchellidiscorso, teresio-cavaliere) reads fine capped by
+width, same as everywhere else. --doc-width can still request a SMALLER width
+than the cap, for a document whose natural size tested too small to read — it
+only ever shrinks the image, never grows it past the cap.
+
+**The cap used to be the viewport, and §AK.3 is where that was fixed.** The
+rule was `max-width: 100vw`; this entry described the cap as the viewport to
+match it. §AK.3 changed the rule to `max-width: 100%` — `vw` counts the 15px
+the page reserves with `scrollbar-gutter: stable`, declared on `html` and not
+on the dialog, which put a horizontal scrollbar under a 1600px scan that would
+otherwise have fitted — and updated the stylesheet comment, but not this entry
+or the quote above it. Both corrected 15 September 2026. The one branch that
+opts out of the cap is `.doc-viewer-scroll img.doc-fit-height` under
+`max-width: 43.75em` **and `orientation: portrait`** (§65), where a
+landscape-shaped scan sizes from height instead and `max-width: none` lets it
+be panned. §AK.3 calls that "the landscape branch", meaning the shape of the
+scan and not the orientation of the phone.
 
 ## §63 — `.doc-viewer-loading`
 
@@ -1741,8 +1777,9 @@ so check whether it closed early for a bad reason before raising the ceiling.
 The footer claimed CC BY-NC-SA over the whole site. The site reproduces
 material that isn't ours: two Facebook posts by Luciano Banchelli, scanned
 pages from Elserino Piol's *Il sogno di un'impresa* (Il Sole 24 Ore, 2004) and
-Sandro Sartor's *Via Jervis, n. 11* (Manni, 2005), press images, and the
-Quercia photographs from two Facebook groups. You cannot license under CC what
+Sandro Sartor's *Via Jervis, n. 11* (Manni, 2005), press images, and on
+`quercia.html` both the photographs of the tree and Valido Capodarca's two
+posts, all of it from two Facebook groups. You cannot license under CC what
 you do not own, so the claim was wrong as written.
 
 **What was already right, and is the load-bearing part.** Italian quotation
@@ -1794,10 +1831,17 @@ qualifier; repeating the note on each would be noise.
   keep in step, for three lines of text.
 
 **Not a legal opinion.** This is an editorial decision about how the site
-presents itself. If the site ever draws real traffic, the Banchelli screenshots
-are the item worth a professional read — they are full reproductions of short
-works, which sits closer to the edge of art. 70 than an excerpted book page
-does.
+presents itself. If the site ever draws real traffic, two items are worth a
+professional read, and they are the same case: **Banchelli's two posts** on
+`discorso.html` and **Capodarca's two posts** on `quercia.html`. Each is
+reproduced whole, by different means — Banchelli as a screenshot of the post
+plus a `.visually-hidden` transcription, Capodarca as a transcription in
+`text-quercia-1` and `text-quercia-2`, opened from the document viewer beside
+photographs of the tree rather than of the post. A full reproduction of a
+short work sits closer to the edge of art. 70 than an excerpted book page
+does, and short social posts are the only material here in that shape.
+Capodarca was missing from this paragraph until 15 September 2026, which made
+the risk read as confined to one page when it is the same risk on two.
 
 ## §J — The breakpoint ladder, and why it stays six rungs
 
@@ -1899,8 +1943,16 @@ would have been worse: `capellaro.webp` is one of six `.clump-photo` images that
 are supposed to land as a simultaneous cluster, and it was the only one marked.
 
 **The rule this establishes.** Every content image on this site is animated —
-`.reveal-img`, `.essay-anim` or `.clump-photo`, all 34 of them, without a single
-exception. There is no such thing here as a change to image scheduling that is
+`.reveal-img`, `.essay-anim` or `.clump-photo`, without a single exception.
+Counted per language on 15 September 2026: 30 `<img>` in `<main>` across the
+seven pages, 28 of them inside one of those three, and the two that are not
+are `.essay-divider` and `.essay-ornament` on Home, which are rules and a
+tailpiece rather than photographs (§AM). **This paragraph said "all 34 of
+them" and no reading of the markup produces 34** — elements give 37, images
+30, images including the rotator's two placeholder frames 32. Corrected 15
+September 2026. Say what is being counted, or the number drifts and nobody
+can check it.
+There is no such thing here as a change to image scheduling that is
 not also a change to the animations. Any optimisation phrased as "defer",
 "deprioritise", "reorder" or "prioritise" is touching the site's primary visual
 language, and has to be judged on how the images *arrive*, not on a waterfall.
@@ -1925,8 +1977,12 @@ fourteen files are the same.
 **What is left, and it is nothing.** No `loading`, no `fetchpriority`, no
 `decoding` attribute on any image. Every image is fetched eagerly at the
 browser's own priority, which is what the animations need. The remaining
-image-weight work is encoding, not scheduling: see the audit note on the
-decorative SVGs, where the bytes are real and the timing is not involved.
+image-weight work is encoding, not scheduling, and it is settled elsewhere:
+the payload as a whole in §AM, *Non-decisions*, and the one file big enough to
+argue about — `sfondi/sgimignano.svg` at 377 KB — in §28, which is where its
+detail turns out to be load-bearing rather than decorative. **This sentence
+pointed at "the audit note on the decorative SVGs" and no such note was ever
+written**; repointed 15 September 2026.
 
 
 ## §L — Two colour declarations the dark page never made
@@ -3720,6 +3776,17 @@ measure bytes of `/* */` against total bytes, which is the figure both passes
 used; anything that counts blank lines as comment will read about four points
 high.
 
+**The figures above are character counts, not bytes.** Measured 15 September
+2026 against the file as it stood before that day's edits: 100,232 bytes and
+99,583 characters, comment share 53.33% by byte against 53.03% by character.
+The second pass recorded "99,562 bytes, 53.0%" — 21 off the character count
+and 670 off the byte count, and the percentage matches the character reading
+to the decimal, so it is characters that were written down under a byte
+instruction. The gap is the file's own em dashes and arrows, two and three
+bytes each in UTF-8. It is 0.3 of a percentage point and changes no decision;
+it is recorded because an instruction and the numbers taken under it should
+not disagree. Whichever is used next, say which.
+
 Four notes had no home here at all. They are below, so the stylesheet can
 point at them instead of carrying them.
 
@@ -4168,13 +4235,14 @@ every selector that was reaching it has to be re-read.
 
 ### Non-decisions
 
-Eight things an earlier audit raised that were settled in conversation and
+Ten things an earlier audit raised that were settled in conversation and
 never written down, so each audit since has raised them again. Written down
-now, one line apiece.
+now, one line apiece. The last two were added 15 September 2026, after an
+audit raised both and found no row to check them against.
 
 | | Decision |
 |---|---|
-| CLS from fonts on Home, 0.09 on a slow network | Accepted; `font-display: swap` on all nine faces is the trade we want |
+| CLS from fonts on Home, 0.09 on a slow network | Accepted; `font-display: swap` on all ten faces is the trade we want (this row said nine until 15 September 2026; there are ten `.woff2` files and ten `@font-face` blocks) |
 | Quercia unreachable from the nav | Intentional — it is an easter egg, found through the link in the Home essay |
 | No custom `404.html` | Overkill for a site this size |
 | Quercia has no `aria-current` | Correct: no nav entry corresponds to it, so highlighting one would be a lie |
@@ -4182,10 +4250,12 @@ now, one line apiece.
 | LinkedIn and Twitter disagree on `og:image` crops | Known, and not worth a second image set |
 | Home carries no watermark | By choice: it is the essay, not a document page |
 | Index shows four cards for five destinations | By choice — the fifth is Quercia, see above |
+| Comments shipped to readers: no minification step | Accepted. `README.md`'s first line is the constraint — no build tools — and the served files are the edited files. §AI keeps the cost in range by pruning the source instead, twice now; the figure to watch is the gzipped one, 29,837 bytes of CSS and 20,809 of JS at gzip level 9, measured 15 September 2026 — not the raw. Bytes, and stated as bytes: see the unit note in §AI's opening section |
+| `DECISIONS.md` and `README.md` served publicly | Accepted, and not an oversight: about a quarter of a megabyte of Markdown at `/DECISIONS.md` and `/README.md`, served raw because neither carries YAML front matter for Jekyll to process. No exact figure here on purpose — it moves with every edit to either file. No page links to either (checked: zero `.md` hrefs in the fourteen), and they hold nothing the public repository does not. Do not add a `robots.txt` rule — `Disallow` on an unlinked file advertises it |
 
 ### Open, measured, and left
 
-Seven items verified in place and judged not worth acting on. Not bugs found
+Eight items verified in place and judged not worth acting on. Not bugs found
 and ignored: each has a number attached and a reason to stay.
 
 | | Why it stays |
@@ -4193,6 +4263,7 @@ and ignored: each has a number attached and a reason to stay.
 | `quercia.html` in `sitemap.xml` | A sitemap is an invitation to index, which pulls against the easter egg; the tension is accepted rather than resolved |
 | 41 patent PDFs with no text layer | Real (0 characters from all 41, 403 pages, 33MB) but inherited from the patent offices; an OCR pass is a project, not a fix |
 | `.essay-divider img` and `.essay-ornament img` without `aspect-ratio` | Neither `<img>` carries `width`/`height` and neither rule sets a height, so each box is 0 tall until its SVG lands: the divider jumps 51.36 / 27.09 / 21.28px and the ornament 100.81 / 69.44 / 54.58px at 1280 / 390 / 320px. Both are small local SVGs, the ornament sits at the very foot of the page, and the pair stays as it is |
+| Pointers with no entry | The reverse failure of the row below, and the one this file had no check for. §K closed on "see the audit note on the decorative SVGs" and no such note existed; found and repointed 15 September 2026. Swept the same day: every `§` reference in `style.css`, `animations.js`, `README.md` and this file resolves to one of the 137 headings. The sweep also caught the prose form — "see the …" and "the note on …" — and found one other, "the retirement note in §O", which resolves. A prose pointer phrased some third way would not have been caught. Worth re-running whenever an entry is retired, since a retired entry is how the next one gets made |
 | Entries no code comment points to | Seven of 137: §F, §N, §Q, §U, §W, §Z, §AG. (§AI, §AK and §AL are containers whose subentries are pointed at, so they reach.) Content is right in each, the pointer is missing — measured 14 September 2026, when this row still said §Z was the only one of 122 |
 | `.ritagli-band li::before` at `#999` | 3.014:1 on the `@supports not (backdrop-filter)` fallback — a decorative marker, above the 3:1 floor for non-text, and the attribution beside it is 6.32:1 |
 | CSP via `<meta>` for `script-src` | Feasible — the inline head script is byte-identical on all 14 pages, one SHA-256 — but `style-src` would still need `unsafe-inline` for ~40 custom-property attributes, and `frame-ancestors` cannot go in a `<meta>` at all |
