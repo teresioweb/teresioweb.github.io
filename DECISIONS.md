@@ -96,7 +96,7 @@ split and are each about a decision rather than a rule.
 | §AK | Five fixes from the same pass |
 | §AL | Two more, at 320px and 200% |
 | §AM | Two small fixes, and a ledger of what was left alone |
-| §AN | Seven drifts, two phantoms, one bad fix, and a checker |
+| §AN | Seven drifts, two phantoms, and one bad fix |
 
 ---
 
@@ -4328,14 +4328,15 @@ published patent application and is already public in that record.
 
 ---
 
-## §AN — Seven drifts, two phantoms, one bad fix, and a checker
+## §AN — Seven drifts, two phantoms, and one bad fix
 
 A running check measured `README.md` and this file against the code rather
-than against each other. Seven things had drifted, the seventh found only once
-a browser was available. Two more were reported and
-were not real. A seventh was real, was "fixed" wrongly, and was reverted the
-same day. The three failures are the more useful half of the entry: all three
-are reproducible, and a later audit will reach them again.
+than against each other. Seven things had drifted: six found by reading, and one — a rounded byte
+figure presented as exact — found only once a browser was available. Two more
+were reported and were not real. And one of the seven was then fixed the wrong
+way and reverted the same day. Those three failures, the two phantoms and the
+bad fix, are the more useful half of the entry: all three are reproducible, and
+a later audit will reach them again.
 
 ### The two that were not drift
 
@@ -4524,12 +4525,22 @@ other's; measure both, or state one and let the other be looked up.
 
 ### What this pass is really about
 
-Four of the six are the same shape: a number or a rule that was right when
-it was written, and a change elsewhere that moved what it described. The
-README's US document claim was overtaken by §AG. "Seven of 137" was overtaken
-by the subentries. Two were never true at all — the `@language` line, and §R's
-version of the US claim — which is the kind this file cannot catch by
-re-measuring, only by reading a rule against the thing it claims to describe.
+The seven are not one kind of failure, and the mix is the point.
+
+**Two were right when written and overtaken since**: the README's US document
+claim, overtaken by §AG, and "Seven of 137", overtaken by the subentries. These
+are the only kind re-measuring catches.
+
+**Three were never true at all**: the `@language` line, §R's version of the US
+claim, and section 1's figures with no unit beside them. No measurement finds
+these, because each one measures correctly against the wrong question. They are
+caught only by reading a rule against the thing it claims to describe.
+
+**One was true to its own precision and called exact**: 127,000 for 127,056. It
+survived every check that used the rounding it introduced.
+
+**And one is still unresolved**: eleven against a list of ten, left contradictory
+on purpose rather than settled by amending whichever half was shorter.
 
 And the two phantoms are the argument for this section existing. A finding
 that survives one check and dies on the second costs an edit that would have
