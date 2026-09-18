@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Favicon: the "T" from Teresio's own signature (sfondi/firma.svg),
+     isolated and rendered in black rather than the brand's signature
+     blue (#2974AE) or any of the link blues used elsewhere on the
+     site — a deliberately neutral, ink-like colour for a small
+     16-32px mark that needs to read clearly against both light and
+     dark browser chrome (tab bars, bookmark bars) regardless of
+     theme, rather than carrying a colour association tied to a
+     specific on-page context. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20.252437 27.071875">
+  <path
+    fill="#000000"
+    stroke="#000000"
+    stroke-width="0.7"
+    d="m 9.288729,25.898930 c -2.43673,-3.71952 0.78895,-8.67982 0.20611,-12.83584 -1.10987,-3.94601 -2.67596,-6.01972 -5.868933,-8.58412 -2.080241,-0.12278 -5.2965481,-5.63774 -1.546375,-3.72911 4.501678,4.19546 11.068258,3.84461 16.736328,3.2736 4.12651,1.4213 -4.70861,2.05906 -6.41881,2.02633 -3.62917,1.15945 -0.77666,6.89304 -0.57734,9.60327 0.77031,3.54936 0.23923,7.42049 -1.8575,10.4395 l -0.67348,-0.19366 z m 1.22402,-3.8373 c 0.69029,-2.08939 0.32401,-8.66962 -0.43831,-3.23324 -0.15013,0.59993 -0.69549,6.93035 0.43831,3.23324 z m -0.46621,-13.62604 c 0.64291,-2.89874 -3.93554,-3.76793 -1.84163,-0.56504 -0.0506,0.44461 2.5021,2.88629 1.84163,0.56504 z"
+  />
+</svg>
